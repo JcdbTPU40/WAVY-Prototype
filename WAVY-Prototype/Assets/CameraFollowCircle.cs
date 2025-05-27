@@ -5,7 +5,7 @@ public class CameraFollowCircle : MonoBehaviour
 {
     public Transform player;
     public float offset = 6f;
-    public float height = 8f;
+    public float height = 5f;
     public float smoothSpeed = 5f;
     public float peekOffset = 2f;
     public static bool IsPeeking { get; private set; } = false;
