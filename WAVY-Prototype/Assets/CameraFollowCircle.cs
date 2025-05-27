@@ -50,7 +50,7 @@ public class CameraFollowCircle : MonoBehaviour
         float baseZ = Mathf.Sin(angle) * camRadius;
 
         // 覗き見角度：最大 ±0.5ラジアン（約30度）
-        float peekAngle = angle + (lookInput.x * 0.5f);
+        float peekAngle = angle + (lookInput.x * 1.5f);
         float peekX = Mathf.Cos(peekAngle) * peekOffset;
         float peekZ = Mathf.Sin(peekAngle) * peekOffset;
 

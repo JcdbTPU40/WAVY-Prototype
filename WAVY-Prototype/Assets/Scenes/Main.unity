@@ -273,6 +273,7 @@ MonoBehaviour:
   offset: 6
   height: 4
   smoothSpeed: 5
+  peekOffset: 2
 --- !u!1 &410087039
 GameObject:
   m_ObjectHideFlags: 0
