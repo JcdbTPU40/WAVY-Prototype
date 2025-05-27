@@ -5,7 +5,7 @@ public class CameraFollowCircle : MonoBehaviour
 {
     public Transform player;
     public float offset = 6f;
-    public float height = 8f;
+    public float height = 5f;
     public float smoothSpeed = 5f;
     public float peekOffset = 2f;
     public static bool IsPeeking { get; private set; } = false;
@@ -50,7 +50,7 @@ public class CameraFollowCircle : MonoBehaviour
         float baseZ = Mathf.Sin(angle) * camRadius;
 
         // 覗き見角度：最大 ±0.5ラジアン（約30度）
-        float peekAngle = angle + (lookInput.x * 0.5f);
+        float peekAngle = angle + (lookInput.x * 1.5f);
         float peekX = Mathf.Cos(peekAngle) * peekOffset;
         float peekZ = Mathf.Sin(peekAngle) * peekOffset;
 
