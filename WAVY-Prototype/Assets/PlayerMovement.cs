@@ -5,7 +5,7 @@ public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed = 5f;
     public float radius = 9f;         // Œ»İ‚Ì”¼Œa
-    public float minRadius = 1.5f;    // ’†S‚É‹ß‚Ã‚¯‚éÅ¬”¼Œa
+    public float minRadius = 3f;    // ’†S‚É‹ß‚Ã‚¯‚éÅ¬”¼Œa
     public float maxRadius = 9f;      // ŠOü‚ÌÅ‘å”¼Œa
 
     private float angle = 0f;
@@ -21,6 +21,16 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
+        // ”`‚«’†‚È‚ç‹­§“I‚ÉˆÚ“®“ü—Í‚ğƒ[ƒ‚É‚·‚é
+        bool shift = Keyboard.current.leftShiftKey.isPressed || Keyboard.current.rightShiftKey.isPressed;
+        bool leftPeek = Keyboard.current.aKey.isPressed;
+        bool rightPeek = Keyboard.current.dKey.isPressed;
+
+        if ((shift && leftPeek) || (shift && rightPeek) || CameraFollowCircle.IsPeeking)
+        {
+            moveInput = Vector2.zero;
+        }
+
         // ¶‰EˆÚ“®i‰~üã‚ÌˆÚ“®j
         float arcLength = moveInput.x * moveSpeed * Time.deltaTime;
         float deltaAngle = arcLength / radius;
@@ -45,6 +55,7 @@ public class PlayerMovement : MonoBehaviour
 
     public void OnMove(InputValue value)
     {
-        moveInput = value.Get<Vector2>();
+            moveInput = value.Get<Vector2>();
     }
+
 }
