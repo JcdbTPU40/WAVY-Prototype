@@ -12,6 +12,7 @@ GameObject:
   - component: {fileID: 9060044559178579478}
   - component: {fileID: 4670597929490509985}
   - component: {fileID: 836320255192975292}
+  - component: {fileID: 4713029524156861078}
   m_Layer: 0
   m_Name: EnemyPrefab
   m_TagString: Untagged
@@ -102,9 +103,23 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Radius: 0.5
+  m_Radius: 10
   m_Center: {x: 0, y: 0, z: 0}
+--- !u!114 &4713029524156861078
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 517447222957638221}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7d68cb8c9a96222448f960586b8332b6, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  EnemySpeed: 1
+  AtDistance: 2
