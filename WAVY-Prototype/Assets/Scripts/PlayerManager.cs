@@ -3,28 +3,32 @@ using UnityEngine;
 public class PlayerManager : MonoBehaviour
 {
     InputManager inputManager;
-    CameraManager cameraManager; // Reference to the CameraManager
+    CameraManager cameraManager;
     PlayerLocomotion playerLocomotion;
+    PlayerCombat playerCombat; // 攻撃システムを追加
 
     private void Awake()
     {
         inputManager = GetComponent<InputManager>();
-        cameraManager = Object.FindAnyObjectByType<CameraManager>(); // Find the CameraManager in the scene 
+        cameraManager = Object.FindAnyObjectByType<CameraManager>();
         playerLocomotion = GetComponent<PlayerLocomotion>();
+        playerCombat = GetComponent<PlayerCombat>(); // 攻撃システムのコンポーネントを取得
     }
 
     private void Update()
     {
-        inputManager.HandleAllInputs(); // Handle all player inputs
+        inputManager.HandleAllInputs();
+
+        playerCombat.HandleAllCombatInput();
     }
 
     private void FixedUpdate()
     {
-        playerLocomotion.HandleAllMovement(); // Handle all player movement
+        playerLocomotion.HandleAllMovement();
     }
 
     private void LateUpdate()
     {
-        cameraManager.HandleAllCameraMovement(); // Update camera position to follow the player
+        cameraManager.HandleAllCameraMovement();
     }
 }

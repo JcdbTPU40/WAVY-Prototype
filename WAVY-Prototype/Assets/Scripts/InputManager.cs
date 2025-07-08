@@ -15,6 +15,8 @@ public class InputManager : MonoBehaviour
     public float verticalInput;
     public float horizontalInput;
 
+    public bool attackInput;
+
     private void Awake()
     {
         animatorManager = GetComponent<AnimatorManager>();
@@ -28,6 +30,7 @@ public class InputManager : MonoBehaviour
 
             playerControls.Player.Move.performed += i => movementInput = i.ReadValue<Vector2>();
             playerControls.Player.Camera.performed += i => cameraInput = i.ReadValue<Vector2>();
+            playerControls.Player.Attack.performed += i => attackInput = true;
         }
 
         playerControls.Enable();
@@ -41,6 +44,7 @@ public class InputManager : MonoBehaviour
     public void HandleAllInputs()
     {
         HandleMovementInput();
+        //HandleAttackInput();
         //HandleJumpingInput();
         //HandleActionInput();
     }
@@ -55,5 +59,13 @@ public class InputManager : MonoBehaviour
 
         moveAmount = Mathf.Clamp01(Mathf.Abs(verticalInput) + Mathf.Abs(horizontalInput));
         animatorManager.UpdateAnimatorValues(0, moveAmount);
+    }
+
+    private void HandleAttackInput()
+    {
+        if (attackInput)
+        {
+            attackInput = false; // Reset attack input after handling
+        }
     }
 }
