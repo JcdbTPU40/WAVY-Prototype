@@ -25,27 +25,20 @@ public class PlayerLocomotion : MonoBehaviour
     {
         HandleMovement(); // Handle player movement
         HandleRotation(); // Handle player rotation
-        
     }
 
     private void HandleMovement()
     {
-        moveDirection = cameraObject.forward * inputManager.verticalInput; // Movement Input
-        moveDirection += cameraObject.right * inputManager.horizontalInput; // Horizontal Input
-        moveDirection.Normalize(); // Normalize to ensure consistent speed
-        moveDirection.y = 0; // Keep movement on the horizontal plane
+        moveDirection = cameraObject.forward * inputManager.verticalInput;
+        moveDirection += cameraObject.right * inputManager.horizontalInput;
+        moveDirection.Normalize();
+        moveDirection.y = 0;
 
-        if (inputManager.moveAmount > 0.5f)
-        {
-            moveDirection *= runningSpeed;
-        }
-        else
-        {
-            moveDirection *= walkingSpeed;
-        }
-
-        Vector3 movementVelocity = moveDirection;
-        playerRigidbody.linearVelocity = movementVelocity; // Adjust speed as needed
+        float currentSpeed = inputManager.moveAmount > 0.5f ? runningSpeed : walkingSpeed;
+        
+        // 水平方向の速度のみを制御
+        Vector3 horizontalVelocity = new Vector3(moveDirection.x * currentSpeed, playerRigidbody.linearVelocity.y, moveDirection.z * currentSpeed);
+        playerRigidbody.linearVelocity = horizontalVelocity;
     }
 
     private void HandleRotation()
