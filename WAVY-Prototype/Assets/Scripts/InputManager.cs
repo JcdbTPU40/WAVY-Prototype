@@ -58,7 +58,7 @@ public class InputManager : MonoBehaviour
         cameraInputX = cameraInput.x;
 
         moveAmount = Mathf.Clamp01(Mathf.Abs(verticalInput) + Mathf.Abs(horizontalInput));
-        animatorManager.UpdateAnimatorValues(0, moveAmount);
+        //animatorManager.UpdateAnimatorValues(0, moveAmount);
     }
 
     private void HandleAttackInput()

@@ -11,7 +11,7 @@ public class PlayerManager : MonoBehaviour
     {
         inputManager = GetComponent<InputManager>();
         cameraManager = Object.FindAnyObjectByType<CameraManager>();
-        playerLocomotion = GetComponent<PlayerLocomotion>();
+        //playerLocomotion = GetComponent<PlayerLocomotion>();
         playerCombat = GetComponent<PlayerCombat>(); // 攻撃システムのコンポーネントを取得
     }
 
@@ -24,7 +24,7 @@ public class PlayerManager : MonoBehaviour
 
     private void FixedUpdate()
     {
-        playerLocomotion.HandleAllMovement();
+        //playerLocomotion.HandleAllMovement();
     }
 
     private void LateUpdate()

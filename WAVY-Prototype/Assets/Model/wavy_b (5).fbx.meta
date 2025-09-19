@@ -1,5 +1,5 @@
 fileFormatVersion: 2
-guid: bdb018215e83a4847a55063fb9643e1b
+guid: 59e8a278bdb3ba1489885cb7a2dc3e4a
 ModelImporter:
   serializedVersion: 22200
   internalIDToNameTable: []
@@ -81,13 +81,13 @@ ModelImporter:
     serializedVersion: 3
     human: []
     skeleton:
-    - name: wavy_b(Clone)
+    - name: wavy_b (5)(Clone)
       parentName: 
       position: {x: 0, y: 0, z: 0}
       rotation: {x: 0, y: 0, z: 0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: wavy
-      parentName: wavy_b(Clone)
+      parentName: wavy_b (5)(Clone)
       position: {x: -0, y: -0.4737437, z: 0.12630346}
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
@@ -117,7 +117,7 @@ ModelImporter:
       rotation: {x: 0, y: -0, z: -0, w: 1}
       scale: {x: 1, y: 1, z: 1}
     - name: Hip
-      parentName: wavy_b(Clone)
+      parentName: wavy_b (5)(Clone)
       position: {x: -0, y: 0.01, z: 0}
       rotation: {x: -0.69437754, y: 0.71319836, z: 0.0023701612, w: 0.095824674}
       scale: {x: 1, y: 1.0000005, z: 1.000001}
