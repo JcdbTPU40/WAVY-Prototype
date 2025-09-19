@@ -27,7 +27,7 @@ public class CameraManager : MonoBehaviour
     private void Awake()
     {
         inputManager = Object.FindAnyObjectByType<InputManager>();
-        targetTransform = Object.FindAnyObjectByType<PlayerManager>().transform;
+        targetTransform = Object.FindAnyObjectByType<PlayerScript>().transform;
         cameraTransform = Camera.main.transform;
         defaultPosition = cameraTransform.localPosition.z; // Store the default position of the camera
     }
