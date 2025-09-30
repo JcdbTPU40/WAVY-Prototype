@@ -3,6 +3,10 @@ using UnityEngine.AI;
 
 public class EnemyScript : MonoBehaviour
 {
+    [Header("経験値プレハブと生成位置")]
+    [SerializeField] GameObject exp_Prefab;
+    [SerializeField] Transform[] exp_Spawnpoint;
+    
      [Header("移動速度")]
     public float EnemySpeed;
 
@@ -97,6 +101,10 @@ public class EnemyScript : MonoBehaviour
                 //agent.enabled = false;
                 //}
 
+                for (int i = 0; i < exp_Spawnpoint.Length; i++)
+                {
+                    Instantiate(exp_Prefab, exp_Spawnpoint[i].position, Quaternion.identity);
+                }
                 Destroy(gameObject, DeathTime);
             }
         }
