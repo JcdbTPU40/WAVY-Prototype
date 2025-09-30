@@ -1,144 +1,330 @@
-using UnityEngine;
 using System.Collections;
+using UnityEngine;
 
 public class PlayerCombat : MonoBehaviour
 {
-    InputManager inputManager;
-    AnimatorManager animatorManager;
+	InputManager inputManager;
+	AnimatorManager animatorManager;
+	Animator animator;
+	CharacterController characterController;
 
-    [Header("Attack Settings")]
-    public float attackDamage = 20f;
-    public float attackRange = 2f;
-    public float attackCooldown = 1f;
-    // public LayerMask enemyLayers = 1; // 敵のレイヤーマスク
+	[Header("Attack Settings")]
+	public float attackDamage = 20f;
+	public float attackRange = 2f;
+	public float attackCooldown = 1f;
 
-    [Header("Attack Animation")]
-    public float attackAnimationDuration = 0.5f;
+	[Header("Beam Attack Settings")]
+	public GameObject beamPrefab;
+	public float beamDuration = 2f;
+	public float beamCooldown = 3f;
+	public Vector3 beamOffset = new Vector3(0f, 0f, 2f);
 
-    private bool canAttack = true;
-    private bool isAttacking = false;
+	[Header("Charge Attack Settings")]
+	public float chargeDistance = 5f;
+	public float chargeDuration = 0.4f;
+	public float chargeCooldown = 3f;
+	public float chargeHitRadius = 1.5f;
 
-    private void Awake()
-    {
-        inputManager = GetComponent<InputManager>();
-        animatorManager = GetComponent<AnimatorManager>();
-    }
+	[Header("Animation Timings")]
+	public float attackAnimationDuration = 0.5f;
 
-    public void HandleAllCombatInput()
-    {
-        HandleAttackInput();
-    }
+	[Header("Animator Parameters")]
+	[SerializeField] string attackBoolName = "Attack";
+	[SerializeField] string tailTriggerName = "Tail";
+	[SerializeField] string beamTriggerName = "Beam";
+	[SerializeField] string chargeTriggerName = "Charge";
 
-    private void HandleAttackInput()
-    {
-        Debug.Log($"攻撃入力チェック: attackInput={inputManager.attackInput}, canAttack={canAttack}, isAttacking={isAttacking}");
-        
-        if (inputManager.attackInput && canAttack && !isAttacking)
-        {
-            Debug.Log("攻撃入力を受け取りました。攻撃を実行します。");
-            PerformAttack();
-            
-            // 攻撃入力をリセット
-            inputManager.attackInput = false;
-        }
-        else if (inputManager.attackInput)
-        {
-            // 攻撃できない理由をログ出力
-            if (!canAttack)
-                Debug.Log("攻撃がクールダウン中です");
-            if (isAttacking)
-                Debug.Log("既に攻撃中です");
-            
-            // 攻撃入力をリセット
-            inputManager.attackInput = false;
-        }
-    }
+	bool canAttack = true;
+	bool canBeam = true;
+	bool canCharge = true;
+	bool isAttacking;
+	bool isCharging;
 
-    private void PerformAttack()
-    {
-        isAttacking = true;
-        canAttack = false;
+	bool hasAttackBool;
+	bool hasTailTrigger;
+	bool hasBeamTrigger;
+	bool hasChargeTrigger;
 
-        Debug.Log("攻撃を実行中...");
+	void Awake()
+	{
+		inputManager = GetComponent<InputManager>();
+		animatorManager = GetComponent<AnimatorManager>();
+		animator = GetComponent<Animator>();
+		characterController = GetComponent<CharacterController>();
 
-        // アニメーション再生（AnimatorManagerがある場合）
-        if (animatorManager != null)
-        {
-            Debug.Log("攻撃アニメーションを再生");
-            animatorManager.PlayTargetAnimation("Attack", true);
-        }
-        else
-        {
-            Debug.Log("AnimatorManagerが見つかりません");
-        }
+		if (animator != null)
+		{
+			hasAttackBool = HasParameter(attackBoolName, AnimatorControllerParameterType.Bool);
+			hasTailTrigger = HasParameter(tailTriggerName, AnimatorControllerParameterType.Trigger);
+			hasBeamTrigger = HasParameter(beamTriggerName, AnimatorControllerParameterType.Trigger);
+			hasChargeTrigger = HasParameter(chargeTriggerName, AnimatorControllerParameterType.Trigger);
+		}
+	}
 
-        // 敵の検知は後で実装
-        // DetectEnemies();
+	bool HasParameter(string paramName, AnimatorControllerParameterType type)
+	{
+		if (animator == null || string.IsNullOrEmpty(paramName))
+		{
+			return false;
+		}
 
-        // クールダウン開始
-        StartCoroutine(AttackCooldown());
-    }
+		foreach (var param in animator.parameters)
+		{
+			if (param.type == type && param.name == paramName)
+			{
+				return true;
+			}
+		}
 
-    private void DetectEnemies()
-    {
-        // プレイヤーの前方に攻撃判定を作成
-        Vector3 attackPosition = transform.position + transform.forward * (attackRange / 2);
-        
-        // 球状の攻撃範囲で敵を検出
-        Collider[] hitEnemies = Physics.OverlapSphere(attackPosition, attackRange);
+		return false;
+	}
 
-        Debug.Log($"攻撃判定: {hitEnemies.Length}体の敵を検出");
+	public void HandleAllCombatInput()
+	{
+		if (inputManager == null)
+		{
+			return;
+		}
 
-        // 敵へのダメージ処理は後で実装
-        /*
-        foreach (Collider enemy in hitEnemies)
-        {
-            // 敵のHealthコンポーネントを取得してダメージを与える
-            EnemyHealth enemyHealth = enemy.GetComponent<EnemyHealth>();
-            if (enemyHealth != null)
-            {
-                enemyHealth.TakeDamage(attackDamage);
-                Debug.Log($"敵 {enemy.name} に {attackDamage} ダメージを与えました！");
-            }
-        }
-        */
-    }
+		HandleAttackInput();
+		HandleTailInput();
+		HandleBeamInput();
+		HandleChargeInput();
+	}
 
-    private IEnumerator AttackCooldown()
-    {
-        yield return new WaitForSeconds(attackAnimationDuration);
-        isAttacking = false;
-        
-        // Attackパラメータをfalseにリセット
-        if (animatorManager != null)
-        {
-            animatorManager.PlayTargetAnimation("Idle", false); // または別の方法でfalseに設定
-        }
-        
-        Debug.Log("攻撃アニメーション終了");
-        
-        yield return new WaitForSeconds(attackCooldown - attackAnimationDuration);
-        canAttack = true;
-        Debug.Log("攻撃クールダウン終了");
-    }
+	void HandleAttackInput()
+	{
+		if (inputManager.attackInput && canAttack && !isAttacking && !isCharging)
+		{
+			PerformAttack();
+		}
 
-    // 攻撃範囲を可視化（デバッグ用）
-    private void OnDrawGizmosSelected()
-    {
-        if (transform != null)
-        {
-            Gizmos.color = Color.red;
-            Vector3 attackPosition = transform.position + transform.forward * (attackRange / 2);
-            Gizmos.DrawWireSphere(attackPosition, attackRange);
-        }
-    }
+		inputManager.attackInput = false;
+	}
 
-    public void SetAttackState(bool state)
-    {
-        Animator animator = GetComponent<Animator>();
-        if (animator != null)
-        {
-            animator.SetBool("Attack", state);
-        }
-    }
+	void HandleTailInput()
+	{
+		if (inputManager.tailInput && canAttack && !isAttacking && !isCharging)
+		{
+			PerformTailAttack();
+		}
+
+		inputManager.tailInput = false;
+	}
+
+	void HandleBeamInput()
+	{
+		if (inputManager.beamInput && canBeam && !isAttacking && !isCharging)
+		{
+			PerformBeamAttack();
+		}
+
+		inputManager.beamInput = false;
+	}
+
+	void HandleChargeInput()
+	{
+		if (inputManager.chargeInput && canCharge && !isAttacking && !isCharging)
+		{
+			PerformChargeAttack();
+		}
+
+		inputManager.chargeInput = false;
+	}
+
+	void PerformAttack()
+	{
+		isAttacking = true;
+		canAttack = false;
+
+		TriggerAttackAnimation(true, true, "Attack");
+
+		StartCoroutine(AttackCooldownRoutine());
+	}
+
+	void PerformTailAttack()
+	{
+		isAttacking = true;
+		canAttack = false;
+
+		TriggerAttackAnimation(true, true, "Attack");
+
+		StartCoroutine(AttackCooldownRoutine());
+	}
+
+	void TriggerAttackAnimation(bool useTailTrigger, bool useAttackBool, string fallbackAnimationName)
+	{
+		bool triggered = false;
+
+		if (animator != null)
+		{
+			if (useTailTrigger && hasTailTrigger)
+			{
+				animator.SetTrigger(tailTriggerName);
+				triggered = true;
+			}
+			if (useAttackBool && hasAttackBool)
+			{
+				animator.SetBool(attackBoolName, true);
+				triggered = true;
+			}
+		}
+
+		if (!triggered && animatorManager != null && !string.IsNullOrEmpty(fallbackAnimationName))
+		{
+			animatorManager.PlayTargetAnimation(fallbackAnimationName, true);
+		}
+	}
+
+	void PerformBeamAttack()
+	{
+		canBeam = false;
+
+		if (animator != null)
+		{
+			if (hasBeamTrigger)
+			{
+				animator.SetTrigger(beamTriggerName);
+			}
+			else if (hasChargeTrigger)
+			{
+				animator.SetTrigger(chargeTriggerName);
+			}
+		}
+		else if (animatorManager != null)
+		{
+			animatorManager.PlayTargetAnimation("Beam", true);
+		}
+
+		if (beamPrefab != null)
+		{
+			Vector3 spawnPosition = transform.position + transform.TransformDirection(beamOffset);
+			Quaternion spawnRotation = transform.rotation * Quaternion.Euler(90f, 0f, 0f);
+			GameObject beamInstance = Instantiate(beamPrefab, spawnPosition, spawnRotation);
+			beamInstance.transform.localScale = new Vector3(10f, 100f, 10f);
+			StartCoroutine(DestroyAfterDelay(beamInstance, beamDuration));
+		}
+		else
+		{
+			Debug.LogWarning("Beam prefab が設定されていません", this);
+		}
+
+		StartCoroutine(BeamCooldownRoutine());
+	}
+
+	void PerformChargeAttack()
+	{
+		isCharging = true;
+		canCharge = false;
+
+		if (animator != null)
+		{
+			if (hasChargeTrigger)
+			{
+				animator.SetTrigger(chargeTriggerName);
+			}
+		}
+		else if (animatorManager != null)
+		{
+			animatorManager.PlayTargetAnimation("Charge", true);
+		}
+
+		StartCoroutine(ChargeMoveRoutine());
+		StartCoroutine(ChargeCooldownRoutine());
+	}
+
+	IEnumerator AttackCooldownRoutine()
+	{
+		yield return new WaitForSeconds(attackAnimationDuration);
+		isAttacking = false;
+
+		if (animator != null && hasAttackBool)
+		{
+			animator.SetBool(attackBoolName, false);
+		}
+
+		yield return new WaitForSeconds(Mathf.Max(0f, attackCooldown - attackAnimationDuration));
+		canAttack = true;
+	}
+
+	IEnumerator BeamCooldownRoutine()
+	{
+		yield return new WaitForSeconds(beamCooldown);
+		canBeam = true;
+	}
+
+	IEnumerator ChargeMoveRoutine()
+	{
+		Vector3 direction = transform.forward;
+		float elapsed = 0f;
+		float speed = chargeDistance / Mathf.Max(0.01f, chargeDuration);
+
+		while (elapsed < chargeDuration)
+		{
+			float delta = Time.deltaTime;
+			Vector3 movement = direction * speed * delta;
+			MoveCharacter(movement);
+			DetectAndRemoveEnemies();
+
+			elapsed += delta;
+			yield return null;
+		}
+
+		DetectAndRemoveEnemies();
+		isCharging = false;
+	}
+
+	IEnumerator ChargeCooldownRoutine()
+	{
+		yield return new WaitForSeconds(chargeCooldown);
+		canCharge = true;
+	}
+
+	void MoveCharacter(Vector3 displacement)
+	{
+		if (characterController != null)
+		{
+			Vector3 verticalVelocity = Vector3.zero;
+			if (!characterController.isGrounded)
+			{
+				verticalVelocity.y = Physics.gravity.y * Time.deltaTime;
+			}
+
+			characterController.Move(displacement + verticalVelocity);
+		}
+		else
+		{
+			transform.position += displacement;
+		}
+	}
+
+	void DetectAndRemoveEnemies()
+	{
+		Collider[] colliders = Physics.OverlapSphere(transform.position, chargeHitRadius);
+		foreach (Collider collider in colliders)
+		{
+			if (collider.CompareTag("Enemy"))
+			{
+				Destroy(collider.gameObject);
+			}
+		}
+	}
+
+	IEnumerator DestroyAfterDelay(GameObject instance, float delay)
+	{
+		yield return new WaitForSeconds(delay);
+		if (instance != null)
+		{
+			Destroy(instance);
+		}
+	}
+
+	void OnDrawGizmosSelected()
+	{
+		Gizmos.color = Color.red;
+		Gizmos.DrawWireSphere(transform.position + transform.forward * (attackRange * 0.5f), attackRange);
+
+		Gizmos.color = Color.cyan;
+		Gizmos.DrawWireSphere(transform.position, chargeHitRadius);
+	}
 }
