@@ -1,37 +1,32 @@
 using UnityEngine;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class QuitScript : MonoBehaviour
 {
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    private void Update()
     {
-        
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
-        EndGame();
-    }
-
-    public void EndGame() //Escボタン押したらゲーム終了
-    {
-        if(Input.GetKey(KeyCode.Escape))
+        if (Input.GetKeyDown(KeyCode.Escape))
         {
-#if UNITY_EDITOR
-            UnityEditor.EditorApplication.isPlaying = false;
-#else
-    Application.Quit(); //ゲームプレイ終了
-#endif
+            QuitApplication();
         }
     }
 
-    public void ExitBtn() //ボタンを押したらゲーム終了
+    /// <summary>
+    /// UI 繝懊ち繝ｳ縺ｮ OnClick 縺九ｉ蜻ｼ縺ｳ蜃ｺ縺励※繧ｲ繝ｼ繝繧堤ｵゆｺ�縺輔○縺ｾ縺吶�
+    /// </summary>
+    public void ExitButton()
+    {
+        QuitApplication();
+    }
+
+    private static void QuitApplication()
     {
 #if UNITY_EDITOR
-        UnityEditor.EditorApplication.isPlaying = false;
+        EditorApplication.isPlaying = false;
 #else
-    Application.Quit(); //ゲームプレイ終了
+        Application.Quit();
 #endif
     }
 }
