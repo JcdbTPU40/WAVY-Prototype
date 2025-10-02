@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class PlayerCombat : MonoBehaviour
@@ -13,11 +14,22 @@ public class PlayerCombat : MonoBehaviour
 	public float attackRange = 2f;
 	public float attackCooldown = 1f;
 
+	[Header("Tail Attack Settings")]
+	public float tailAttackDamage = 35f;
+	public float tailAttackRadius = 2f;
+	[Range(10f, 180f)] public float tailAttackAngle = 90f;
+	public float tailAttackHitDelay = 0.2f;
+	public float tailHeightOffset = 0.5f;
+
 	[Header("Beam Attack Settings")]
 	public GameObject beamPrefab;
 	public float beamDuration = 2f;
 	public float beamCooldown = 3f;
 	public Vector3 beamOffset = new Vector3(0f, 0f, 2f);
+	public float beamDamage = 45f;
+	public float beamRange = 12f;
+	public float beamRadius = 1.2f;
+	public float beamHitDelay = 0.1f;
 
 	[Header("Charge Attack Settings")]
 	public float chargeDistance = 5f;
@@ -33,6 +45,9 @@ public class PlayerCombat : MonoBehaviour
 	[SerializeField] string tailTriggerName = "Tail";
 	[SerializeField] string beamTriggerName = "Beam";
 	[SerializeField] string chargeTriggerName = "Charge";
+
+	[Header("Target Filtering")]
+	[SerializeField] LayerMask enemyLayers = ~0;
 
 	bool canAttack = true;
 	bool canBeam = true;
@@ -148,6 +163,7 @@ public class PlayerCombat : MonoBehaviour
 		canAttack = false;
 
 		TriggerAttackAnimation(true, true, "Attack");
+		StartCoroutine(TailAttackRoutine());
 
 		StartCoroutine(AttackCooldownRoutine());
 	}
@@ -209,6 +225,8 @@ public class PlayerCombat : MonoBehaviour
 			Debug.LogWarning("Beam prefab が設定されていません", this);
 		}
 
+		StartCoroutine(BeamDamageRoutine());
+
 		StartCoroutine(BeamCooldownRoutine());
 	}
 
@@ -251,6 +269,28 @@ public class PlayerCombat : MonoBehaviour
 	{
 		yield return new WaitForSeconds(beamCooldown);
 		canBeam = true;
+	}
+
+	IEnumerator TailAttackRoutine()
+	{
+		float waitTime = Mathf.Max(0f, Mathf.Min(tailAttackHitDelay, attackAnimationDuration));
+		if (waitTime > 0f)
+		{
+			yield return new WaitForSeconds(waitTime);
+		}
+
+		ApplyTailDamage();
+	}
+
+	IEnumerator BeamDamageRoutine()
+	{
+		float waitTime = Mathf.Max(0f, beamHitDelay);
+		if (waitTime > 0f)
+		{
+			yield return new WaitForSeconds(waitTime);
+		}
+
+		ApplyBeamDamage();
 	}
 
 	IEnumerator ChargeMoveRoutine()
@@ -307,6 +347,80 @@ public class PlayerCombat : MonoBehaviour
 			{
 				Destroy(collider.gameObject);
 			}
+		}
+	}
+
+	void ApplyTailDamage()
+	{
+		int mask = enemyLayers.value == 0 ? Physics.DefaultRaycastLayers : enemyLayers.value;
+		Vector3 origin = transform.position + Vector3.up * tailHeightOffset;
+		Collider[] hits = Physics.OverlapSphere(origin, tailAttackRadius, mask, QueryTriggerInteraction.Ignore);
+		if (hits == null || hits.Length == 0)
+		{
+			return;
+		}
+
+		float halfAngle = tailAttackAngle * 0.5f;
+		HashSet<EnemyScript> damagedEnemies = new HashSet<EnemyScript>();
+
+		foreach (Collider hit in hits)
+		{
+			if (hit == null)
+			{
+				continue;
+			}
+
+			EnemyScript enemy = hit.GetComponentInParent<EnemyScript>();
+			if (enemy == null || damagedEnemies.Contains(enemy))
+			{
+				continue;
+			}
+
+			Vector3 toEnemy = enemy.transform.position - origin;
+			toEnemy.y = 0f;
+			if (toEnemy.sqrMagnitude < Mathf.Epsilon)
+			{
+				toEnemy = transform.forward;
+			}
+
+			float angle = Vector3.Angle(transform.forward, toEnemy);
+			if (angle > halfAngle)
+			{
+				continue;
+			}
+
+			enemy.ApplyDamage(Mathf.RoundToInt(tailAttackDamage));
+			damagedEnemies.Add(enemy);
+		}
+	}
+
+	void ApplyBeamDamage()
+	{
+		int mask = enemyLayers.value == 0 ? Physics.DefaultRaycastLayers : enemyLayers.value;
+		Vector3 start = transform.position + transform.TransformDirection(beamOffset);
+		Vector3 end = start + transform.forward * Mathf.Max(0f, beamRange);
+		Collider[] hits = Physics.OverlapCapsule(start, end, Mathf.Max(0.01f, beamRadius), mask, QueryTriggerInteraction.Ignore);
+		if (hits == null || hits.Length == 0)
+		{
+			return;
+		}
+
+		HashSet<EnemyScript> damagedEnemies = new HashSet<EnemyScript>();
+		foreach (Collider hit in hits)
+		{
+			if (hit == null)
+			{
+				continue;
+			}
+
+			EnemyScript enemy = hit.GetComponentInParent<EnemyScript>();
+			if (enemy == null || damagedEnemies.Contains(enemy))
+			{
+				continue;
+			}
+
+			enemy.ApplyDamage(Mathf.RoundToInt(beamDamage));
+			damagedEnemies.Add(enemy);
 		}
 	}
 
