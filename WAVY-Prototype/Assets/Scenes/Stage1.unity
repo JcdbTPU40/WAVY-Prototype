@@ -887,6 +887,55 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: b5fead16552398740975db22e4f9d9e8, type: 3}
+--- !u!1 &1453573446
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1453573448}
+  - component: {fileID: 1453573447}
+  m_Layer: 0
+  m_Name: ScoreManager
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1453573447
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1453573446}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 41732946134c4e84bb16383a39fc78b2, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  persistAcrossScenes: 1
+  startingScore: 0
+  scoreChanged:
+    m_PersistentCalls:
+      m_Calls: []
+--- !u!4 &1453573448
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1453573446}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1457428580
 GameObject:
   m_ObjectHideFlags: 0
@@ -1271,6 +1320,7 @@ MonoBehaviour:
   tailAttackAngle: 100
   tailAttackHitDelay: 0
   tailHeightOffset: 0
+  tailKnockbackDistance: 3
   beamPrefab: {fileID: 6319171772100809965, guid: 081386ade7196b3469062b4a8139ff95, type: 3}
   beamDuration: 2
   beamCooldown: 3
@@ -1279,10 +1329,12 @@ MonoBehaviour:
   beamRange: 100
   beamRadius: 1.2
   beamHitDelay: 0.1
+  beamKnockbackDistance: 2.5
   chargeDistance: 5
   chargeDuration: 0.4
   chargeCooldown: 3
   chargeHitRadius: 1.5
+  chargeKnockbackDistance: 2
   attackAnimationDuration: 0.5
   attackBoolName: Attack
   tailTriggerName: Tail
@@ -1436,7 +1488,8 @@ PrefabInstance:
       propertyPath: m_Name
       value: Enemy_tower
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    m_RemovedComponents:
+    - {fileID: 7245522264242579629, guid: b5fead16552398740975db22e4f9d9e8, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents: []
@@ -1656,6 +1709,7 @@ SceneRoots:
   - {fileID: 1020566224}
   - {fileID: 2112955967}
   - {fileID: 1457428582}
+  - {fileID: 1453573448}
   - {fileID: 1264147088}
   - {fileID: 595887878}
   - {fileID: 663286544}

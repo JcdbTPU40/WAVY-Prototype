@@ -1,6 +1,10 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.AI;
+#if UNITY_EDITOR
+using UnityEditor;
+#endif
 
 public class PlayerCombat : MonoBehaviour
 {
@@ -20,6 +24,7 @@ public class PlayerCombat : MonoBehaviour
 	[Range(10f, 180f)] public float tailAttackAngle = 90f;
 	public float tailAttackHitDelay = 0.2f;
 	public float tailHeightOffset = 0.5f;
+	public float tailKnockbackDistance = 3f;
 
 	[Header("Beam Attack Settings")]
 	public GameObject beamPrefab;
@@ -30,12 +35,14 @@ public class PlayerCombat : MonoBehaviour
 	public float beamRange = 12f;
 	public float beamRadius = 1.2f;
 	public float beamHitDelay = 0.1f;
+	public float beamKnockbackDistance = 2.5f;
 
 	[Header("Charge Attack Settings")]
 	public float chargeDistance = 5f;
 	public float chargeDuration = 0.4f;
 	public float chargeCooldown = 3f;
 	public float chargeHitRadius = 1.5f;
+	public float chargeKnockbackDistance = 2f;
 
 	[Header("Animation Timings")]
 	public float attackAnimationDuration = 0.5f;
@@ -343,9 +350,24 @@ public class PlayerCombat : MonoBehaviour
 		Collider[] colliders = Physics.OverlapSphere(transform.position, chargeHitRadius);
 		foreach (Collider collider in colliders)
 		{
-			if (collider.CompareTag("Enemy"))
+			if (collider == null)
 			{
-				Destroy(collider.gameObject);
+				continue;
+			}
+
+			EnemyScript enemy = collider.GetComponentInParent<EnemyScript>();
+			if (enemy != null)
+			{
+				enemy.ApplyDamage(Mathf.RoundToInt(attackDamage));
+				Vector3 fromPlayer = enemy.transform.position - transform.position;
+				ApplyKnockback(enemy, fromPlayer, chargeKnockbackDistance);
+				continue;
+			}
+
+			EnemyTowerHealth tower = collider.GetComponentInParent<EnemyTowerHealth>();
+			if (tower != null)
+			{
+				tower.TakeDamage(Mathf.RoundToInt(attackDamage));
 			}
 		}
 	}
@@ -361,7 +383,7 @@ public class PlayerCombat : MonoBehaviour
 		}
 
 		float halfAngle = tailAttackAngle * 0.5f;
-		HashSet<EnemyScript> damagedEnemies = new HashSet<EnemyScript>();
+		HashSet<Transform> damagedTargets = new HashSet<Transform>();
 
 		foreach (Collider hit in hits)
 		{
@@ -371,26 +393,37 @@ public class PlayerCombat : MonoBehaviour
 			}
 
 			EnemyScript enemy = hit.GetComponentInParent<EnemyScript>();
-			if (enemy == null || damagedEnemies.Contains(enemy))
+			EnemyTowerHealth tower = enemy != null ? null : hit.GetComponentInParent<EnemyTowerHealth>();
+			Transform targetTransform = enemy != null ? enemy.transform : tower != null ? tower.transform : null;
+			if (targetTransform == null || damagedTargets.Contains(targetTransform))
 			{
 				continue;
 			}
 
-			Vector3 toEnemy = enemy.transform.position - origin;
-			toEnemy.y = 0f;
-			if (toEnemy.sqrMagnitude < Mathf.Epsilon)
+			Vector3 toTarget = targetTransform.position - origin;
+			toTarget.y = 0f;
+			if (toTarget.sqrMagnitude < Mathf.Epsilon)
 			{
-				toEnemy = transform.forward;
+				toTarget = transform.forward;
 			}
 
-			float angle = Vector3.Angle(transform.forward, toEnemy);
+			float angle = Vector3.Angle(transform.forward, toTarget);
 			if (angle > halfAngle)
 			{
 				continue;
 			}
 
-			enemy.ApplyDamage(Mathf.RoundToInt(tailAttackDamage));
-			damagedEnemies.Add(enemy);
+			if (enemy != null)
+			{
+				enemy.ApplyDamage(Mathf.RoundToInt(tailAttackDamage));
+				ApplyKnockback(enemy, toTarget, tailKnockbackDistance);
+			}
+			else if (tower != null)
+			{
+				tower.TakeDamage(Mathf.RoundToInt(tailAttackDamage));
+			}
+
+			damagedTargets.Add(targetTransform);
 		}
 	}
 
@@ -405,7 +438,7 @@ public class PlayerCombat : MonoBehaviour
 			return;
 		}
 
-		HashSet<EnemyScript> damagedEnemies = new HashSet<EnemyScript>();
+		HashSet<Transform> damagedTargets = new HashSet<Transform>();
 		foreach (Collider hit in hits)
 		{
 			if (hit == null)
@@ -414,14 +447,72 @@ public class PlayerCombat : MonoBehaviour
 			}
 
 			EnemyScript enemy = hit.GetComponentInParent<EnemyScript>();
-			if (enemy == null || damagedEnemies.Contains(enemy))
+			EnemyTowerHealth tower = enemy != null ? null : hit.GetComponentInParent<EnemyTowerHealth>();
+			Transform targetTransform = enemy != null ? enemy.transform : tower != null ? tower.transform : null;
+			if (targetTransform == null || damagedTargets.Contains(targetTransform))
 			{
 				continue;
 			}
 
-			enemy.ApplyDamage(Mathf.RoundToInt(beamDamage));
-			damagedEnemies.Add(enemy);
+			Vector3 toTarget = targetTransform.position - start;
+			toTarget.y = 0f;
+			if (toTarget.sqrMagnitude < Mathf.Epsilon)
+			{
+				toTarget = transform.forward;
+			}
+
+			if (enemy != null)
+			{
+				enemy.ApplyDamage(Mathf.RoundToInt(beamDamage));
+				ApplyKnockback(enemy, toTarget, beamKnockbackDistance);
+			}
+			else if (tower != null)
+			{
+				tower.TakeDamage(Mathf.RoundToInt(beamDamage));
+			}
+
+			damagedTargets.Add(targetTransform);
 		}
+	}
+
+	void ApplyKnockback(EnemyScript enemy, Vector3 direction, float distance)
+	{
+		if (enemy == null)
+		{
+			return;
+		}
+
+		Vector3 knockDir = direction;
+		knockDir.y = 0f;
+
+		if (knockDir.sqrMagnitude < Mathf.Epsilon)
+		{
+			knockDir = transform.forward;
+		}
+
+		knockDir.Normalize();
+		float clampedDistance = Mathf.Max(0f, distance);
+
+		if (clampedDistance <= 0f)
+		{
+			return;
+		}
+
+		NavMeshAgent enemyAgent = enemy.GetComponent<NavMeshAgent>();
+		if (enemyAgent != null && enemyAgent.enabled)
+		{
+			enemyAgent.Move(knockDir * clampedDistance);
+			return;
+		}
+
+		Rigidbody enemyRb = enemy.GetComponent<Rigidbody>();
+		if (enemyRb != null && !enemyRb.isKinematic)
+		{
+			enemyRb.AddForce(knockDir * clampedDistance / Mathf.Max(Time.fixedDeltaTime, 0.02f), ForceMode.VelocityChange);
+			return;
+		}
+
+		enemy.transform.position += knockDir * clampedDistance;
 	}
 
 	IEnumerator DestroyAfterDelay(GameObject instance, float delay)
@@ -435,10 +526,132 @@ public class PlayerCombat : MonoBehaviour
 
 	void OnDrawGizmosSelected()
 	{
-		Gizmos.color = Color.red;
-		Gizmos.DrawWireSphere(transform.position + transform.forward * (attackRange * 0.5f), attackRange);
+		Vector3 origin = transform.position;
+		Vector3 forward = transform.forward;
 
-		Gizmos.color = Color.cyan;
-		Gizmos.DrawWireSphere(transform.position, chargeHitRadius);
+		// Basic attack range
+		float clampedAttackRange = Mathf.Max(0f, attackRange);
+		if (clampedAttackRange > 0f)
+		{
+			Vector3 attackCenter = origin + forward * (clampedAttackRange * 0.5f);
+			Gizmos.color = new Color(1f, 0.3f, 0.3f, 0.9f);
+			Gizmos.DrawWireSphere(attackCenter, clampedAttackRange);
+			Gizmos.DrawLine(origin, origin + forward * clampedAttackRange);
+		}
+
+		// Tail attack fan
+		Vector3 tailOrigin = origin + Vector3.up * tailHeightOffset;
+		float clampedTailRadius = Mathf.Max(0f, tailAttackRadius);
+		if (clampedTailRadius > 0f)
+		{
+			Gizmos.color = new Color(1f, 0.85f, 0f, 0.85f);
+			Gizmos.DrawWireSphere(tailOrigin, clampedTailRadius);
+
+#if UNITY_EDITOR
+			if (tailAttackAngle > 0f)
+			{
+				float halfAngle = Mathf.Clamp(tailAttackAngle * 0.5f, 0f, 180f);
+				Vector3 leftDir = Quaternion.AngleAxis(-halfAngle, Vector3.up) * forward;
+				Vector3 rightDir = Quaternion.AngleAxis(halfAngle, Vector3.up) * forward;
+
+				Handles.color = new Color(1f, 0.85f, 0f, 0.2f);
+				Handles.DrawSolidArc(tailOrigin, Vector3.up, leftDir, tailAttackAngle, clampedTailRadius);
+
+				Handles.color = new Color(1f, 0.75f, 0f, 1f);
+				Handles.DrawAAPolyLine(3f, new Vector3[]
+				{
+					tailOrigin,
+					tailOrigin + leftDir.normalized * clampedTailRadius
+				});
+				Handles.DrawAAPolyLine(3f, new Vector3[]
+				{
+					tailOrigin,
+					tailOrigin + rightDir.normalized * clampedTailRadius
+				});
+			}
+#endif
+		}
+
+		// Beam capsule
+		Vector3 beamStart = origin + transform.TransformDirection(beamOffset);
+		float clampedBeamRange = Mathf.Max(0f, beamRange);
+		float clampedBeamRadius = Mathf.Max(0.01f, beamRadius);
+		if (clampedBeamRange > 0f)
+		{
+			Vector3 beamEnd = beamStart + forward * clampedBeamRange;
+			Gizmos.color = new Color(0.2f, 0.6f, 1f, 0.9f);
+			DrawWireCapsule(beamStart, beamEnd, clampedBeamRadius);
+		}
+
+		// Charge hit radius
+		float clampedChargeRadius = Mathf.Max(0f, chargeHitRadius);
+		if (clampedChargeRadius > 0f)
+		{
+			Gizmos.color = Color.cyan;
+			Gizmos.DrawWireSphere(origin, clampedChargeRadius);
+		}
+	}
+
+	void DrawWireCapsule(Vector3 start, Vector3 end, float radius)
+	{
+		Vector3 axis = end - start;
+		if (axis.sqrMagnitude < Mathf.Epsilon)
+		{
+			Gizmos.DrawWireSphere(start, radius);
+			return;
+		}
+
+		Vector3 direction = axis.normalized;
+		Vector3 tangent = GetAnyPerpendicular(direction).normalized * radius;
+		Vector3 bitangent = Vector3.Cross(direction, tangent).normalized * radius;
+
+		DrawWireCircle(start, direction, radius);
+		DrawWireCircle(end, direction, radius);
+
+		Gizmos.DrawLine(start + tangent, end + tangent);
+		Gizmos.DrawLine(start - tangent, end - tangent);
+		Gizmos.DrawLine(start + bitangent, end + bitangent);
+		Gizmos.DrawLine(start - bitangent, end - bitangent);
+	}
+
+	Vector3 GetAnyPerpendicular(Vector3 direction)
+	{
+		if (direction.sqrMagnitude < Mathf.Epsilon)
+		{
+			return Vector3.right;
+		}
+
+		Vector3 perpendicular = Vector3.Cross(direction, Vector3.up);
+		if (perpendicular.sqrMagnitude < 0.0001f)
+		{
+			perpendicular = Vector3.Cross(direction, Vector3.right);
+		}
+
+		return perpendicular;
+	}
+
+	void DrawWireCircle(Vector3 center, Vector3 normal, float radius)
+	{
+		if (radius <= 0f)
+		{
+			return;
+		}
+
+		normal = normal.normalized;
+		Vector3 tangent = GetAnyPerpendicular(normal).normalized;
+		Vector3 bitangent = Vector3.Cross(normal, tangent).normalized;
+
+		const int segmentCount = 32;
+		float angleStep = 360f / segmentCount;
+		Vector3 previousPoint = center + tangent * radius;
+
+		for (int i = 1; i <= segmentCount; i++)
+		{
+			float rad = Mathf.Deg2Rad * angleStep * i;
+			Vector3 localPoint = (Mathf.Cos(rad) * tangent + Mathf.Sin(rad) * bitangent) * radius;
+			Vector3 nextPoint = center + localPoint;
+			Gizmos.DrawLine(previousPoint, nextPoint);
+			previousPoint = nextPoint;
+		}
 	}
 }

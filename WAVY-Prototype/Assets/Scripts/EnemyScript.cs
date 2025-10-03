@@ -32,6 +32,10 @@ public class EnemyScript : MonoBehaviour
     [Header("敵を倒した時のスコア")]
     public int ScoreOnDeath = 100;                   // スコア加算量（ScoreScript未使用）
 
+    [Header("攻撃設定")]
+    [SerializeField] int attackDamage = 10;
+    private float lastAttackTime;
+
     //private ScoreScript scoreScript;               // スコア管理（コメントアウト中）
     private GameObject Target;                       // 追跡対象（Player）
     private NavMeshAgent agent;                      // NavMeshAgent参照
@@ -57,37 +61,47 @@ public class EnemyScript : MonoBehaviour
     {
         if (Target != null)
         {
-            float dis = Vector3.Distance(Target.transform.position, transform.position); // プレイヤーとの距離
-            transform.LookAt(Target.transform); // 常にプレイヤー方向を向く（首だけ回したい場合は別オブジェクト化推奨）
+            float dis = Vector3.Distance(Target.transform.position, transform.position);
+            transform.LookAt(Target.transform);
 
             if (agent != null && agent.enabled && agent.isOnNavMesh)
             {
                 if (dis > AtDistance)
                 {
-                    // 攻撃距離外：追跡継続
                     if (agent.isStopped)
                     {
-                        agent.isStopped = false; // 再開
+                        agent.isStopped = false;
                     }
-                    agent.SetDestination(Target.transform.position); // 目標地点更新
-                    //animator.SetBool("IsWalking", true);
+                    agent.SetDestination(Target.transform.position);
+
+                    if (animator != null)
+                    {
+                        animator.SetBool("IsWalking", true);
+                    }
                 }
                 else
                 {
-                    // 攻撃距離内：停止（攻撃未実装）
                     if (!agent.isStopped)
                     {
-                        agent.ResetPath(); // 進行経路クリア
+                        agent.ResetPath();
                         agent.isStopped = true;
                     }
-                    //animator.SetBool("IsWalking", false);
+
+                    if (animator != null)
+                    {
+                        animator.SetBool("IsWalking", false);
+                    }
+
+                    TryAttackPlayer();
                 }
             }
         }
         else
         {
-            // ターゲットが存在しない（例：プレイヤーが破壊された）
-            //animator.SetBool("IsWalking", false);
+            if (animator != null)
+            {
+                animator.SetBool("IsWalking", false);
+            }
         }
     }
 
@@ -150,12 +164,18 @@ public class EnemyScript : MonoBehaviour
         hasDied = true;
         currentHP = 0;
 
-        //animator?.SetTrigger("Die");
-
         if (agent != null && agent.enabled)
         {
             agent.ResetPath();
             agent.isStopped = true;
+            agent.enabled = false;
+        }
+
+        // EnableRagdoll();
+
+        if (ScoreOnDeath > 0 && ScoreManager.Instance != null)
+        {
+            ScoreManager.Instance.AddScore(ScoreOnDeath);
         }
 
         if (exp_Prefab != null && exp_Spawnpoint != null)
@@ -172,5 +192,47 @@ public class EnemyScript : MonoBehaviour
         }
 
         Destroy(gameObject, DeathTime);
+    }
+
+    private void EnableRagdoll()
+    {
+        Rigidbody[] rigidbodies = GetComponentsInChildren<Rigidbody>();
+        foreach (var childRb in rigidbodies)
+        {
+            childRb.isKinematic = false;
+        }
+
+        Collider[] colliders = GetComponentsInChildren<Collider>();
+        foreach (var col in colliders)
+        {
+            col.enabled = true;
+        }
+
+        if (animator != null)
+        {
+            animator.enabled = false;
+        }
+    }
+
+    void TryAttackPlayer()
+    {
+        if (Target == null || !Target.CompareTag("Player"))
+        {
+            return;
+        }
+
+        if (Time.time - lastAttackTime < AttackInterval)
+        {
+            return;
+        }
+
+        lastAttackTime = Time.time;
+        PerformAttack();
+    }
+
+    void PerformAttack()
+    {
+        animator?.SetTrigger("Attack");
+        Target.SendMessage("TakeDamage", attackDamage, SendMessageOptions.DontRequireReceiver);
     }
 }
