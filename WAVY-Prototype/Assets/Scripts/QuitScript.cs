@@ -7,10 +7,7 @@ public class QuitScript : MonoBehaviour
 {
     private void Update()
     {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            QuitApplication();
-        }
+
     }
 
     /// <summary>
