@@ -1964,7 +1964,7 @@ MonoBehaviour:
   beamPrefab: {fileID: 6319171772100809965, guid: 081386ade7196b3469062b4a8139ff95, type: 3}
   beamDuration: 2
   beamCooldown: 3
-  beamOffset: {x: 0, y: 0, z: 2}
+  beamOffset: {x: 0, y: 0, z: 0}
   beamDamage: 45
   beamRange: 100
   beamRadius: 1.2
