@@ -1,3 +1,4 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -35,6 +36,11 @@ public class EnemyScript : MonoBehaviour
     [Header("攻撃設定")]
     [SerializeField] int attackDamage = 10;
     private float lastAttackTime;
+
+    [Header("ヒット演出")]
+    [SerializeField] private GameObject hitFxPrefab;
+    [SerializeField] private Vector3 hitFxOffset = new Vector3(0f, 0.5f, 0f);
+    [SerializeField] private float hitFxDelay = 0f;      // ヒットから再生までの遅延秒
 
     //private ScoreScript scoreScript;               // スコア管理（コメントアウト中）
     private GameObject Target;                       // 追跡対象（Player）
@@ -117,7 +123,12 @@ public class EnemyScript : MonoBehaviour
         var damager = other.GetComponent<DamegeScript>();
         if (damager != null)
         {
-            ApplyDamage(damager.damage);
+            Vector3 hitPoint = other.ClosestPoint(transform.position);
+            Vector3 hitNormal = (transform.position - hitPoint).sqrMagnitude > Mathf.Epsilon
+                ? (transform.position - hitPoint).normalized
+                : transform.forward * -1f;
+
+            ApplyDamage(damager.damage, hitPoint, hitNormal);
         }
     }
 
@@ -135,7 +146,7 @@ public class EnemyScript : MonoBehaviour
     /// 外部から敵にダメージを与える際に利用する。
     /// </summary>
     /// <param name="damage">減算するHP量。0以下の場合は無視。</param>
-    public void ApplyDamage(int damage)
+    public void ApplyDamage(int damage, Vector3? hitPoint = null, Vector3? hitNormal = null)
     {
         if (hasDied || damage <= 0)
         {
@@ -143,6 +154,15 @@ public class EnemyScript : MonoBehaviour
         }
 
         currentHP -= damage;
+
+        if (hitFxDelay <= 0f)
+        {
+            SpawnHitEffect(hitPoint, hitNormal);
+        }
+        else
+        {
+            StartCoroutine(SpawnHitEffectDelayed(hitPoint, hitNormal));
+        }
 
         if (currentHP <= 0)
         {
@@ -152,6 +172,31 @@ public class EnemyScript : MonoBehaviour
         {
             //animator?.SetTrigger("GetHit"); // 被弾アニメを再活性化したい場合に利用
         }
+    }
+
+    private void SpawnHitEffect(Vector3? hitPoint, Vector3? hitNormal)
+    {
+        if (hitFxPrefab == null)
+        {
+            return;
+        }
+
+        Vector3 spawnPosition = hitPoint ?? transform.position + hitFxOffset;
+        Vector3 normal = hitNormal ?? (transform.forward * -1f);
+
+        if (normal.sqrMagnitude < Mathf.Epsilon)
+        {
+            normal = Vector3.up;
+        }
+
+        Quaternion rotation = Quaternion.LookRotation(normal);
+        Instantiate(hitFxPrefab, spawnPosition, rotation);
+    }
+
+    private IEnumerator SpawnHitEffectDelayed(Vector3? hitPoint, Vector3? hitNormal)
+    {
+        yield return new WaitForSeconds(hitFxDelay);
+        SpawnHitEffect(hitPoint, hitNormal);
     }
 
     private void HandleDeath()
