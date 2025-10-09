@@ -21,6 +21,8 @@ public class SuperMarioGalaxyMainMenuManager : MonoBehaviour
     [Header("UI")]
     [SerializeField] private CanvasGroup panelCanvasGroup;
     [SerializeField] private float panelFadeDuration = 0.4f;
+    [SerializeField] private CanvasGroup nextPanelCanvasGroup;
+    [SerializeField] private float nextPanelFadeDuration = 0.4f;
 
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
@@ -117,6 +119,17 @@ public class SuperMarioGalaxyMainMenuManager : MonoBehaviour
         {
             yield return StartCoroutine(FadeCanvasGroup(panelCanvasGroup, 0f, panelFadeDuration));
             panelCanvasGroup.gameObject.SetActive(false);
+        }
+
+        if (nextPanelCanvasGroup != null)
+        {
+            if (!nextPanelCanvasGroup.gameObject.activeSelf)
+            {
+                nextPanelCanvasGroup.gameObject.SetActive(true);
+            }
+
+            nextPanelCanvasGroup.alpha = 0f;
+            yield return StartCoroutine(FadeCanvasGroup(nextPanelCanvasGroup, 1f, nextPanelFadeDuration));
         }
 
         isTransitionRunning = false;

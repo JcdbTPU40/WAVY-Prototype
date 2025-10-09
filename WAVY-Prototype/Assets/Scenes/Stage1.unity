@@ -444,7 +444,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a7b0163478ca45e44b2dd63e4b6107a1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  scoreText: {fileID: 0}
+  scoreText: {fileID: 579974450}
 --- !u!1 &595887875
 GameObject:
   m_ObjectHideFlags: 0
@@ -1154,7 +1154,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pauseMenuUI: {fileID: 454613749}
   manageCursorVisibility: 1
-  mainMenuSceneName: Start
+  mainMenuSceneName: SuperMarioGalaxyMainMenu
 --- !u!4 &1457428582
 Transform:
   m_ObjectHideFlags: 0
@@ -1700,7 +1700,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 5908829791859861275, guid: 2372a1945048ecb46a54a107c8b82df9, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 6319414526192099602, guid: 2372a1945048ecb46a54a107c8b82df9, type: 3}
       propertyPath: m_fontAsset

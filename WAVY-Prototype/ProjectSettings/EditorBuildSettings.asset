@@ -17,6 +17,9 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Start.unity
     guid: 8163a48c0cf2fab48a801a8ae237e40a
+  - enabled: 1
+    path: Assets/Scenes/ChevyOnly/SuperMarioGalaxyMainMenu.unity
+    guid: 7cd896bec01d6d844a1375ab052f6613
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 04ca315ef5c38ff49bb842044661b625, type: 3}
   m_UseUCBPForAssetBundles: 0

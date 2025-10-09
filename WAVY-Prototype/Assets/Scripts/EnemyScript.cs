@@ -42,7 +42,6 @@ public class EnemyScript : MonoBehaviour
     [SerializeField] private Vector3 hitFxOffset = new Vector3(0f, 0.5f, 0f);
     [SerializeField] private float hitFxDelay = 0f;      // ヒットから再生までの遅延秒
 
-    //private ScoreScript scoreScript;               // スコア管理（コメントアウト中）
     private GameObject Target;                       // 追跡対象（Player）
     private NavMeshAgent agent;                      // NavMeshAgent参照
     private Animator animator;                       // アニメーター（現在未使用）
@@ -60,7 +59,6 @@ public class EnemyScript : MonoBehaviour
         }
         currentHP = MaxHP;                           // 現在HP初期化
         Target = GameObject.FindGameObjectWithTag("Player"); // Playerタグから追跡対象取得
-        //scoreScript = FindFirstObjectByType<ScoreScript>(); // スコア管理取得（未使用）
     }
 
     void Update()
@@ -131,16 +129,6 @@ public class EnemyScript : MonoBehaviour
             ApplyDamage(damager.damage, hitPoint, hitNormal);
         }
     }
-
-    /* 敵破壊時にスコア加算したい場合は復活させる
-    void OnDestroy()
-    {
-        if (scoreScript != null)
-        {
-            scoreScript.AddScore(ScoreOnDeath);
-        }
-    }
-    */
 
     /// <summary>
     /// 外部から敵にダメージを与える際に利用する。
