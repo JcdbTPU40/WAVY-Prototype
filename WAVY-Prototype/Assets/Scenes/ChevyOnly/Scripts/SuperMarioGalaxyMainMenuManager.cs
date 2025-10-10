@@ -1,8 +1,6 @@
 using System.Collections;
 using UnityEngine;
 using UnityEngine.InputSystem;
-using UnityEngine.Rendering;
-using UnityEngine.Rendering.Universal;
 
 public class SuperMarioGalaxyMainMenuManager : MonoBehaviour
 {
@@ -11,48 +9,22 @@ public class SuperMarioGalaxyMainMenuManager : MonoBehaviour
     [SerializeField] private string actionMapName = "MainMenu";
     [SerializeField] private string startActionName = "Start";
 
-    [Header("Bloom Settings")]
-    [SerializeField] private Volume globalVolume;
-    [SerializeField] private float bloomIntensityPeak = 30f;
-    [SerializeField] private float bloomFadeInDuration = 0.5f;
-    [SerializeField] private float bloomHoldDuration = 0.2f;
-    [SerializeField] private float bloomFadeOutDuration = 1f;
-
     [Header("UI")]
     [SerializeField] private CanvasGroup panelCanvasGroup;
     [SerializeField] private float panelFadeDuration = 0.4f;
     [SerializeField] private CanvasGroup nextPanelCanvasGroup;
     [SerializeField] private float nextPanelFadeDuration = 0.4f;
 
+    [Header("HDR Multiplier Effect")]
+    [SerializeField] private HDRMultiplierLerp hdrMultiplierLerp;
+    [SerializeField] private bool waitForHdrEffectCompletion = true;
+
     [Header("Audio")]
     [SerializeField] private AudioSource audioSource;
     [SerializeField] private AudioClip startSfx;
 
     private InputAction startAction;
-    private Bloom bloom;
     private bool isTransitionRunning;
-    private float defaultBloomIntensity;
-
-    private void Awake()
-    {
-    if (globalVolume == null)
-    {
-#if UNITY_2023_1_OR_NEWER
-        globalVolume = FindFirstObjectByType<Volume>();
-#else
-        globalVolume = FindObjectOfType<Volume>();
-#endif
-    }
-
-        if (globalVolume != null)
-        {
-            globalVolume.profile.TryGet(out bloom);
-            if (bloom != null)
-            {
-                defaultBloomIntensity = bloom.intensity.value;
-            }
-        }
-    }
 
     private void OnEnable()
     {
@@ -110,10 +82,7 @@ public class SuperMarioGalaxyMainMenuManager : MonoBehaviour
     {
         isTransitionRunning = true;
 
-        if (bloom != null)
-        {
-            yield return StartCoroutine(AnimateBloom());
-        }
+        yield return StartCoroutine(PlayHdrEffectIfAvailable());
 
         if (panelCanvasGroup != null)
         {
@@ -135,44 +104,6 @@ public class SuperMarioGalaxyMainMenuManager : MonoBehaviour
         isTransitionRunning = false;
     }
 
-    private IEnumerator AnimateBloom()
-    {
-        if (bloom == null)
-        {
-            yield break;
-        }
-
-        float elapsed = 0f;
-        float startIntensity = bloom.intensity.value;
-        float targetIntensity = bloomIntensityPeak;
-
-        while (elapsed < bloomFadeInDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = bloomFadeInDuration > 0f ? Mathf.Clamp01(elapsed / bloomFadeInDuration) : 1f;
-            bloom.intensity.value = Mathf.Lerp(startIntensity, targetIntensity, t);
-            yield return null;
-        }
-
-        bloom.intensity.value = targetIntensity;
-
-        if (bloomHoldDuration > 0f)
-        {
-            yield return new WaitForSeconds(bloomHoldDuration);
-        }
-
-        elapsed = 0f;
-        while (elapsed < bloomFadeOutDuration)
-        {
-            elapsed += Time.deltaTime;
-            float t = bloomFadeOutDuration > 0f ? Mathf.Clamp01(elapsed / bloomFadeOutDuration) : 1f;
-            bloom.intensity.value = Mathf.Lerp(targetIntensity, defaultBloomIntensity, t);
-            yield return null;
-        }
-
-        bloom.intensity.value = defaultBloomIntensity;
-    }
-
     private IEnumerator FadeCanvasGroup(CanvasGroup group, float targetAlpha, float duration)
     {
         if (group == null)
@@ -192,6 +123,23 @@ public class SuperMarioGalaxyMainMenuManager : MonoBehaviour
         }
 
         group.alpha = targetAlpha;
+    }
+
+    private IEnumerator PlayHdrEffectIfAvailable()
+    {
+        if (hdrMultiplierLerp == null)
+        {
+            yield break;
+        }
+
+        if (waitForHdrEffectCompletion)
+        {
+            yield return hdrMultiplierLerp.PlayCoroutine();
+        }
+        else
+        {
+            hdrMultiplierLerp.Play();
+        }
     }
 
     private void PlayStartSound()
