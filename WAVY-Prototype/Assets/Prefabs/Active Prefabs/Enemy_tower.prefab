@@ -11,7 +11,7 @@ PrefabInstance:
     - target: {fileID: -8953068697885657634, guid: fbd3a1f783d20184694947158a1e024d, type: 3}
       propertyPath: enemy
       value: 
-      objectReference: {fileID: 2619998069855359508, guid: 2451052a9c700584e8b372c5a21e044d, type: 3}
+      objectReference: {fileID: 4492889921191898461, guid: 1c69eb6772b59b54283349aca9d82eb7, type: 3}
     - target: {fileID: -4213853836369149709, guid: fbd3a1f783d20184694947158a1e024d, type: 3}
       propertyPath: m_Enabled
       value: 0

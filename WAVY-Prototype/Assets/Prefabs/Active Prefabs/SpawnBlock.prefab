@@ -122,7 +122,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: bff5a16360ec4a04bba17cc41a2d714d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  enemy: {fileID: 6381329321015968412, guid: b82d141f377c322469a7005fdb02c516, type: 3}
+  enemy: {fileID: 4492889921191898461, guid: 1c69eb6772b59b54283349aca9d82eb7, type: 3}
   repeat: 1
   spawnOffset: 1.5
 --- !u!114 &8076545393215117480
@@ -145,7 +145,7 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 128
   playerAttackTag: Player
-  deathSpawnPrefab: {fileID: 2619998069855359508, guid: 2451052a9c700584e8b372c5a21e044d, type: 3}
+  deathSpawnPrefab: {fileID: 4492889921191898461, guid: 1c69eb6772b59b54283349aca9d82eb7, type: 3}
   deathSpawnCount: 100
   deathSpawnRadius: 3
   deathSpawnOffset: {x: 0, y: 0, z: 0}
