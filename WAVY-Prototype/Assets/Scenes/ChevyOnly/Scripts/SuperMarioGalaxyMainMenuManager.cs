@@ -25,6 +25,7 @@ public class SuperMarioGalaxyMainMenuManager : MonoBehaviour
 
     private InputAction startAction;
     private bool isTransitionRunning;
+    private bool hasTransitionCompleted;
 
     private void OnEnable()
     {
@@ -69,7 +70,7 @@ public class SuperMarioGalaxyMainMenuManager : MonoBehaviour
 
     private void OnStartAction(InputAction.CallbackContext context)
     {
-        if (isTransitionRunning)
+        if (isTransitionRunning || hasTransitionCompleted)
         {
             return;
         }
@@ -102,6 +103,7 @@ public class SuperMarioGalaxyMainMenuManager : MonoBehaviour
         }
 
         isTransitionRunning = false;
+        hasTransitionCompleted = true;
     }
 
     private IEnumerator FadeCanvasGroup(CanvasGroup group, float targetAlpha, float duration)
