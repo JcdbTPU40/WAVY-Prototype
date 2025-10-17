@@ -91,6 +91,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
       insertIndex: -1
       addedObject: {fileID: -6445379526859062655}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -5485591376123263235}
     - targetCorrespondingSourceObject: {fileID: 6107913692295745523, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 995908419508902628}
@@ -221,10 +224,10 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!144 &831155688429870394
 CharacterJoint:
   m_ObjectHideFlags: 0
@@ -322,10 +325,10 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!144 &6899297925325174025
 CharacterJoint:
   m_ObjectHideFlags: 0
@@ -423,10 +426,10 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!144 &1985088143140296384
 CharacterJoint:
   m_ObjectHideFlags: 0
@@ -492,17 +495,25 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   exp_Prefab: {fileID: 0}
   exp_Spawnpoint: []
-  EnemySpeed: 0
-  AtDistance: 0
-  AttackInterval: 0
+  EnemySpeed: 3
+  AtDistance: 1
+  AttackInterval: 2
   AttackTimer: 1
-  MaxHP: 0
+  MaxHP: 10
   DeathTime: 2
   ScoreOnDeath: 100
   attackDamage: 10
   hitFxPrefab: {fileID: 0}
   hitFxOffset: {x: 0, y: 0.5, z: 0}
   hitFxDelay: 0
+  ragdollController: {fileID: 0}
+  deathKnockbackForce: 16
+  deathKnockbackUpForce: 8
+  deathKnockbackAngle: 89
+  hitKnockbackForce: 4
+  hitKnockbackUpForce: 1.5
+  hitKnockbackAngle: 89
+  hitKnockbackRecoveryDelay: 0.25
 --- !u!195 &6052058895093225110
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -512,7 +523,7 @@ NavMeshAgent:
   m_GameObject: {fileID: 4492889921191898461}
   m_Enabled: 1
   m_AgentTypeID: 0
-  m_Radius: 0.5
+  m_Radius: 0.25
   m_Speed: 3.5
   m_Acceleration: 8
   avoidancePriority: 50
@@ -521,7 +532,7 @@ NavMeshAgent:
   m_AutoTraverseOffMeshLink: 1
   m_AutoBraking: 1
   m_AutoRepath: 1
-  m_Height: 2
+  m_Height: 0.8
   m_BaseOffset: 0
   m_WalkableMask: 4294967295
   m_ObstacleAvoidanceType: 4
@@ -581,6 +592,33 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.58, y: 0.8, z: 0.743}
   m_Center: {x: 0, y: 0.4, z: 0}
+--- !u!54 &-5485591376123263235
+Rigidbody:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4492889921191898461}
+  serializedVersion: 5
+  m_Mass: 1
+  m_LinearDamping: 0
+  m_AngularDamping: 0.05
+  m_CenterOfMass: {x: 0, y: 0, z: 0}
+  m_InertiaTensor: {x: 1, y: 1, z: 1}
+  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ImplicitCom: 1
+  m_ImplicitTensor: 1
+  m_UseGravity: 0
+  m_IsKinematic: 1
+  m_Interpolate: 0
+  m_Constraints: 0
+  m_CollisionDetection: 1
 --- !u!1 &5134306523431569721 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8491575379566418229, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
@@ -632,10 +670,10 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!144 &427345189836239581
 CharacterJoint:
   m_ObjectHideFlags: 0
@@ -731,10 +769,10 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!144 &8056210860561230618
 CharacterJoint:
   m_ObjectHideFlags: 0
@@ -832,10 +870,10 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!144 &2282261224390895092
 CharacterJoint:
   m_ObjectHideFlags: 0
@@ -933,10 +971,10 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!1 &8309233785251527580 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 4740265518144498576, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
@@ -988,10 +1026,10 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!144 &7842023670524917472
 CharacterJoint:
   m_ObjectHideFlags: 0
@@ -1089,10 +1127,10 @@ Rigidbody:
   m_ImplicitCom: 1
   m_ImplicitTensor: 1
   m_UseGravity: 1
-  m_IsKinematic: 0
+  m_IsKinematic: 1
   m_Interpolate: 0
   m_Constraints: 0
-  m_CollisionDetection: 0
+  m_CollisionDetection: 1
 --- !u!144 &8279311967475140023
 CharacterJoint:
   m_ObjectHideFlags: 0
