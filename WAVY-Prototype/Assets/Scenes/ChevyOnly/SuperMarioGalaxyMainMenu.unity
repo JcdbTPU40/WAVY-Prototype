@@ -520,7 +520,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e9f679f7a6fd264e88344d90ab386d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  firstStageSceneName: Stage1
+  firstStageSceneName: Mario Stage
 --- !u!1 &313465132
 GameObject:
   m_ObjectHideFlags: 0
