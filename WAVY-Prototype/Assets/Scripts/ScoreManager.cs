@@ -4,11 +4,6 @@ using UnityEngine.Events;
 [System.Serializable]
 public class IntEvent : UnityEvent<int> { }
 
-/// <summary>
-/// シンプルなスコア管理用シングルトン。<br/>
-/// ・シーンをまたいで保持（任意）<br/>
-/// ・スコア加算時に UnityEvent で通知<br/>
-/// </summary>
 public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance { get; private set; }

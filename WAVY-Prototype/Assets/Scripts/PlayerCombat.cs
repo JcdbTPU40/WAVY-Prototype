@@ -108,20 +108,10 @@ public class PlayerCombat : MonoBehaviour
 			return;
 		}
 
-		HandleAttackInput();
+		//HandleAttackInput();
 		HandleTailInput();
 		HandleBeamInput();
 		HandleChargeInput();
-	}
-
-	void HandleAttackInput()
-	{
-		if (inputManager.attackInput && canAttack && !isAttacking && !isCharging)
-		{
-			PerformAttack();
-		}
-
-		inputManager.attackInput = false;
 	}
 
 	void HandleTailInput()
@@ -154,15 +144,6 @@ public class PlayerCombat : MonoBehaviour
 		inputManager.chargeInput = false;
 	}
 
-	void PerformAttack()
-	{
-		isAttacking = true;
-		canAttack = false;
-
-		TriggerAttackAnimation(true, true, "Attack");
-
-		StartCoroutine(AttackCooldownRoutine());
-	}
 
 	void PerformTailAttack()
 	{

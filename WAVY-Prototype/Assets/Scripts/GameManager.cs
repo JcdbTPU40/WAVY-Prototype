@@ -9,7 +9,7 @@ public class GameManager : MonoBehaviour
     [SerializeField] private bool manageCursorVisibility = true;
 
     [Header("Scenes")]
-    [SerializeField] private string mainMenuSceneName = "Main Menu";
+    [SerializeField] private string mainMenuSceneName = "Start";
 
     public static GameManager Instance { get; private set; }
 
@@ -134,7 +134,7 @@ public class GameManager : MonoBehaviour
         }
         else
         {
-            Debug.LogError("Main menu scene name is not set on the GameManager.");
+            Debug.LogError("Start scene name is not set on the GameManager.");
         }
     }
 
