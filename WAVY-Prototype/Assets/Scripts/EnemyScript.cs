@@ -48,11 +48,19 @@ public class EnemyScript : MonoBehaviour
     [SerializeField] private float deathKnockbackUpForce = 2f;
     [SerializeField, Range(0f, 89f)] private float deathKnockbackAngle = 30f;
 
+    [Header("死亡後ノックバック制御")]
+    [SerializeField] private bool disableKnockbackAfterDeath = true; // 死んだら一切ノックバックしない
+
     [Header("被弾ノックバック")]
     [SerializeField] private float hitKnockbackForce = 4f;
     [SerializeField] private float hitKnockbackUpForce = 1.5f;
     [SerializeField, Range(0f, 89f)] private float hitKnockbackAngle = 20f;
     [SerializeField] private float hitKnockbackRecoveryDelay = 0.25f;
+
+    [Header("地面判定設定")]
+    [SerializeField] LayerMask groundMask = ~0;  // 地面用。必要に応じて調整
+    [SerializeField] float liftBeforePhysics = 0.08f; // 8cmくらい持ち上げ
+    [SerializeField] float groundRayLength = 2.0f;
 
     private GameObject Target;                       // 追跡対象（Player）
     private NavMeshAgent agent;                      // NavMeshAgent参照
@@ -65,6 +73,7 @@ public class EnemyScript : MonoBehaviour
     private Coroutine knockbackRoutine;
     private bool wasRbKinematicBeforeKnockback;
     private bool agentWasEnabledBeforeKnockback;
+    private bool isKnockbacking;
 
     void Start()
     {
@@ -86,6 +95,21 @@ public class EnemyScript : MonoBehaviour
 
     void Update()
     {
+        // Knockback中や死亡後は、LookAt/経路更新/攻撃などのAI更新を止める
+        if (isKnockbacking || hasDied)
+        {
+            if (animator != null)
+            {
+                animator.SetBool("IsWalking", false);
+            }
+            if (agent != null && agent.enabled && !agent.isStopped)
+            {
+                agent.ResetPath();
+                agent.isStopped = true;
+            }
+            return;
+        }
+
         if (Target != null)
         {
             float dis = Vector3.Distance(Target.transform.position, transform.position);
@@ -140,6 +164,8 @@ public class EnemyScript : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
+        if (hasDied) return; // ★死亡後は攻撃を無視（ヒットデータも更新しない）
+
         // 衝突相手にDamegeScript（綴り注意：Damageではない）が付いているか確認
         var damager = other.GetComponent<DamegeScript>();
         if (damager != null)
@@ -224,6 +250,16 @@ public class EnemyScript : MonoBehaviour
         hasDied = true;
         currentHP = 0;
 
+        // 任意：死亡直後にレイヤーを切り替え、以降の攻撃ヒットを物理的に避ける
+        if (disableKnockbackAfterDeath)
+        {
+            int corpse = LayerMask.NameToLayer("Corpse");
+            if (corpse != -1)
+            {
+                SetLayerRecursively(gameObject, corpse);
+            }
+        }
+
         if (agent != null)
         {
             if (agent.enabled)
@@ -260,44 +296,55 @@ public class EnemyScript : MonoBehaviour
 
     void TriggerRagdollDeath()
     {
-        if (ragdollController == null)
+        // ① 物理切替直前に少し持ち上げて“地面と重ならない”状態を作る
+        LiftAboveGround(transform);
+
+        // ② Rootの干渉源を切る
+        if (agent != null) { agent.enabled = false; }
+
+        var rootCol = GetComponent<Collider>();
+        if (rootCol != null) rootCol.enabled = false;
+
+        if (rb != null)
         {
-            EnableRagdoll();
-            return;
+            rb.isKinematic = true; // Rootは物理から外す
+            rb.detectCollisions = false;
         }
 
+        if (animator != null) animator.enabled = false;
+
+        // ③ ノックバック方向の計算
         Vector3 hitPos = hasLastHitData ? lastHitPosition : transform.position + Vector3.up * 0.5f;
         Vector3 direction = hasLastHitData && lastHitDirection.sqrMagnitude > Mathf.Epsilon
             ? lastHitDirection.normalized
             : (-transform.forward);
 
         Vector3 horizontalDir = Vector3.ProjectOnPlane(direction, Vector3.up);
-        if (horizontalDir.sqrMagnitude < Mathf.Epsilon)
-        {
-            horizontalDir = Vector3.ProjectOnPlane(-transform.forward, Vector3.up);
-        }
-        if (horizontalDir.sqrMagnitude < Mathf.Epsilon)
-        {
-            horizontalDir = Vector3.forward;
-        }
+        if (horizontalDir.sqrMagnitude < Mathf.Epsilon) horizontalDir = Vector3.forward;
         horizontalDir.Normalize();
 
         Vector3 rotationAxis = Vector3.Cross(horizontalDir, Vector3.up);
-        if (rotationAxis.sqrMagnitude < Mathf.Epsilon)
-        {
-            rotationAxis = transform.right;
-        }
+        if (rotationAxis.sqrMagnitude < Mathf.Epsilon) rotationAxis = transform.right;
         rotationAxis.Normalize();
 
         Vector3 angledDir = Quaternion.AngleAxis(deathKnockbackAngle, rotationAxis) * horizontalDir;
-        Vector3 finalForce = angledDir.normalized * deathKnockbackForce;
-        if (deathKnockbackUpForce != 0f)
+        Vector3 finalForce = angledDir.normalized * deathKnockbackForce + Vector3.up * Mathf.Max(0.1f, deathKnockbackUpForce);
+
+        // ★死亡後ノックバックを禁止する場合は力をゼロにする
+        if (disableKnockbackAfterDeath)
+            finalForce = Vector3.zero;
+
+        // ④ ラグドールを安全に有効化
+        if (ragdollController != null)
         {
-            finalForce += Vector3.up * deathKnockbackUpForce;
+            ragdollController.Die(hitPos, finalForce);
+        }
+        else
+        {
+            EnableRagdoll_StableFallback(finalForce);
         }
 
-        ragdollController.Die(hitPos, finalForce);
-        enabled = false; // 以降のUpdate処理を停止
+        enabled = false;
     }
 
     private void EnableRagdoll()
@@ -318,6 +365,59 @@ public class EnemyScript : MonoBehaviour
         {
             animator.enabled = false;
         }
+    }
+
+    // ragdollControllerが未設定の時用：子RBに設定＋インパルス
+    void EnableRagdoll_StableFallback(Vector3 impulse)
+    {
+        // Rootは既に切っている前提
+        var childRBs = GetComponentsInChildren<Rigidbody>();
+        foreach (var crb in childRBs)
+        {
+            if (crb == rb) continue; // Rootは除外
+            crb.isKinematic = false;
+            crb.detectCollisions = true;
+            crb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            crb.interpolation = RigidbodyInterpolation.Interpolate;
+        }
+
+        // 代表ボーン（胸 or 骨盤）にだけインパルス
+        Rigidbody drive = FindPreferBone(childRBs, "Spine", "Hips", "Chest");
+        if (drive == null) drive = childRBs.Length > 0 ? childRBs[0] : null;
+        if (drive != null)
+        {
+            drive.AddForce(impulse, ForceMode.VelocityChange);
+        }
+    }
+
+    Rigidbody FindPreferBone(Rigidbody[] rbs, params string[] names)
+    {
+        foreach (var n in names)
+        {
+            foreach (var r in rbs)
+            {
+                if (r != null && r.transform.name.IndexOf(n, System.StringComparison.OrdinalIgnoreCase) >= 0)
+                    return r;
+            }
+        }
+        return null;
+    }
+
+    bool LiftAboveGround(Transform t)
+    {
+        if (t == null) return false;
+        // 足元基準のレイ。必要なら足元のダミーTransformを用意してそこから撃つ
+        Vector3 rayStart = t.position + Vector3.up * 0.2f;
+        if (Physics.Raycast(rayStart, Vector3.down, out var hit, groundRayLength, groundMask, QueryTriggerInteraction.Ignore))
+        {
+            float targetY = hit.point.y + liftBeforePhysics;
+            if (t.position.y < targetY)
+            {
+                var p = t.position; p.y = targetY; t.position = p;
+                return true;
+            }
+        }
+        return false;
     }
 
     void CacheLastHitData(Vector3? hitPoint, Vector3? hitNormal)
@@ -390,6 +490,7 @@ public class EnemyScript : MonoBehaviour
 
     void ApplyHitKnockback()
     {
+        if (hasDied) return; // ★死亡後は完全無効
         if (!hasLastHitData || lastHitDirection.sqrMagnitude < Mathf.Epsilon)
         {
             return;
@@ -417,7 +518,11 @@ public class EnemyScript : MonoBehaviour
             force += Vector3.up * hitKnockbackUpForce;
         }
 
+        // 連続被弾でも1フレーム追従しないよう先にフラグを立てる
+        isKnockbacking = true;
         CancelActiveKnockback();
+        // Cancel内でfalseになっている可能性に備え明示再設定
+        isKnockbacking = true;
         knockbackRoutine = StartCoroutine(HandleHitKnockback(force));
     }
 
@@ -428,49 +533,66 @@ public class EnemyScript : MonoBehaviour
         {
             agent.ResetPath();
             agent.isStopped = true;
-            agent.enabled = false;
+
+            // ★これが重要：内部位置を今に合わせ、追従を止める
+            agent.nextPosition = transform.position;
+            agent.updatePosition = false;
+            agent.updateRotation = false;
         }
+
+        isKnockbacking = true;
 
         if (rb != null)
         {
             wasRbKinematicBeforeKnockback = rb.isKinematic;
+            LiftAboveGround(transform);
             rb.isKinematic = false;
+            rb.detectCollisions = true;
+            rb.collisionDetectionMode = CollisionDetectionMode.ContinuousDynamic;
+            rb.interpolation = RigidbodyInterpolation.Interpolate;
+
+            #if UNITY_6000_0_OR_NEWER
             rb.linearVelocity = Vector3.zero;
+            #else
+            rb.velocity = Vector3.zero;
+            #endif
             rb.angularVelocity = Vector3.zero;
+
+            force += Vector3.up * 0.15f;
             rb.AddForce(force, ForceMode.VelocityChange);
-        }
-        else
-        {
-            transform.position += force * Time.deltaTime;
         }
 
         float elapsed = 0f;
         bool interrupted = false;
         while (elapsed < hitKnockbackRecoveryDelay)
         {
-            if (hasDied)
-            {
-                interrupted = true;
-                break;
-            }
+            if (hasDied) { interrupted = true; break; }
             elapsed += Time.deltaTime;
             yield return null;
         }
 
         if (rb != null)
         {
+            #if UNITY_6000_0_OR_NEWER
             rb.linearVelocity = Vector3.zero;
+            #else
+            rb.velocity = Vector3.zero;
+            #endif
             rb.angularVelocity = Vector3.zero;
             rb.isKinematic = wasRbKinematicBeforeKnockback;
         }
 
         if (!interrupted && agentWasEnabledBeforeKnockback && agent != null)
         {
-            agent.enabled = true;
+            // ★現在位置をAgentに同期してから再開
+            agent.Warp(transform.position);
+            agent.updatePosition = true;
+            agent.updateRotation = true;
             agent.isStopped = false;
         }
 
         agentWasEnabledBeforeKnockback = false;
+        isKnockbacking = false;
         knockbackRoutine = null;
     }
 
@@ -486,17 +608,39 @@ public class EnemyScript : MonoBehaviour
 
         if (rb != null)
         {
+            #if UNITY_6000_0_OR_NEWER
             rb.linearVelocity = Vector3.zero;
+            #else
+            rb.velocity = Vector3.zero;
+            #endif
             rb.angularVelocity = Vector3.zero;
             rb.isKinematic = wasRbKinematicBeforeKnockback;
         }
 
         if (resumeAgent && agentWasEnabledBeforeKnockback && agent != null)
         {
-            agent.enabled = true;
+            // Knockback中に停止・非追従にしていたAgentを安全に再開
+            agent.Warp(transform.position);
+            agent.updatePosition = true;
+            agent.updateRotation = true;
             agent.isStopped = false;
         }
 
         agentWasEnabledBeforeKnockback = false;
+        isKnockbacking = false;
+    }
+
+    // 任意：指定GameObject配下の全てのレイヤーを変更
+    void SetLayerRecursively(GameObject obj, int layer)
+    {
+        if (obj == null) return;
+        obj.layer = layer;
+        foreach (Transform c in obj.transform)
+        {
+            if (c != null)
+            {
+                SetLayerRecursively(c.gameObject, layer);
+            }
+        }
     }
 }

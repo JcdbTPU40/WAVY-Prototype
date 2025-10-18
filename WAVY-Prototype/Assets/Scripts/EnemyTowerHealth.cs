@@ -1,16 +1,26 @@
+using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class EnemyTowerHealth : MonoBehaviour
 {
-    [SerializeField] public int maxHealth = 100; // 最大体力
+    const int MaxHearts = 3;
+    const int HealthPerHeart = 2;
+
+    [SerializeField, Min(0)] public int maxHealth = MaxHearts * HealthPerHeart; // 初期最大体力
     private int currentHealth;
 
     [Header("プレイヤー攻撃検出")]
     [SerializeField] float detectionRadius = 2f;
-    [SerializeField] int detectionDamage = 10;
-    [SerializeField] float damageInterval = 0.5f;
+    [SerializeField] int detectionDamage = 1;
+    [SerializeField] float damageInterval = 1f;
     [SerializeField] LayerMask playerAttackLayers = ~0;
     [SerializeField] string playerAttackTag = "Player";
+
+    [Header("ハートUI設定")]
+    [SerializeField] Transform heartContainer;
+    [SerializeField] List<Image> heartImages = new List<Image>();
+    [SerializeField] Transform heartLookTarget;
 
     [Header("破壊時スポーン設定")]
     [SerializeField] GameObject deathSpawnPrefab;
@@ -21,22 +31,46 @@ public class EnemyTowerHealth : MonoBehaviour
     [SerializeField] Transform deathSpawnParent;
 
     float lastDamageTime;
+    readonly List<Image> runtimeHeartImages = new List<Image>();
+    bool loggedMissingHearts;
 
     void Start()
     {
-        // 初期体力を設定
+        // 初期体力とハートUIを設定
+        maxHealth = Mathf.Clamp(maxHealth, 0, MaxHearts * HealthPerHeart);
         currentHealth = maxHealth;
+        PrepareHeartImages();
+        UpdateHeartDisplay();
     }
 
     void Update()
     {
         TryDetectPlayerAttack();
+        UpdateHeartFacing();
+    }
+
+    void LateUpdate()
+    {
+        UpdateHeartFacing();
     }
 
     // 攻撃を受けたときに呼び出されるメソッド
     public void TakeDamage(int damage)
     {
-        currentHealth -= damage;
+        if (damage <= 0 || currentHealth <= 0)
+        {
+            return;
+        }
+
+        int previousHealth = currentHealth;
+        currentHealth = Mathf.Clamp(currentHealth - Mathf.Abs(damage), 0, maxHealth);
+
+        if (currentHealth == previousHealth)
+        {
+            return;
+        }
+
+        UpdateHeartDisplay();
         Debug.Log($"Enemy_towerの体力: {currentHealth}");
 
         // 体力が0以下になったら壊れる
@@ -89,6 +123,149 @@ public class EnemyTowerHealth : MonoBehaviour
         Destroy(gameObject); // オブジェクトを破壊
     }
 
+    void PrepareHeartImages()
+    {
+        runtimeHeartImages.Clear();
+
+        if (heartImages != null)
+        {
+            for (int i = 0; i < heartImages.Count; i++)
+            {
+                Image image = heartImages[i];
+                if (image != null && !runtimeHeartImages.Contains(image))
+                {
+                    runtimeHeartImages.Add(image);
+                }
+            }
+        }
+
+        if (runtimeHeartImages.Count < MaxHearts && heartContainer != null)
+        {
+            for (int i = 0; i < heartContainer.childCount; i++)
+            {
+                Image childImage = heartContainer.GetChild(i).GetComponent<Image>();
+                if (childImage != null && !runtimeHeartImages.Contains(childImage))
+                {
+                    runtimeHeartImages.Add(childImage);
+                    if (runtimeHeartImages.Count >= MaxHearts)
+                    {
+                        break;
+                    }
+                }
+            }
+        }
+
+        runtimeHeartImages.Sort((a, b) =>
+        {
+            if (a == null || b == null)
+            {
+                return 0;
+            }
+            return a.transform.GetSiblingIndex().CompareTo(b.transform.GetSiblingIndex());
+        });
+
+        if (runtimeHeartImages.Count > MaxHearts)
+        {
+            runtimeHeartImages.RemoveRange(MaxHearts, runtimeHeartImages.Count - MaxHearts);
+        }
+
+        ResolveHeartLookTarget();
+    }
+
+    void UpdateHeartDisplay()
+    {
+        if (runtimeHeartImages.Count == 0)
+        {
+            if (!loggedMissingHearts)
+            {
+                Debug.LogWarning("ハートUIが設定されていません", this);
+                loggedMissingHearts = true;
+            }
+            return;
+        }
+
+        int remainingHealth = Mathf.Clamp(currentHealth, 0, MaxHearts * HealthPerHeart);
+
+        for (int i = 0; i < runtimeHeartImages.Count; i++)
+        {
+            Image heart = runtimeHeartImages[i];
+            if (heart == null)
+            {
+                continue;
+            }
+
+            float fill = 0f;
+            if (remainingHealth >= HealthPerHeart)
+            {
+                fill = 1f;
+                remainingHealth -= HealthPerHeart;
+            }
+            else if (remainingHealth == 1)
+            {
+                fill = 0.5f;
+                remainingHealth = 0;
+            }
+
+            heart.fillAmount = fill;
+            heart.gameObject.SetActive(fill > 0f);
+        }
+    }
+
+    void UpdateHeartFacing()
+    {
+        if (heartContainer == null)
+        {
+            return;
+        }
+
+        if (heartLookTarget == null)
+        {
+            ResolveHeartLookTarget();
+            if (heartLookTarget == null)
+            {
+                return;
+            }
+        }
+
+        Vector3 targetPosition = heartLookTarget.position;
+        Vector3 direction = targetPosition - heartContainer.position;
+        direction.y = 0f;
+
+        if (direction.sqrMagnitude < 0.0001f)
+        {
+            return;
+        }
+
+        heartContainer.rotation = Quaternion.LookRotation(direction);
+    }
+
+    void ResolveHeartLookTarget()
+    {
+        if (heartLookTarget != null)
+        {
+            return;
+        }
+
+        if (!Application.isPlaying)
+        {
+            return;
+        }
+
+        if (!string.IsNullOrEmpty(playerAttackTag))
+        {
+            GameObject player = GameObject.FindGameObjectWithTag(playerAttackTag);
+            if (player != null)
+            {
+                heartLookTarget = player.transform;
+            }
+        }
+
+        if (heartLookTarget == null && Camera.main != null)
+        {
+            heartLookTarget = Camera.main.transform;
+        }
+    }
+
     void SpawnEnemiesOnDeath()
     {
         if (deathSpawnPrefab == null || deathSpawnCount <= 0)
@@ -124,6 +301,20 @@ public class EnemyTowerHealth : MonoBehaviour
     {
         Gizmos.color = Color.red;
         Gizmos.DrawWireSphere(transform.position, detectionRadius);
+    }
+#endif
+
+#if UNITY_EDITOR
+    void OnValidate()
+    {
+        maxHealth = Mathf.Clamp(maxHealth, 0, MaxHearts * HealthPerHeart);
+        if (!Application.isPlaying)
+        {
+            currentHealth = maxHealth;
+        }
+
+        PrepareHeartImages();
+        UpdateHeartDisplay();
     }
 #endif
 }
