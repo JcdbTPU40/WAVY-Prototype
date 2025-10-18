@@ -50,7 +50,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 919132149155446097, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
       propertyPath: m_Name
-      value: zako_b2 (1)
+      value: zakotekisp
       objectReference: {fileID: 0}
     - target: {fileID: 8277406119553070589, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
       propertyPath: m_LocalRotation.w
@@ -506,14 +506,20 @@ MonoBehaviour:
   hitFxPrefab: {fileID: 0}
   hitFxOffset: {x: 0, y: 0.5, z: 0}
   hitFxDelay: 0
-  ragdollController: {fileID: 0}
-  deathKnockbackForce: 16
-  deathKnockbackUpForce: 8
-  deathKnockbackAngle: 89
-  hitKnockbackForce: 4
+  ragdollController: {fileID: 5509398658302410200}
+  deathKnockbackForce: 32.4
+  deathKnockbackUpForce: 15.88
+  deathKnockbackAngle: 30.9
+  disableKnockbackAfterDeath: 1
+  hitKnockbackForce: 2
   hitKnockbackUpForce: 1.5
   hitKnockbackAngle: 89
   hitKnockbackRecoveryDelay: 0.25
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  liftBeforePhysics: 0.08
+  groundRayLength: 2
 --- !u!195 &6052058895093225110
 NavMeshAgent:
   m_ObjectHideFlags: 0
@@ -549,6 +555,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   anim: {fileID: -6726244030715007928}
+  agent: {fileID: 6052058895093225110}
+  rootRb: {fileID: 4393067706467678622}
+  rootCol: {fileID: 995908419508902628}
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  liftBeforePhysics: 0.08
+  groundRayLen: 2
+  autoDestroySec: 10
 --- !u!95 &-6726244030715007928
 Animator:
   serializedVersion: 7

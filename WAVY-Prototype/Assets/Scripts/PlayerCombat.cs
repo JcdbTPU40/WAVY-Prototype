@@ -12,6 +12,7 @@ public class PlayerCombat : MonoBehaviour
 	AnimatorManager animatorManager;
 	Animator animator;
 	CharacterController characterController;
+	const int TowerDamagePerHit = 1;
 
 	[Header("Attack Settings")]
 	public float attackDamage = 20f;
@@ -43,6 +44,7 @@ public class PlayerCombat : MonoBehaviour
 	public float chargeCooldown = 3f;
 	public float chargeHitRadius = 1.5f;
 	public float chargeKnockbackDistance = 2f;
+	[Min(0f)] public float chargeTowerHitInterval = 1f;
 
 	[Header("Animation Timings")]
 	public float attackAnimationDuration = 0.5f;
@@ -66,6 +68,8 @@ public class PlayerCombat : MonoBehaviour
 	bool hasTailTrigger;
 	bool hasBeamTrigger;
 	bool hasChargeTrigger;
+	readonly Dictionary<EnemyTowerHealth, float> towerHitTimestamps = new Dictionary<EnemyTowerHealth, float>();
+	readonly HashSet<EnemyScript> chargeHitEnemies = new HashSet<EnemyScript>();
 
 	void Awake()
 	{
@@ -217,9 +221,9 @@ public class PlayerCombat : MonoBehaviour
 
 		StartCoroutine(BeamCooldownRoutine());
 	}
-
 	void PerformChargeAttack()
 	{
+		chargeHitEnemies.Clear();
 		isCharging = true;
 		canCharge = false;
 
@@ -300,6 +304,7 @@ public class PlayerCombat : MonoBehaviour
 
 		DetectAndRemoveEnemies();
 		isCharging = false;
+		chargeHitEnemies.Clear();
 	}
 
 	IEnumerator ChargeCooldownRoutine()
@@ -328,6 +333,7 @@ public class PlayerCombat : MonoBehaviour
 
 	void DetectAndRemoveEnemies()
 	{
+		CleanupTowerHitCache();
 		Collider[] colliders = Physics.OverlapSphere(transform.position, chargeHitRadius);
 		foreach (Collider collider in colliders)
 		{
@@ -339,6 +345,10 @@ public class PlayerCombat : MonoBehaviour
 			EnemyScript enemy = collider.GetComponentInParent<EnemyScript>();
 			if (enemy != null)
 			{
+				if (!chargeHitEnemies.Add(enemy))
+				{
+					continue;
+				}
 				enemy.ApplyDamage(Mathf.RoundToInt(attackDamage));
 				Vector3 fromPlayer = enemy.transform.position - transform.position;
 				ApplyKnockback(enemy, fromPlayer, chargeKnockbackDistance);
@@ -348,8 +358,38 @@ public class PlayerCombat : MonoBehaviour
 			EnemyTowerHealth tower = collider.GetComponentInParent<EnemyTowerHealth>();
 			if (tower != null)
 			{
-				tower.TakeDamage(Mathf.RoundToInt(attackDamage));
+				float lastHit;
+				float interval = Mathf.Max(0f, chargeTowerHitInterval);
+				if (interval > 0f && towerHitTimestamps.TryGetValue(tower, out lastHit) && Time.time - lastHit < interval)
+				{
+					continue;
+				}
+
+				towerHitTimestamps[tower] = Time.time;
+				tower.TakeDamage(TowerDamagePerHit);
 			}
+		}
+	}
+
+	void CleanupTowerHitCache()
+	{
+		if (towerHitTimestamps.Count == 0)
+		{
+			return;
+		}
+
+		var staleEntries = new List<EnemyTowerHealth>();
+		foreach (var entry in towerHitTimestamps)
+		{
+			if (entry.Key == null)
+			{
+				staleEntries.Add(entry.Key);
+			}
+		}
+
+		for (int i = 0; i < staleEntries.Count; i++)
+		{
+			towerHitTimestamps.Remove(staleEntries[i]);
 		}
 	}
 
@@ -401,7 +441,7 @@ public class PlayerCombat : MonoBehaviour
 			}
 			else if (tower != null)
 			{
-				tower.TakeDamage(Mathf.RoundToInt(tailAttackDamage));
+				tower.TakeDamage(TowerDamagePerHit);
 			}
 
 			damagedTargets.Add(targetTransform);
@@ -449,7 +489,7 @@ public class PlayerCombat : MonoBehaviour
 			}
 			else if (tower != null)
 			{
-				tower.TakeDamage(Mathf.RoundToInt(beamDamage));
+				tower.TakeDamage(TowerDamagePerHit);
 			}
 
 			damagedTargets.Add(targetTransform);
