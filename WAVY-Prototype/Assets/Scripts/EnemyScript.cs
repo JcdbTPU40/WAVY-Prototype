@@ -286,7 +286,7 @@ public class EnemyScript : MonoBehaviour
                 {
                     continue;
                 }
-                Debug.Log("Called");
+
                 Instantiate(exp_Prefab, point.position, Quaternion.identity);
             }
         }
