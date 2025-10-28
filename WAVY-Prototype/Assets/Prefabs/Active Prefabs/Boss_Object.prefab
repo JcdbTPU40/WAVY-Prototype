@@ -29,7 +29,7 @@ Transform:
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 4.68, y: -1, z: 1}
-  m_LocalScale: {x: 5, y: 5, z: 5}
+  m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 6881854788260290936}
@@ -48,19 +48,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boss_Max_HP: 100
-  target: {fileID: 3214834095011878990, guid: ae87be017c29d104eb40568082b63ed3, type: 3}
-  patrolTargets:
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  - {fileID: 0}
-  arrivalThreshold: 1
   speed: 10
   flightHeight: 0
+  circleCenter: {fileID: 0}
+  circleCenterOffset: {x: 0, y: 0, z: 0}
+  circleRadius: 10
+  angularSpeed: 45
+  clockwise: 1
+  investigateArrivalThreshold: 1
+  defaultInvestigateStayDuration: 5
 --- !u!65 &4057029001972109774
 BoxCollider:
   m_ObjectHideFlags: 0

@@ -600,11 +600,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 430aee48ddc93ed4ab5ad44a9aff39ec, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  exp_Prefab: {fileID: 2360584092786099001, guid: e947775bb9399734caa7da07d6609bc4, type: 3}
-  exp_Spawnpoint:
-  - {fileID: 7510829430201587031}
-  - {fileID: 8009153914536719509}
-  - {fileID: 2486968717118694601}
+  exp_Prefab: {fileID: 0}
+  exp_Spawnpoint: []
   EnemySpeed: 3
   AtDistance: 1
   AttackInterval: 2
