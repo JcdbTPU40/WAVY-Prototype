@@ -70,6 +70,7 @@ public class PlayerCombat : MonoBehaviour
 	bool hasChargeTrigger;
 	readonly Dictionary<EnemyTowerHealth, float> towerHitTimestamps = new Dictionary<EnemyTowerHealth, float>();
 	readonly HashSet<EnemyScript> chargeHitEnemies = new HashSet<EnemyScript>();
+	readonly HashSet<BossScript> chargeHitBosses = new HashSet<BossScript>();
 
 	void Awake()
 	{
@@ -305,6 +306,7 @@ public class PlayerCombat : MonoBehaviour
 		DetectAndRemoveEnemies();
 		isCharging = false;
 		chargeHitEnemies.Clear();
+		chargeHitBosses.Clear();
 	}
 
 	IEnumerator ChargeCooldownRoutine()
@@ -352,6 +354,18 @@ public class PlayerCombat : MonoBehaviour
 				enemy.ApplyDamage(Mathf.RoundToInt(attackDamage));
 				Vector3 fromPlayer = enemy.transform.position - transform.position;
 				ApplyKnockback(enemy, fromPlayer, chargeKnockbackDistance);
+				continue;
+			}
+
+			BossScript boss = collider.GetComponentInParent<BossScript>();
+			if (boss != null)
+			{
+				if (!chargeHitBosses.Add(boss))
+				{
+					continue;
+				}
+				// ボスにはダメージのみ（ノックバック無し）
+				boss.take_Damage(Mathf.RoundToInt(attackDamage));
 				continue;
 			}
 
@@ -414,8 +428,9 @@ public class PlayerCombat : MonoBehaviour
 			}
 
 			EnemyScript enemy = hit.GetComponentInParent<EnemyScript>();
-			EnemyTowerHealth tower = enemy != null ? null : hit.GetComponentInParent<EnemyTowerHealth>();
-			Transform targetTransform = enemy != null ? enemy.transform : tower != null ? tower.transform : null;
+			BossScript boss = enemy != null ? null : hit.GetComponentInParent<BossScript>();
+			EnemyTowerHealth tower = (enemy != null || boss != null) ? null : hit.GetComponentInParent<EnemyTowerHealth>();
+			Transform targetTransform = enemy != null ? enemy.transform : boss != null ? boss.transform : tower != null ? tower.transform : null;
 			if (targetTransform == null || damagedTargets.Contains(targetTransform))
 			{
 				continue;
@@ -438,6 +453,11 @@ public class PlayerCombat : MonoBehaviour
 			{
 				enemy.ApplyDamage(Mathf.RoundToInt(tailAttackDamage));
 				ApplyKnockback(enemy, toTarget, tailKnockbackDistance);
+			}
+			else if (boss != null)
+			{
+				// ボスにはダメージのみ与え、ノックバックは適用しない
+				boss.take_Damage(Mathf.RoundToInt(tailAttackDamage));
 			}
 			else if (tower != null)
 			{
@@ -468,8 +488,9 @@ public class PlayerCombat : MonoBehaviour
 			}
 
 			EnemyScript enemy = hit.GetComponentInParent<EnemyScript>();
-			EnemyTowerHealth tower = enemy != null ? null : hit.GetComponentInParent<EnemyTowerHealth>();
-			Transform targetTransform = enemy != null ? enemy.transform : tower != null ? tower.transform : null;
+			BossScript boss = enemy != null ? null : hit.GetComponentInParent<BossScript>();
+			EnemyTowerHealth tower = (enemy != null || boss != null) ? null : hit.GetComponentInParent<EnemyTowerHealth>();
+			Transform targetTransform = enemy != null ? enemy.transform : boss != null ? boss.transform : tower != null ? tower.transform : null;
 			if (targetTransform == null || damagedTargets.Contains(targetTransform))
 			{
 				continue;
@@ -486,6 +507,11 @@ public class PlayerCombat : MonoBehaviour
 			{
 				enemy.ApplyDamage(Mathf.RoundToInt(beamDamage));
 				ApplyKnockback(enemy, toTarget, beamKnockbackDistance);
+			}
+			else if (boss != null)
+			{
+				// ボスにはダメージのみ与え、ノックバックは適用しない
+				boss.take_Damage(Mathf.RoundToInt(beamDamage));
 			}
 			else if (tower != null)
 			{

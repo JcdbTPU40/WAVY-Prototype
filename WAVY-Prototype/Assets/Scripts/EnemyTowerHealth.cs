@@ -30,6 +30,9 @@ public class EnemyTowerHealth : MonoBehaviour
     [SerializeField] bool inheritSpawnRotation = true;
     [SerializeField] Transform deathSpawnParent;
 
+    [Header("破壊時にボスが来て滞在する時間（秒）")]
+    [SerializeField, Min(0f)] float bossInvestigateDuration = 5f;
+
     float lastDamageTime;
     readonly List<Image> runtimeHeartImages = new List<Image>();
     bool loggedMissingHearts;
@@ -118,9 +121,59 @@ public class EnemyTowerHealth : MonoBehaviour
 
     private void DestroyTower()
     {
+        Vector3 towerPos = transform.position;
+
         SpawnEnemiesOnDeath();
+
+        // ボスへ通知（位置と滞在時間）
+        NotifyBossesOfDestruction(towerPos, bossInvestigateDuration);
+
         Debug.Log("Enemy_towerが破壊されました！");
         Destroy(gameObject); // オブジェクトを破壊
+    }
+
+    void SpawnEnemiesOnDeath()
+    {
+        if (deathSpawnPrefab == null || deathSpawnCount <= 0)
+        {
+            return;
+        }
+
+        Quaternion spawnRotation = inheritSpawnRotation ? transform.rotation : Quaternion.identity;
+        Transform parent = deathSpawnParent != null ? deathSpawnParent : null;
+
+        for (int i = 0; i < deathSpawnCount; i++)
+        {
+            Vector3 spawnPosition = transform.position + deathSpawnOffset;
+            if (deathSpawnRadius > 0f)
+            {
+                // 明示的に UnityEngine.Random を使う（System.Random と衝突する環境を回避）
+                Vector2 randomCircle = UnityEngine.Random.insideUnitCircle * deathSpawnRadius;
+                spawnPosition += new Vector3(randomCircle.x, 0f, randomCircle.y);
+            }
+
+            if (parent != null)
+            {
+                Instantiate(deathSpawnPrefab, spawnPosition, spawnRotation, parent);
+            }
+            else
+            {
+                Instantiate(deathSpawnPrefab, spawnPosition, spawnRotation);
+            }
+        }
+    }
+
+    void NotifyBossesOfDestruction(Vector3 towerWorldPos, float stayDuration)
+    {
+        // シーン内のすべての BossScript に通知（複数ボス対応）
+        BossScript[] bosses = FindObjectsOfType<BossScript>();
+        if (bosses == null || bosses.Length == 0) return;
+
+        foreach (var boss in bosses)
+        {
+            if (boss == null) continue;
+            boss.OnTowerDestroyed(towerWorldPos, stayDuration);
+        }
     }
 
     void PrepareHeartImages()
@@ -263,36 +316,6 @@ public class EnemyTowerHealth : MonoBehaviour
         if (heartLookTarget == null && Camera.main != null)
         {
             heartLookTarget = Camera.main.transform;
-        }
-    }
-
-    void SpawnEnemiesOnDeath()
-    {
-        if (deathSpawnPrefab == null || deathSpawnCount <= 0)
-        {
-            return;
-        }
-
-        Quaternion spawnRotation = inheritSpawnRotation ? transform.rotation : Quaternion.identity;
-        Transform parent = deathSpawnParent != null ? deathSpawnParent : null;
-
-        for (int i = 0; i < deathSpawnCount; i++)
-        {
-            Vector3 spawnPosition = transform.position + deathSpawnOffset;
-            if (deathSpawnRadius > 0f)
-            {
-                Vector2 randomCircle = Random.insideUnitCircle * deathSpawnRadius;
-                spawnPosition += new Vector3(randomCircle.x, 0f, randomCircle.y);
-            }
-
-            if (parent != null)
-            {
-                Instantiate(deathSpawnPrefab, spawnPosition, spawnRotation, parent);
-            }
-            else
-            {
-                Instantiate(deathSpawnPrefab, spawnPosition, spawnRotation);
-            }
         }
     }
 
