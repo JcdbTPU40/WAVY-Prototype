@@ -500,17 +500,17 @@ MonoBehaviour:
   AttackInterval: 2
   AttackTimer: 1
   MaxHP: 10
-  DeathTime: 2
+  DeathTime: 5
   ScoreOnDeath: 100
   attackDamage: 10
-  hitFxPrefab: {fileID: 0}
+  hitFxPrefab: {fileID: 4021103657954561961, guid: 5c755f9bc5253ea418e919994537dcc7, type: 3}
   hitFxOffset: {x: 0, y: 0.5, z: 0}
   hitFxDelay: 0
   ragdollController: {fileID: 5509398658302410200}
-  deathKnockbackForce: 32.4
-  deathKnockbackUpForce: 15.88
-  deathKnockbackAngle: 30.9
-  disableKnockbackAfterDeath: 1
+  deathKnockbackForce: 26
+  deathKnockbackUpForce: 16
+  deathKnockbackAngle: 10
+  disableKnockbackAfterDeath: 0
   hitKnockbackForce: 2
   hitKnockbackUpForce: 1.5
   hitKnockbackAngle: 89
@@ -528,7 +528,7 @@ NavMeshAgent:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4492889921191898461}
   m_Enabled: 1
-  m_AgentTypeID: 0
+  m_AgentTypeID: -1372625422
   m_Radius: 0.25
   m_Speed: 3.5
   m_Acceleration: 8
