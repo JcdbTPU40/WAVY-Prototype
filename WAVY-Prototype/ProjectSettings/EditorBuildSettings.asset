@@ -14,10 +14,10 @@ EditorBuildSettings:
   - enabled: 0
     path: Assets/Scenes/Stage1.unity
     guid: c7d176ca006731749b4925965547e1e4
-  - enabled: 0
+  - enabled: 1
     path: Assets/Scenes/Start.unity
     guid: 8163a48c0cf2fab48a801a8ae237e40a
-  - enabled: 1
+  - enabled: 0
     path: Assets/Scenes/ChevyOnly/SuperMarioGalaxyMainMenu.unity
     guid: 7cd896bec01d6d844a1375ab052f6613
   - enabled: 1

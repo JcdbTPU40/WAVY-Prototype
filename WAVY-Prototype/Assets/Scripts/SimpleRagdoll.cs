@@ -60,10 +60,27 @@ public class SimpleRagdoll : MonoBehaviour
         // Root側はラグドール中は物理から外す（干渉源を切る）
         if (rootRb)
         {
-            rootRb.isKinematic = on;           // ラグドール中はキネマティック
-            rootRb.detectCollisions = !on;
-            rootRb.linearVelocity = Vector3.zero;
-            rootRb.angularVelocity = Vector3.zero;
+            if (!on)
+            {
+                // 通常状態：Rootを物理有効（ノックバック等で使用）
+                rootRb.isKinematic = false;
+                rootRb.detectCollisions = true;
+                // Kinematicでない時のみ速度リセットを行う
+                rootRb.linearVelocity = Vector3.zero;
+                rootRb.angularVelocity = Vector3.zero;
+            }
+            else
+            {
+                // ラグドール中：Rootを物理から外す（干渉源を切る）。
+                // すでにKinematicの場合、linearVelocityの設定はサポートされないため行わない。
+                if (!rootRb.isKinematic)
+                {
+                    rootRb.linearVelocity = Vector3.zero;
+                    rootRb.angularVelocity = Vector3.zero;
+                }
+                rootRb.isKinematic = true;           // ラグドール中はキネマティック
+                rootRb.detectCollisions = false;
+            }
         }
         if (rootCol) rootCol.enabled = !on;
 
