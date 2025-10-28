@@ -48,9 +48,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   boss_Max_HP: 100
-  target: {fileID: 0}
   speed: 10
   flightHeight: 0
+  circleCenter: {fileID: 0}
+  circleCenterOffset: {x: 0, y: 0, z: 0}
+  circleRadius: 10
+  angularSpeed: 45
+  clockwise: 1
+  investigateArrivalThreshold: 1
+  defaultInvestigateStayDuration: 5
 --- !u!65 &4057029001972109774
 BoxCollider:
   m_ObjectHideFlags: 0
