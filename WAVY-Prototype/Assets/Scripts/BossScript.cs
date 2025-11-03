@@ -1,3 +1,4 @@
+// ...existing code...
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -35,6 +36,23 @@ public class BossScript : MonoBehaviour
     [SerializeField, Min(0f)]
     private float defaultInvestigateStayDuration = 5f;     // 指定が無い場合の滞在時間（秒）
 
+    // 追加: 射撃設定
+    [Header("射撃設定")]
+    [SerializeField, Tooltip("プレイヤー方向へ発射する弾のプレハブ (Rigidbody 必須推奨)")]
+    private GameObject projectilePrefab = null;
+    [SerializeField, Min(0.01f), Tooltip("弾の速度")]
+    private float projectileSpeed = 20f;
+    [SerializeField, Min(0f), Tooltip("発射間隔（秒）")]
+    private float shootInterval = 1.5f;
+    [SerializeField, Min(0f), Tooltip("射程（この距離内のプレイヤーにのみ撃つ。0 なら距離無視）")]
+    private float shootRange = 0f;
+    [SerializeField, Tooltip("発射位置のオフセット（ボスの基準座標系）")]
+    private Vector3 shootOffset = Vector3.forward * 1.5f;
+    [SerializeField, Min(0f), Tooltip("生成した弾の自動破棄時間")]
+    private float projectileLifetime = 8f;
+    [SerializeField, Tooltip("調査モード中にも射撃するか")]
+    private bool shootWhileInvestigating = false;
+
     private float currentAngleDeg = 0f;                     // 現在角度（度）
     private Vector3 initialCircleCenter = Vector3.zero;     // Start 時のデフォルト中心
 
@@ -47,6 +65,10 @@ public class BossScript : MonoBehaviour
     float investigateStayDuration = 0f;
     float investigateEndTime = 0f;
     // --------------------
+
+    // 射撃内部管理
+    float shootTimer = 0f;
+    Transform playerTransform = null;
 
     void Start()
     {
@@ -75,6 +97,15 @@ public class BossScript : MonoBehaviour
         {
             currentAngleDeg = 0f;
         }
+
+        // プレイヤー参照をキャッシュ（Player タグを利用）
+        var playerObj = GameObject.FindGameObjectWithTag("Player");
+        if (playerObj != null)
+        {
+            playerTransform = playerObj.transform;
+        }
+
+        shootTimer = shootInterval; // 起動直後にすぐ撃ちたい場合は 0 にする
     }
 
     void Update()
@@ -123,8 +154,25 @@ public class BossScript : MonoBehaviour
                 }
             }
 
-            return;
+            // 調査中に射撃しない場合はここで early return
+            if (!shootWhileInvestigating)
+            {
+                // タイマーは進めない／リセットしておく
+                return;
+            }
         }
+
+        // --- 射撃タイマー更新 ---
+        if (!boss_isDied && projectilePrefab != null && playerTransform != null)
+        {
+            shootTimer += Time.deltaTime;
+            if (shootTimer >= Mathf.Max(0.0001f, shootInterval))
+            {
+                TryShootAtPlayer();
+                shootTimer = 0f;
+            }
+        }
+
         // --- 円移動（通常運転） ---
         Vector3 center = (circleCenter != null) ? (circleCenter.position + circleCenterOffset) : initialCircleCenter;
 
@@ -175,6 +223,57 @@ public class BossScript : MonoBehaviour
         }
     }
 
+    // プレイヤーに向けて発射を試みる
+    void TryShootAtPlayer()
+    {
+        if (playerTransform == null || projectilePrefab == null || boss_isDied) return;
+
+        // 射程チェック（0 以下なら距離無視）
+        if (shootRange > 0f)
+        {
+            float sqr = (new Vector3(playerTransform.position.x, 0f, playerTransform.position.z) - new Vector3(transform.position.x, 0f, transform.position.z)).sqrMagnitude;
+            if (sqr > shootRange * shootRange) return;
+        }
+
+        // 発射位置（ボスの高さを flightHeight に揃える）
+        Vector3 basePos = new Vector3(transform.position.x, flightHeight, transform.position.z);
+        Vector3 spawnPos = basePos + transform.TransformDirection(shootOffset);
+
+        Vector3 targetPos = playerTransform.position;
+        // プレイヤーの高さに合わせて狙う（水平成分を使って飛行する場合は y を調整）
+        targetPos = new Vector3(targetPos.x, playerTransform.position.y, targetPos.z);
+
+        Vector3 dir = (targetPos - spawnPos);
+        if (dir.sqrMagnitude <= Mathf.Epsilon)
+        {
+            dir = transform.forward;
+        }
+        dir.Normalize();
+
+        // インスタンス化
+        GameObject proj = Instantiate(projectilePrefab, spawnPos, Quaternion.LookRotation(dir));
+        if (proj != null)
+        {
+            // Rigidbody があれば速度を与える
+            Rigidbody rb = proj.GetComponent<Rigidbody>();
+            if (rb != null)
+            {
+                rb.linearVelocity = dir * projectileSpeed;
+            }
+            else
+            {
+                // Rigidbody が無ければ transform で前方方向に移動する可能性を残す
+                proj.transform.forward = dir;
+            }
+
+            // 自動破棄
+            if (projectileLifetime > 0f)
+            {
+                Destroy(proj, projectileLifetime);
+            }
+        }
+    }
+
     // 外部から呼ばれる：タワー破壊時に呼び出してボスを調査モードへ切替える
     public void OnTowerDestroyed(Vector3 towerWorldPosition, float stayDuration = -1f)
     {
@@ -187,7 +286,7 @@ public class BossScript : MonoBehaviour
         investigateArrived = false;
         // 到着時に滞在時間がカウントされるように、investigateEndTime は到着時にセットする
     }
-
+// ...existing code...
     public void take_Damage(int damage)
     {
         if (boss_isDied || damage <= 0)
@@ -216,3 +315,4 @@ public class BossScript : MonoBehaviour
         Destroy(gameObject);
     }
 }
+// ...existing code...

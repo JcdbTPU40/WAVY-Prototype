@@ -31,7 +31,7 @@ public class EnemyTowerHealth : MonoBehaviour
     [SerializeField] Transform deathSpawnParent;
 
     [Header("破壊時にボスが来て滞在する時間（秒）")]
-    [SerializeField, Min(0f)] float bossInvestigateDuration = 5f;
+    [SerializeField, Min(0f)] float bossInvestigateDuration = 20f;
 
     float lastDamageTime;
     readonly List<Image> runtimeHeartImages = new List<Image>();
