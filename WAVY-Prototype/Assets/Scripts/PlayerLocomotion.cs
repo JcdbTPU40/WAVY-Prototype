@@ -1,63 +1,177 @@
 using UnityEngine;
-using UnityEngine.EventSystems;
 
 public class PlayerLocomotion : MonoBehaviour
 {
-    InputManager inputManager; // Interface for input management
+    InputManager inputManager;
+    AnimatorManager animatorManager;
 
-    Vector3 moveDirection;          // Direction of movement based on input
-    Transform cameraObject;         // Reference to the camera for directional movement
-    Rigidbody playerRigidbody;      // Rigidbody component for physics-based movement
+    Vector3 moveDirection;
+    Transform cameraObject;
+    CharacterController characterController; // CharacterController を使用（プロジェクト標準）
+    Animator animator;
 
     [Header("Movement Speeds")]
-    public float walkingSpeed = 2;
-    public float runningSpeed = 7;
-    public float rotationSpeed = 15;
+    public float walkingSpeed = 2f;
+    public float runningSpeed = 7f;
+    public float rotationSpeed = 15f;
+
+    [Header("Gravity Settings")]
+    public float gravity = 9.8f;
+    private float verticalVelocity = 0f;
+
+    [Header("Animator Parameters")]
+    [SerializeField] string speedParameterName = "Speed";
+    [SerializeField] string movementTimeParameterName = "time";
+
+    bool hasSpeedFloat;
+    bool hasTimeFloat;
+    float movementTime = 0f;
+
+    [Header("物理押し出し")]
+    public float pushPower = 2.0f;
 
     private void Start()
     {
-        inputManager = GetComponent<InputManager>(); // Get the InputManager component
-        cameraObject = Camera.main.transform; // Reference to the main camera's transform
-        playerRigidbody = GetComponent<Rigidbody>(); // Get the Rigidbody component for physics interactions
+        inputManager = GetComponent<InputManager>();
+        animatorManager = GetComponent<AnimatorManager>();
+        animator = GetComponent<Animator>();
+        cameraObject = Camera.main.transform;
+        characterController = GetComponent<CharacterController>();
+
+        if (characterController == null)
+        {
+            Debug.LogError("CharacterController が見つかりません。Player に CharacterController を追加してください。", this);
+        }
+
+        if (animator != null)
+        {
+            hasSpeedFloat = HasAnimatorParameter(speedParameterName, AnimatorControllerParameterType.Float);
+            hasTimeFloat = HasAnimatorParameter(movementTimeParameterName, AnimatorControllerParameterType.Float);
+        }
     }
 
     public void HandleAllMovement()
     {
-        HandleMovement(); // Handle player movement
-        HandleRotation(); // Handle player rotation
+        HandleMovement();
+        HandleRotation();
+        UpdateAnimator();
     }
 
     private void HandleMovement()
     {
+        if (characterController == null || inputManager == null) return;
+
+        // カメラ相対の移動方向を計算
         moveDirection = cameraObject.forward * inputManager.verticalInput;
         moveDirection += cameraObject.right * inputManager.horizontalInput;
         moveDirection.Normalize();
         moveDirection.y = 0;
 
+        // 速度を決定（走り/歩き）
         float currentSpeed = inputManager.moveAmount > 0.5f ? runningSpeed : walkingSpeed;
-        
-        // 水平方向の速度のみを制御
-        Vector3 horizontalVelocity = new Vector3(moveDirection.x * currentSpeed, playerRigidbody.linearVelocity.y, moveDirection.z * currentSpeed);
-        playerRigidbody.linearVelocity = horizontalVelocity;
+        Vector3 motion = moveDirection * currentSpeed * Time.deltaTime;
+
+        // 重力処理
+        if (characterController.isGrounded)
+        {
+            verticalVelocity = 0f;
+        }
+        else
+        {
+            verticalVelocity -= gravity * Time.deltaTime;
+        }
+
+        motion.y = verticalVelocity * Time.deltaTime;
+        characterController.Move(motion);
     }
 
     private void HandleRotation()
     {
-        Vector3 targetDirection = Vector3.zero; // Initialize target direction
+        if (inputManager == null) return;
 
-        targetDirection = cameraObject.forward * inputManager.verticalInput; // Forward movement
-        targetDirection += cameraObject.right * inputManager.horizontalInput; // Right movement
-        targetDirection.Normalize(); // Normalize to ensure consistent direction
-        targetDirection.y = 0; // Keep rotation on the horizontal plane
+        Vector3 targetDirection = Vector3.zero;
+        targetDirection = cameraObject.forward * inputManager.verticalInput;
+        targetDirection += cameraObject.right * inputManager.horizontalInput;
+        targetDirection.Normalize();
+        targetDirection.y = 0;
 
-        if (targetDirection == Vector3.zero) // If no input, do not rotate
+        if (targetDirection == Vector3.zero)
         {
-            targetDirection = transform.forward; // Maintain current forward direction
+            targetDirection = transform.forward;
         }
 
-        Quaternion targetRotation = Quaternion.LookRotation(targetDirection); // Create rotation based on movement direction
-        Quaternion playerRotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime); // Smoothly rotate towards the target direction
+        Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+        Quaternion playerRotation = Quaternion.Slerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
 
-        transform.rotation = playerRotation; // Apply the rotation to the player
+        transform.rotation = playerRotation;
+    }
+
+    private void UpdateAnimator()
+    {
+        if (animator == null || inputManager == null) return;
+
+        // 移動速度をアニメーターに反映
+        if (hasSpeedFloat)
+        {
+            animator.SetFloat(speedParameterName, inputManager.moveAmount);
+        }
+
+        // 移動時間を更新
+        if (inputManager.moveAmount > 0.1f)
+        {
+            movementTime += Time.deltaTime;
+        }
+        else
+        {
+            movementTime = 0f;
+        }
+
+        if (hasTimeFloat)
+        {
+            animator.SetFloat(movementTimeParameterName, movementTime);
+        }
+
+        // AnimatorManager との連携（存在する場合）
+        if (animatorManager != null)
+        {
+            animatorManager.UpdateAnimatorValues(0, inputManager.moveAmount);
+        }
+    }
+
+    void OnControllerColliderHit(ControllerColliderHit hit)
+    {
+        Rigidbody body = hit.collider.attachedRigidbody;
+
+        if (body == null || body.isKinematic)
+        {
+            return;
+        }
+
+        // 下方向の押し出しは無視
+        if (hit.moveDirection.y < -0.3f)
+        {
+            return;
+        }
+
+        Vector3 pushDir = new Vector3(hit.moveDirection.x, 0, hit.moveDirection.z);
+        body.AddForce(pushDir * pushPower, ForceMode.VelocityChange);
+    }
+
+    bool HasAnimatorParameter(string parameterName, AnimatorControllerParameterType type)
+    {
+        if (animator == null || string.IsNullOrEmpty(parameterName))
+        {
+            return false;
+        }
+
+        foreach (var parameter in animator.parameters)
+        {
+            if (parameter.type == type && parameter.name == parameterName)
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
