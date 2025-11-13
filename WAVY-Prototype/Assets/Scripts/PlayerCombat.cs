@@ -38,6 +38,27 @@ public class PlayerCombat : MonoBehaviour
 	public float beamHitDelay = 0.1f;
 	public float beamKnockbackDistance = 2.5f;
 
+	// 投擲（Throw）関連（既存）
+	[Header("Throw (投擲) Attack Settings")]
+	[SerializeField] GameObject throwProjectilePrefab = null; // Rigidbody を持つ弾のプレハブ（ProjectileThrow コンポーネント推奨）
+	[SerializeField, Min(0f)] float throwRange = 8f;          // 水平射程（前方方向の距離）
+	[SerializeField, Range(5f, 85f)] float throwAngleDeg = 45f; // 発射角度（度）
+	[SerializeField] Vector3 throwSpawnOffset = new Vector3(0f, 3.0f, 3.0f); // ボス基準のスポーンオフセット
+	[SerializeField, Min(0f)] float throwCooldown = 2f;
+	[SerializeField, Min(0f)] float throwProjectileLifetime = 10f;
+
+	// ビーム入力でビームか投擲かを切り替える（Inspector で排他的に設定）
+	public enum BeamOrThrowMode { Beam = 0, Throw = 1 }
+	[Header("Beam / Throw 切替 (ビーム入力でどちらを発動するか)")]
+	[SerializeField] BeamOrThrowMode beamOrThrowMode = BeamOrThrowMode.Beam;
+
+	// 着弾エリア（ProjectileThrow から渡される値）
+	[SerializeField] GameObject landingAreaPrefab = null;
+	[SerializeField, Min(0f)] float landingAreaRadius = 3f;
+	[SerializeField, Min(0f)] float landingAreaDuration = 5f;
+	[SerializeField, Min(0f)] int landingAreaDamagePerTick = 5;
+	[SerializeField, Min(0f)] float landingAreaTickInterval = 1f;
+
 	[Header("Charge Attack Settings")]
 	public float chargeDistance = 5f;
 	public float chargeDuration = 0.4f;
@@ -63,6 +84,8 @@ public class PlayerCombat : MonoBehaviour
 	bool canCharge = true;
 	bool isAttacking;
 	bool isCharging;
+	// 追加: 投擲制御
+	bool canThrow = true;
 
 	bool hasAttackBool;
 	bool hasTailTrigger;
@@ -113,10 +136,18 @@ public class PlayerCombat : MonoBehaviour
 			return;
 		}
 
-		//HandleAttackInput();
+		HandleAttackInput(); // 追加: 投擲入力をここで処理
 		HandleTailInput();
 		HandleBeamInput();
 		HandleChargeInput();
+	}
+
+	void HandleAttackInput()
+	{
+		// attackInput は InputManager が一フレームフラグとしてセットする想定
+		// ここでは通常の「攻撃（Attack）」入力は消費するのみとし、
+		// 投擲はビーム入力で切り替えて発動するように変更しています。
+		inputManager.attackInput = false;
 	}
 
 	void HandleTailInput()
@@ -131,11 +162,26 @@ public class PlayerCombat : MonoBehaviour
 
 	void HandleBeamInput()
 	{
-		if (inputManager.beamInput && canBeam && !isAttacking && !isCharging)
+		// beamInput を受けて、Inspector 設定に従い Beam または Throw を発動する
+		if (inputManager.beamInput && !isAttacking && !isCharging)
 		{
-			PerformBeamAttack();
+			if (beamOrThrowMode == BeamOrThrowMode.Beam)
+			{
+				if (canBeam)
+				{
+					PerformBeamAttack();
+				}
+			}
+			else // Throw モード
+			{
+				if (canThrow)
+				{
+					PerformThrowAttack();
+				}
+			}
 		}
 
+		// フラグは消費しておく
 		inputManager.beamInput = false;
 	}
 
@@ -243,6 +289,89 @@ public class PlayerCombat : MonoBehaviour
 		StartCoroutine(ChargeMoveRoutine());
 		StartCoroutine(ChargeCooldownRoutine());
 	}
+	void PerformThrowAttack()
+	{
+		if (!canThrow || throwProjectilePrefab == null)
+		{
+			// 無効またはプレハブ未設定ならクールダウンだけ行う
+			StartCoroutine(ThrowCooldownRoutine());
+			return;
+		}
+
+		canThrow = false;
+
+		// アニメーション（存在すれば Attack の bool/triggers を利用）
+		TriggerAttackAnimation(false, true, "Attack");
+
+		// 実際に弾を生成して打つ（即時）
+		Vector3 spawnPos = transform.position + transform.TransformDirection(throwSpawnOffset);
+		float angleRad = Mathf.Deg2Rad * Mathf.Clamp(throwAngleDeg, 5f, 85f);
+
+		// 水平方向の単位ベクトル
+		Vector3 forward = transform.forward;
+		Vector3 horizontalDir = new Vector3(forward.x, 0f, forward.z).normalized;
+		if (horizontalDir.sqrMagnitude < Mathf.Epsilon)
+		{
+			horizontalDir = Vector3.forward;
+		}
+
+		// 重力の正数値
+		float g = Mathf.Abs(Physics.gravity.y);
+		// 目標水平距離 = throwRange
+		float d = Mathf.Max(0.001f, throwRange);
+
+		// 初速度の大きさ（単純な角度指定から計算）
+		// v = sqrt(d * g / sin(2*angle))
+		float denom = Mathf.Sin(2f * angleRad);
+		float speed = 0f;
+		if (Mathf.Abs(denom) > 0.0001f)
+		{
+			float tmp = d * g / denom;
+			if (tmp < 0f) tmp = 0f;
+			speed = Mathf.Sqrt(tmp);
+		}
+		else
+		{
+			// フォールバック
+			speed = 10f;
+		}
+
+		Vector3 initialVelocity = horizontalDir * (speed * Mathf.Cos(angleRad)) + Vector3.up * (speed * Mathf.Sin(angleRad));
+
+		GameObject proj = Instantiate(throwProjectilePrefab, spawnPos, Quaternion.LookRotation(initialVelocity.normalized));
+		if (proj != null)
+		{
+			Rigidbody rb = proj.GetComponent<Rigidbody>();
+			if (rb != null)
+			{
+				rb.linearVelocity = initialVelocity;
+			}
+			else
+			{
+				// Rigidbody 無ければ forward を設定して放り出すふりをする
+				proj.transform.forward = initialVelocity.normalized;
+			}
+
+			// ProjectileThrow コンポーネントへ着弾エリア情報を渡す（存在すれば）
+			var pt = proj.GetComponent<ProjectileThrow>();
+			if (pt != null)
+			{
+				pt.landingAreaPrefab = landingAreaPrefab;
+				pt.landingAreaRadius = landingAreaRadius;
+				pt.landingAreaDuration = landingAreaDuration;
+				pt.landingAreaDamagePerTick = landingAreaDamagePerTick;
+				pt.landingAreaTickInterval = landingAreaTickInterval;
+			}
+
+			if (throwProjectileLifetime > 0f)
+			{
+				Destroy(proj, throwProjectileLifetime);
+			}
+		}
+
+		// 投擲クールダウン開始
+		StartCoroutine(ThrowCooldownRoutine());
+	}
 
 	IEnumerator AttackCooldownRoutine()
 	{
@@ -313,6 +442,12 @@ public class PlayerCombat : MonoBehaviour
 	{
 		yield return new WaitForSeconds(chargeCooldown);
 		canCharge = true;
+	}
+
+	IEnumerator ThrowCooldownRoutine()
+	{
+		yield return new WaitForSeconds(Mathf.Max(0f, throwCooldown));
+		canThrow = true;
 	}
 
 	void MoveCharacter(Vector3 displacement)
