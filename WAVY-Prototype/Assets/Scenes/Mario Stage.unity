@@ -1245,6 +1245,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5844970145033203958, guid: b5fead16552398740975db22e4f9d9e8, type: 3}
+      propertyPath: deathSpawnPrefab
+      value: 
+      objectReference: {fileID: 4492889921191898461, guid: 4680414e4628f174aa72c0e990c01839, type: 3}
     - target: {fileID: 7792046320457077015, guid: b5fead16552398740975db22e4f9d9e8, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -1406,6 +1410,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5844970145033203958, guid: b5fead16552398740975db22e4f9d9e8, type: 3}
+      propertyPath: deathSpawnPrefab
+      value: 
+      objectReference: {fileID: 4492889921191898461, guid: 4680414e4628f174aa72c0e990c01839, type: 3}
     - target: {fileID: 7792046320457077015, guid: b5fead16552398740975db22e4f9d9e8, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2216,6 +2224,10 @@ PrefabInstance:
       propertyPath: m_AnchoredPosition.y
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 5844970145033203958, guid: b5fead16552398740975db22e4f9d9e8, type: 3}
+      propertyPath: deathSpawnPrefab
+      value: 
+      objectReference: {fileID: 4492889921191898461, guid: 4680414e4628f174aa72c0e990c01839, type: 3}
     - target: {fileID: 7792046320457077015, guid: b5fead16552398740975db22e4f9d9e8, type: 3}
       propertyPath: m_AnchorMax.y
       value: 0
@@ -2884,7 +2896,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   pauseMenuUI: {fileID: 454613749}
   manageCursorVisibility: 1
-  mainMenuSceneName: SuperMarioGalaxyMainMenu
+  mainMenuSceneName: Start
 --- !u!4 &1457428582
 Transform:
   m_ObjectHideFlags: 0
@@ -4268,35 +4280,27 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 4530962120736003760, guid: 55d55169bc09e0542a3dd7678c1f2f1b, type: 3}
       propertyPath: angularSpeed
-      value: 11.25
+      value: 9
       objectReference: {fileID: 0}
     - target: {fileID: 4530962120736003760, guid: 55d55169bc09e0542a3dd7678c1f2f1b, type: 3}
       propertyPath: circleCenter
       value: 
-      objectReference: {fileID: 502991374}
+      objectReference: {fileID: 1095016096}
     - target: {fileID: 4530962120736003760, guid: 55d55169bc09e0542a3dd7678c1f2f1b, type: 3}
       propertyPath: circleRadius
-      value: 40
+      value: 50
       objectReference: {fileID: 0}
     - target: {fileID: 4530962120736003760, guid: 55d55169bc09e0542a3dd7678c1f2f1b, type: 3}
       propertyPath: flightHeight
-      value: 20
+      value: 10
       objectReference: {fileID: 0}
-    - target: {fileID: 4530962120736003760, guid: 55d55169bc09e0542a3dd7678c1f2f1b, type: 3}
-      propertyPath: shootInterval
-      value: 5
-      objectReference: {fileID: 0}
-    - target: {fileID: 4530962120736003760, guid: 55d55169bc09e0542a3dd7678c1f2f1b, type: 3}
-      propertyPath: projectileSpeed
-      value: 20
-      objectReference: {fileID: 0}
-    - target: {fileID: 4530962120736003760, guid: 55d55169bc09e0542a3dd7678c1f2f1b, type: 3}
-      propertyPath: projectilePrefab
-      value: 
-      objectReference: {fileID: 2360584092786099001, guid: e947775bb9399734caa7da07d6609bc4, type: 3}
     - target: {fileID: 7883408086090201896, guid: 55d55169bc09e0542a3dd7678c1f2f1b, type: 3}
       propertyPath: m_Speed
-      value: 20
+      value: 10
+      objectReference: {fileID: 0}
+    - target: {fileID: 7883408086090201896, guid: 55d55169bc09e0542a3dd7678c1f2f1b, type: 3}
+      propertyPath: m_AgentTypeID
+      value: -1372625422
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -5423,10 +5427,10 @@ PrefabInstance:
       propertyPath: tailAttackHitDelay
       value: 0.8
       objectReference: {fileID: 0}
-    - target: {fileID: 6495216264112346069, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
-      propertyPath: throwProjectilePrefab
-      value: 
-      objectReference: {fileID: 7528221558601790308, guid: 81ea67d0ddf538f458480990adede0e2, type: 3}
+    - target: {fileID: 6937111084098499519, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      propertyPath: m_IsActive
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 8163356372023265571, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
       propertyPath: cameraTransform
       value: 
