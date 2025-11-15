@@ -125,3 +125,6 @@ MonoBehaviour:
   speed: 0.05
   maxTimer: 10
   collectDistance: 0.5
+  yAxisOnly: 1
+  rotationLerpSpeed: 0
+  playerTag: Player
