@@ -1,7 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
 
-public class StartScript : MonoBehaviour
+public class ToMainMenu : MonoBehaviour
 {
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -12,11 +12,11 @@ public class StartScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
-    }
 
-    public void StartBtn() //�X�^�[�g�{�^�����\�b�h�������Main���Ăяo��
+    }
+    
+    public void MenuBtn() //�X�^�[�g�{�^�����\�b�h�������Main���Ăяo��
     {
-        SceneManager.LoadScene("Main");
+        SceneManager.LoadScene("Start");
     }
 }
