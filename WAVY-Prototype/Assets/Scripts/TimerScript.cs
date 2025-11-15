@@ -1,17 +1,18 @@
 using TMPro;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class TimerScript : MonoBehaviour
 {
-    private float totalTime; //‡ŒvŠÔ
-    [SerializeField] private int minutes; //§ŒÀŠÔ‚Ì•ª
-    [SerializeField] private float seconds; //§ŒÀŠÔ‚Ì•b
-    private float oldSeconds; //ƒ^ƒCƒ}[‚ÌˆÀ’è«AŠŠ‚ç‚©‚³‚Ì•\¦
+    private float totalTime; //ç·è¨ˆæ™‚é–“
+    [SerializeField] private int minutes; //æ®‹ã‚Šæ™‚é–“ã®åˆ†
+    [SerializeField] private float seconds; //æ®‹ã‚Šæ™‚é–“ã®ç§’
+    private float oldSeconds; //å‰å›ã®ãƒ•ãƒ¬ãƒ¼ãƒ ã®ç§’æ•°ã‚’ä¿æŒã™ã‚‹ãŸã‚ã®å¤‰æ•°
     private TextMeshProUGUI timerText;
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
-        totalTime = minutes * 60 + seconds; //—ái3•ª * 60 = 180 180 + 0•b = ‡Œv180•b)
+        totalTime = minutes * 60 + seconds; //ä¾‹ãˆã°3åˆ† *  60 = 180 180 + 0ç§’ = ç·è¨ˆ180ç§’)
         oldSeconds = 0f;
         timerText = GetComponent<TextMeshProUGUI>();
     }
@@ -19,21 +20,23 @@ public class TimerScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        totalTime = minutes * 60 + seconds; //‡ŒvŠÔ‚ÌŒvZ
+        totalTime = minutes * 60 + seconds; //ç¾åœ¨ã®æ®‹ã‚Šæ™‚é–“ã‚’è¨ˆç®—
         totalTime -= Time.deltaTime;
 
-        minutes = (int)totalTime / 60;@  //@Äİ’è
+        minutes = (int)totalTime / 60;  //åˆ†ã®è¨ˆç®—
         seconds = totalTime - minutes * 60;
 
         if ((int)seconds != (int)oldSeconds)
         {
-            timerText.text = minutes.ToString("00") + ":" + ((int)seconds).ToString("00"); //UI‚ÌƒeƒLƒXƒg•\¦iŠÔj
+            timerText.text = minutes.ToString("00") + ":" + ((int)seconds).ToString("00"); //UIã®ãƒ†ã‚­ã‚¹ãƒˆè¡¨ç¤ºã‚’æ›´æ–°
         }
         oldSeconds = seconds;
 
         if (totalTime <= 0f)
         {
-            return; //0•bˆÈ‰º‚É‚È‚Á‚½‚çˆ—‚ğ~‚ß‚é‚æI@//ƒr[ƒ€ƒV[ƒ“‚ÌØ‚è‘Ö‚¦‚É‚È‚é—\’èB
+            return; //0ç§’ã‚’éãã¦ã‚‚å‡¦ç†ãŒç¶šãã®ã‚’é˜²ããŸã‚ã«ãƒªã‚¿ãƒ¼ãƒ³ã‚’å…¥ã‚Œã‚‹
         }
     }
+
+    
 }
