@@ -6,6 +6,13 @@ public class exp_approach : MonoBehaviour
     [SerializeField] float speed = 0.4f;
     [SerializeField] float maxTimer = 10.0f;
     [SerializeField] float collectDistance = 1.0f;
+
+    [Header("ビルボード")]
+    public bool yAxisOnly = false;
+    [Min(0f)] public float rotationLerpSpeed = 0f;　//回転スムーズ速度
+    public string playerTag = "Player"; //Playerタグ配下から探索
+
+    private Transform cam;
     private float timer = 0.0f;
     private bool isCollect = false;
 
@@ -18,6 +25,8 @@ public class exp_approach : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
+        Billboard();
+
         if (!isCollect)
         {
             return;
@@ -46,6 +55,67 @@ public class exp_approach : MonoBehaviour
         {
             Debug.Log("Player is close enough. Finishing collect.");
             FinishCollect();
+        }
+    }
+
+    private void Billboard() //オブジェクトが常にカメラの方を向くようにする
+    {
+          if (exp == null) return;
+
+        if (cam == null || !cam.gameObject.activeInHierarchy)
+        {
+            ResolveCamera(false);
+            if (cam == null) return;
+        }
+
+        Vector3 targetPos = cam.position;
+        Vector3 dir = targetPos - exp.transform.position;
+
+        if (yAxisOnly)
+        {
+            dir.y = 0f;
+        }
+
+        if (dir.sqrMagnitude < 1e-6f) return;
+
+        Quaternion targetRot = Quaternion.LookRotation(dir.normalized, Vector3.up);
+
+        if (rotationLerpSpeed > 0f)
+        {
+            exp.transform.rotation = Quaternion.Slerp(
+                exp.transform.rotation,
+                targetRot,
+                1f - Mathf.Exp(-rotationLerpSpeed * Time.deltaTime)
+            );
+        }
+        else
+        {
+            exp.transform.rotation = targetRot;
+        }
+    }
+
+    private void ResolveCamera(bool firstTry)
+    {
+        // Playerタグ配下から探索
+        if (!string.IsNullOrEmpty(playerTag))
+        {
+            var player = GameObject.FindGameObjectWithTag(playerTag);
+            if (player != null)
+            {
+                var playerCam = player.GetComponentInChildren<Camera>(true);
+                if (playerCam != null)
+                {
+                    cam = playerCam.transform;
+                    return;
+                }
+            }
+        }
+
+        // Camera.main をフォールバックとして使用
+        if (Camera.main != null)
+        {
+            cam = Camera.main.transform;
+            return;
         }
     }
 
