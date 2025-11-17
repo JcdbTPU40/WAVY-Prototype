@@ -263,6 +263,23 @@ MonoBehaviour:
   DeathTime: 2
   ScoreOnDeath: 100
   attackDamage: 10
+  hitFxPrefab: {fileID: 0}
+  hitFxOffset: {x: 0, y: 0.5, z: 0}
+  hitFxDelay: 0
+  ragdollController: {fileID: 0}
+  deathKnockbackForce: 12
+  deathKnockbackUpForce: 2
+  deathKnockbackAngle: 30
+  disableKnockbackAfterDeath: 1
+  hitKnockbackForce: 4
+  hitKnockbackUpForce: 1.5
+  hitKnockbackAngle: 20
+  hitKnockbackRecoveryDelay: 0.25
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  liftBeforePhysics: 0.08
+  groundRayLength: 2
 --- !u!195 &147607299055879781
 NavMeshAgent:
   m_ObjectHideFlags: 0

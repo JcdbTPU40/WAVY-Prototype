@@ -17,7 +17,7 @@ public class ScoreManager : MonoBehaviour
 
     public int CurrentScore => currentScore;
 
-    int currentScore;
+    static int currentScore;
 
     void Awake()
     {
