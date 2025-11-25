@@ -28,7 +28,7 @@ public class PlayerCombat : MonoBehaviour
 	public float tailKnockbackDistance = 3f;
 
 	[Header("Beam Attack Settings")]
-	public GameObject beamPrefab;
+	[SerializeField] public GameObject beamPrefab;
 	public float beamDuration = 2f;
 	public float beamCooldown = 3f;
 	public Vector3 beamOffset = new Vector3(0f, 0f, 2f);
