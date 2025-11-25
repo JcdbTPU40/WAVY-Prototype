@@ -612,7 +612,7 @@ MonoBehaviour:
   MaxHP: 10
   DeathTime: 5
   ScoreOnDeath: 100
-  attackDamage: 10
+  attackDamage: 20
   hitFxPrefab: {fileID: 4021103657954561961, guid: 5c755f9bc5253ea418e919994537dcc7, type: 3}
   hitFxOffset: {x: 0, y: 0.5, z: 0}
   hitFxDelay: 0

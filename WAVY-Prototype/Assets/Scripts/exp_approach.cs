@@ -128,8 +128,18 @@ public class exp_approach : MonoBehaviour
     {
         Debug.Log("FinishCollect called");
         isCollect = false;
-        
+
+        // Player に接触したとみなし、HPを回復
+        var playerObj = GameObject.FindWithTag(playerTag);
+        if (playerObj != null)
+        {
+            var health = playerObj.GetComponent<PlayerHealth>();
+            if (health != null)
+            {
+                health.HealFromExp();
+            }
+        }
+
         Destroy(this.gameObject);
-	
     }
 }

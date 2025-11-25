@@ -130,12 +130,12 @@ GameObject:
   - component: {fileID: 79570927}
   - component: {fileID: 79570928}
   m_Layer: 5
-  m_Name: Slider
+  m_Name: PlayerHealth
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!224 &79570927
 RectTransform:
   m_ObjectHideFlags: 0
@@ -2976,7 +2976,7 @@ RectTransform:
   m_Father: {fileID: 1091948926}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 10}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -3510,6 +3510,35 @@ MonoBehaviour:
   legacyText: {fileID: 0}
   duration: 8
   holdAlpha: 0.4
+--- !u!1 &1718845243 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 4222518874670096430, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+  m_PrefabInstance: {fileID: 7448846436230383638}
+  m_PrefabAsset: {fileID: 0}
+--- !u!95 &1718845252 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 7436176305119977710, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+  m_PrefabInstance: {fileID: 7448846436230383638}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1718845253
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1718845243}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d8844318a75c3904cb9b18ff3ed85f6f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  maxHealth: 100
+  currentHealth: 100
+  expHealAmount: 1
+  deathDelay: 0
+  animator: {fileID: 1718845252}
+  deathTriggerName: Die
+  healthSlider: {fileID: 79570928}
 --- !u!1 &1722503295 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1594506253673570205, guid: ff83fa5e49e76504e8f2942e3ca54222, type: 3}
@@ -3931,7 +3960,7 @@ RectTransform:
   m_Father: {fileID: 2092152492}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
-  m_AnchorMax: {x: 1, y: 0}
+  m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 20}
   m_Pivot: {x: 0.5, y: 0.5}
@@ -5567,10 +5596,38 @@ PrefabInstance:
       propertyPath: m_Name
       value: Player
       objectReference: {fileID: 0}
-    m_RemovedComponents: []
+    - target: {fileID: 6495216264112346069, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      propertyPath: beamPrefab
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6495216264112346069, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      propertyPath: attackCooldown
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6495216264112346069, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      propertyPath: beamOrThrowMode
+      value: 0
+      objectReference: {fileID: 0}
+    - target: {fileID: 6495216264112346069, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      propertyPath: tailAttackAngle
+      value: 360
+      objectReference: {fileID: 0}
+    - target: {fileID: 6495216264112346069, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      propertyPath: landingAreaPrefab
+      value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 6495216264112346069, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      propertyPath: tailAttackHitDelay
+      value: 0
+      objectReference: {fileID: 0}
+    m_RemovedComponents:
+    - {fileID: 3768377352582204481, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 4222518874670096430, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1718845253}
   m_SourcePrefab: {fileID: 100100000, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:

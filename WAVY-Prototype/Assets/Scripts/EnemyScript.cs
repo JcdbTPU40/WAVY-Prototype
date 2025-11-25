@@ -484,8 +484,20 @@ public class EnemyScript : MonoBehaviour
 
     void PerformAttack()
     {
+        // 攻撃アニメーション（設定されていれば）
         animator?.SetTrigger("Attack");
-        Target.SendMessage("TakeDamage", attackDamage, SendMessageOptions.DontRequireReceiver);
+
+        // 新: PlayerHealth への直接ダメージ
+        var health = Target.GetComponent<PlayerHealth>();
+        if (health != null)
+        {
+            health.TakeDamage(attackDamage);
+        }
+        else
+        {
+            // 互換性維持のため、従来の SendMessage も残す
+            Target.SendMessage("TakeDamage", attackDamage, SendMessageOptions.DontRequireReceiver);
+        }
     }
 
     void ApplyHitKnockback()
