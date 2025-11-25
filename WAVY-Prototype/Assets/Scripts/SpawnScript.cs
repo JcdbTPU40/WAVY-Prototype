@@ -71,7 +71,7 @@ public class SpawnScript : MonoBehaviour
         }
 
         // 自身の位置から右方向（ローカル X 軸）にオフセットした地点に生成
-        Vector3 spawnPosition = transform.position + transform.right * spawnOffset;
+        Vector3 spawnPosition = transform.position + transform.forward * spawnOffset;
 
         // 回転はこのオブジェクトの回転をそのまま継承
         Instantiate(enemy, spawnPosition, transform.rotation);
