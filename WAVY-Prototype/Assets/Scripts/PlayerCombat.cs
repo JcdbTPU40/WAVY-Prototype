@@ -24,60 +24,53 @@ public class PlayerCombat : MonoBehaviour
 
 	#region Attack Settings
 	[Header("Basic Attack Settings")]
-	public float attackDamage = 20f;
-	public float attackRange = 2f;
-	public float attackCooldown = 1f;
+	[SerializeField] float attackDamage = 20f;
+	[SerializeField] float attackCooldown = 1f;
+	[SerializeField] float attackAnimationDuration = 0.5f;
 
 	[Header("Tail Attack Settings")]
-	public float tailAttackDamage = 35f;
-	public float tailAttackRadius = 2f;
-	[Range(10f, 180f)] public float tailAttackAngle = 90f;
-	public float tailAttackHitDelay = 0.2f;
-	public float tailHeightOffset = 0.5f;
-	public float tailKnockbackDistance = 3f;
+	[SerializeField] float tailAttackDamage = 35f;
+	[SerializeField] float tailAttackRadius = 2f;
+	[SerializeField, Range(10f, 180f)] float tailAttackAngle = 90f;
+	[SerializeField] float tailAttackHitDelay = 0.2f;
+	[SerializeField] float tailHeightOffset = 0.5f;
+	[SerializeField] float tailKnockbackDistance = 3f;
 
 	[Header("Beam Attack Settings")]
-	public GameObject beamPrefab;
-	public float beamDuration = 2f;
-	public float beamCooldown = 3f;
-	public Vector3 beamOffset = new Vector3(0f, 0f, 2f);
-	public float beamDamage = 45f;
-	public float beamRange = 12f;
-	public float beamRadius = 1.2f;
-	public float beamHitDelay = 0.1f;
-	public float beamKnockbackDistance = 2.5f;
+	[SerializeField] GameObject beamPrefab;
+	[SerializeField] float beamDuration = 2f;
+	[SerializeField] float beamCooldown = 3f;
+	[SerializeField] Vector3 beamOffset = new Vector3(0f, 0f, 2f);
+	[SerializeField] float beamDamage = 45f;
+	[SerializeField] float beamRange = 12f;
+	[SerializeField] float beamRadius = 1.2f;
+	[SerializeField] float beamHitDelay = 0.1f;
+	[SerializeField] float beamKnockbackDistance = 2.5f;
 
-	// 投擲（Throw）関連（既存）
-	[Header("Throw (投擲) Attack Settings")]
-	[SerializeField] GameObject throwProjectilePrefab = null; // Rigidbody を持つ弾のプレハブ（ProjectileThrow コンポーネント推奨）
-	[SerializeField, Min(0f)] float throwRange = 8f;          // 水平射程（前方方向の距離）
-	[SerializeField, Range(5f, 85f)] float throwAngleDeg = 45f; // 発射角度（度）
-	[SerializeField] Vector3 throwSpawnOffset = new Vector3(0f, 3.0f, 3.0f); // ボス基準のスポーンオフセット
+	[Header("Throw Attack Settings")]
+	[SerializeField] GameObject throwProjectilePrefab;
+	[SerializeField, Min(0f)] float throwRange = 8f;
+	[SerializeField, Range(5f, 85f)] float throwAngleDeg = 45f;
+	[SerializeField] Vector3 throwSpawnOffset = new Vector3(0f, 3.0f, 3.0f);
 	[SerializeField, Min(0f)] float throwCooldown = 2f;
 	[SerializeField, Min(0f)] float throwProjectileLifetime = 10f;
-
-	// ビーム入力でビームか投擲かを切り替える（Inspector で排他的に設定）
-	public enum BeamOrThrowMode { Beam = 0, Throw = 1 }
-	[Header("Beam / Throw 切替 (ビーム入力でどちらを発動するか)")]
-	[SerializeField] BeamOrThrowMode beamOrThrowMode = BeamOrThrowMode.Beam;
-
-	// 着弾エリア（ProjectileThrow から渡される値）
-	[SerializeField] GameObject landingAreaPrefab = null;
+	[SerializeField] GameObject landingAreaPrefab;
 	[SerializeField, Min(0f)] float landingAreaRadius = 3f;
 	[SerializeField, Min(0f)] float landingAreaDuration = 5f;
 	[SerializeField, Min(0f)] int landingAreaDamagePerTick = 5;
 	[SerializeField, Min(0f)] float landingAreaTickInterval = 1f;
 
-	[Header("Charge Attack Settings")]
-	public float chargeDistance = 5f;
-	public float chargeDuration = 0.4f;
-	public float chargeCooldown = 3f;
-	public float chargeHitRadius = 1.5f;
-	public float chargeKnockbackDistance = 2f;
-	[Min(0f)] public float chargeTowerHitInterval = 1f;
+	public enum BeamOrThrowMode { Beam = 0, Throw = 1 }
+	[Header("Beam / Throw Mode")]
+	[SerializeField] BeamOrThrowMode beamOrThrowMode = BeamOrThrowMode.Beam;
 
-	[Header("Animation Timings")]
-	public float attackAnimationDuration = 0.5f;
+	[Header("Charge Attack Settings")]
+	[SerializeField] float chargeDistance = 5f;
+	[SerializeField] float chargeDuration = 0.4f;
+	[SerializeField] float chargeCooldown = 3f;
+	[SerializeField] float chargeHitRadius = 1.5f;
+	[SerializeField] float chargeKnockbackDistance = 2f;
+	[SerializeField, Min(0f)] float chargeTowerHitInterval = 1f;
 
 	[Header("Animator Parameters")]
 	[SerializeField] string attackBoolName = "Attack";
@@ -167,7 +160,6 @@ public class PlayerCombat : MonoBehaviour
 
 	void HandleAttackInput()
 	{
-		// 通常攻撃入力を消費（現在は投擲がビーム入力で切り替わるため）
 		inputManager.attackInput = false;
 	}
 
@@ -177,22 +169,24 @@ public class PlayerCombat : MonoBehaviour
 		{
 			PerformTailAttack();
 		}
-
 		inputManager.tailInput = false;
 	}
 
 	void HandleBeamInput()
 	{
-		if (inputManager.beamInput && !isAttacking && !isCharging)
+		if (!inputManager.beamInput || isAttacking || isCharging)
 		{
-			if (beamOrThrowMode == BeamOrThrowMode.Beam && canBeam)
-			{
-				PerformBeamAttack();
-			}
-			else if (beamOrThrowMode == BeamOrThrowMode.Throw && canThrow)
-			{
-				PerformThrowAttack();
-			}
+			inputManager.beamInput = false;
+			return;
+		}
+
+		if (beamOrThrowMode == BeamOrThrowMode.Beam && canBeam)
+		{
+			PerformBeamAttack();
+		}
+		else if (beamOrThrowMode == BeamOrThrowMode.Throw && canThrow)
+		{
+			PerformThrowAttack();
 		}
 
 		inputManager.beamInput = false;
@@ -204,7 +198,6 @@ public class PlayerCombat : MonoBehaviour
 		{
 			PerformChargeAttack();
 		}
-
 		inputManager.chargeInput = false;
 	}
 	#endregion
@@ -248,7 +241,6 @@ public class PlayerCombat : MonoBehaviour
 	void PerformBeamAttack()
 	{
 		canBeam = false;
-
 		TriggerBeamAnimation();
 		SpawnBeamVisual();
 		StartCoroutine(BeamDamageRoutine());
@@ -257,18 +249,23 @@ public class PlayerCombat : MonoBehaviour
 
 	void TriggerBeamAnimation()
 	{
+		bool triggered = false;
+
 		if (animator != null)
 		{
 			if (hasBeamTrigger)
 			{
 				animator.SetTrigger(beamTriggerName);
+				triggered = true;
 			}
 			else if (hasChargeTrigger)
 			{
 				animator.SetTrigger(chargeTriggerName);
+				triggered = true;
 			}
 		}
-		else if (animatorManager != null)
+
+		if (!triggered && animatorManager != null)
 		{
 			animatorManager.PlayTargetAnimation("Beam", true);
 		}
@@ -313,9 +310,9 @@ public class PlayerCombat : MonoBehaviour
 	}
 	void PerformThrowAttack()
 	{
-		if (!canThrow || throwProjectilePrefab == null)
+		if (throwProjectilePrefab == null)
 		{
-			StartCoroutine(ThrowCooldownRoutine());
+			Debug.LogWarning("Throw projectile prefab が設定されていません", this);
 			return;
 		}
 
@@ -324,8 +321,8 @@ public class PlayerCombat : MonoBehaviour
 
 		Vector3 spawnPos = transform.position + transform.TransformDirection(throwSpawnOffset);
 		Vector3 initialVelocity = CalculateThrowVelocity();
-
 		SpawnThrowProjectile(spawnPos, initialVelocity);
+		
 		StartCoroutine(ThrowCooldownRoutine());
 	}
 
@@ -333,10 +330,10 @@ public class PlayerCombat : MonoBehaviour
 	{
 		float angleRad = Mathf.Deg2Rad * Mathf.Clamp(throwAngleDeg, 5f, 85f);
 		Vector3 horizontalDir = GetHorizontalDirection(transform.forward);
-		float g = Mathf.Abs(Physics.gravity.y);
-		float d = Mathf.Max(MinimumRange, throwRange);
-
-		float speed = CalculateProjectileSpeed(angleRad, d, g);
+		float gravity = Mathf.Abs(Physics.gravity.y);
+		float distance = Mathf.Max(MinimumRange, throwRange);
+		float speed = CalculateProjectileSpeed(angleRad, distance, gravity);
+		
 		return horizontalDir * (speed * Mathf.Cos(angleRad)) + Vector3.up * (speed * Mathf.Sin(angleRad));
 	}
 
@@ -351,42 +348,33 @@ public class PlayerCombat : MonoBehaviour
 		float denom = Mathf.Sin(2f * angleRad);
 		if (Mathf.Abs(denom) > 0.0001f)
 		{
-			float tmp = distance * gravity / denom;
-			return Mathf.Sqrt(Mathf.Max(0f, tmp));
+			return Mathf.Sqrt(Mathf.Max(0f, distance * gravity / denom));
 		}
-		return 10f; // フォールバック速度
+		return 10f;
 	}
 
 	void SpawnThrowProjectile(Vector3 spawnPos, Vector3 initialVelocity)
 	{
-		GameObject proj = Instantiate(throwProjectilePrefab, spawnPos, Quaternion.LookRotation(initialVelocity.normalized));
-		if (proj == null) return;
+		GameObject projectile = Instantiate(throwProjectilePrefab, spawnPos, Quaternion.LookRotation(initialVelocity.normalized));
+		if (projectile == null) return;
 
-		ApplyProjectileVelocity(proj, initialVelocity);
-		ConfigureProjectileThrow(proj);
-
-		if (throwProjectileLifetime > 0f)
-		{
-			Destroy(proj, throwProjectileLifetime);
-		}
-	}
-
-	void ApplyProjectileVelocity(GameObject projectile, Vector3 velocity)
-	{
 		Rigidbody rb = projectile.GetComponent<Rigidbody>();
 		if (rb != null)
 		{
-			rb.linearVelocity = velocity;
+			rb.linearVelocity = initialVelocity;
 		}
-		else
+
+		ConfigureProjectileThrow(projectile);
+
+		if (throwProjectileLifetime > 0f)
 		{
-			projectile.transform.forward = velocity.normalized;
+			Destroy(projectile, throwProjectileLifetime);
 		}
 	}
 
 	void ConfigureProjectileThrow(GameObject projectile)
 	{
-		var pt = projectile.GetComponent<ProjectileThrow>();
+		ProjectileThrow pt = projectile.GetComponent<ProjectileThrow>();
 		if (pt != null)
 		{
 			pt.landingAreaPrefab = landingAreaPrefab;
@@ -509,52 +497,51 @@ public class PlayerCombat : MonoBehaviour
 	{
 		CleanupTowerHitCache();
 		Collider[] colliders = Physics.OverlapSphere(transform.position, chargeHitRadius);
+		
 		foreach (Collider collider in colliders)
 		{
-			if (collider == null)
-			{
-				continue;
-			}
+			if (collider == null) continue;
 
-			EnemyScript enemy = collider.GetComponentInParent<EnemyScript>();
-			if (enemy != null)
-			{
-				if (!chargeHitEnemies.Add(enemy))
-				{
-					continue;
-				}
-				enemy.ApplyDamage(Mathf.RoundToInt(attackDamage));
-				Vector3 fromPlayer = enemy.transform.position - transform.position;
-				ApplyKnockback(enemy, fromPlayer, chargeKnockbackDistance);
-				continue;
-			}
-
-			BossScript boss = collider.GetComponentInParent<BossScript>();
-			if (boss != null)
-			{
-				if (!chargeHitBosses.Add(boss))
-				{
-					continue;
-				}
-				// ボスにはダメージのみ（ノックバック無し）
-				boss.take_Damage(Mathf.RoundToInt(attackDamage));
-				continue;
-			}
-
-			EnemyTowerHealth tower = collider.GetComponentInParent<EnemyTowerHealth>();
-			if (tower != null)
-			{
-				float lastHit;
-				float interval = Mathf.Max(0f, chargeTowerHitInterval);
-				if (interval > 0f && towerHitTimestamps.TryGetValue(tower, out lastHit) && Time.time - lastHit < interval)
-				{
-					continue;
-				}
-
-				towerHitTimestamps[tower] = Time.time;
-				tower.TakeDamage(TowerDamagePerHit);
-			}
+			if (TryHitEnemy(collider)) continue;
+			if (TryHitBoss(collider)) continue;
+			TryHitTower(collider);
 		}
+	}
+
+	bool TryHitEnemy(Collider collider)
+	{
+		EnemyScript enemy = collider.GetComponentInParent<EnemyScript>();
+		if (enemy == null || !chargeHitEnemies.Add(enemy)) return false;
+
+		enemy.ApplyDamage(Mathf.RoundToInt(attackDamage));
+		Vector3 fromPlayer = enemy.transform.position - transform.position;
+		ApplyKnockback(enemy, fromPlayer, chargeKnockbackDistance);
+		return true;
+	}
+
+	bool TryHitBoss(Collider collider)
+	{
+		BossScript boss = collider.GetComponentInParent<BossScript>();
+		if (boss == null || !chargeHitBosses.Add(boss)) return false;
+
+		boss.take_Damage(Mathf.RoundToInt(attackDamage));
+		return true;
+	}
+
+	bool TryHitTower(Collider collider)
+	{
+		EnemyTowerHealth tower = collider.GetComponentInParent<EnemyTowerHealth>();
+		if (tower == null) return false;
+
+		float interval = Mathf.Max(0f, chargeTowerHitInterval);
+		if (interval > 0f && towerHitTimestamps.TryGetValue(tower, out float lastHit) && Time.time - lastHit < interval)
+		{
+			return false;
+		}
+
+		towerHitTimestamps[tower] = Time.time;
+		tower.TakeDamage(TowerDamagePerHit);
+		return true;
 	}
 
 	void CleanupTowerHitCache()
@@ -575,7 +562,7 @@ public class PlayerCombat : MonoBehaviour
 
 	void ApplyTailDamage()
 	{
-		int mask = enemyLayers.value == 0 ? Physics.DefaultRaycastLayers : enemyLayers.value;
+		int mask = GetValidLayerMask();
 		Vector3 origin = transform.position + Vector3.up * tailHeightOffset;
 		Collider[] hits = Physics.OverlapSphere(origin, tailAttackRadius, mask, QueryTriggerInteraction.Ignore);
 		
@@ -588,8 +575,8 @@ public class PlayerCombat : MonoBehaviour
 		{
 			if (hit == null) continue;
 
-			var (enemy, boss, tower) = GetTargetComponents(hit);
-			Transform targetTransform = GetTargetTransform(enemy, boss, tower);
+			var components = GetTargetComponents(hit);
+			Transform targetTransform = GetTargetTransform(components.enemy, components.boss, components.tower);
 			
 			if (targetTransform == null || damagedTargets.Contains(targetTransform)) continue;
 
@@ -598,14 +585,14 @@ public class PlayerCombat : MonoBehaviour
 			
 			if (angle > halfAngle) continue;
 
-			ApplyDamageToTarget(enemy, boss, tower, tailAttackDamage, toTarget, tailKnockbackDistance);
+			ApplyDamageToTarget(components.enemy, components.boss, components.tower, tailAttackDamage, toTarget, tailKnockbackDistance);
 			damagedTargets.Add(targetTransform);
 		}
 	}
 
 	void ApplyBeamDamage()
 	{
-		int mask = enemyLayers.value == 0 ? Physics.DefaultRaycastLayers : enemyLayers.value;
+		int mask = GetValidLayerMask();
 		Vector3 start = transform.position + transform.TransformDirection(beamOffset);
 		Vector3 end = start + transform.forward * Mathf.Max(0f, beamRange);
 		Collider[] hits = Physics.OverlapCapsule(start, end, Mathf.Max(MinimumRadius, beamRadius), mask, QueryTriggerInteraction.Ignore);
@@ -617,15 +604,20 @@ public class PlayerCombat : MonoBehaviour
 		{
 			if (hit == null) continue;
 
-			var (enemy, boss, tower) = GetTargetComponents(hit);
-			Transform targetTransform = GetTargetTransform(enemy, boss, tower);
+			var components = GetTargetComponents(hit);
+			Transform targetTransform = GetTargetTransform(components.enemy, components.boss, components.tower);
 			
 			if (targetTransform == null || damagedTargets.Contains(targetTransform)) continue;
 
 			Vector3 toTarget = GetDirectionToTarget(start, targetTransform.position);
-			ApplyDamageToTarget(enemy, boss, tower, beamDamage, toTarget, beamKnockbackDistance);
+			ApplyDamageToTarget(components.enemy, components.boss, components.tower, beamDamage, toTarget, beamKnockbackDistance);
 			damagedTargets.Add(targetTransform);
 		}
+	}
+
+	int GetValidLayerMask()
+	{
+		return enemyLayers.value == 0 ? Physics.DefaultRaycastLayers : enemyLayers.value;
 	}
 
 	(EnemyScript enemy, BossScript boss, EnemyTowerHealth tower) GetTargetComponents(Collider hit)
@@ -670,26 +662,10 @@ public class PlayerCombat : MonoBehaviour
 
 	void ApplyKnockback(EnemyScript enemy, Vector3 direction, float distance)
 	{
-		if (enemy == null)
-		{
-			return;
-		}
+		if (enemy == null || distance <= 0f) return;
 
-		Vector3 knockDir = direction;
-		knockDir.y = 0f;
-
-		if (knockDir.sqrMagnitude < Mathf.Epsilon)
-		{
-			knockDir = transform.forward;
-		}
-
-		knockDir.Normalize();
+		Vector3 knockDir = GetNormalizedKnockbackDirection(direction);
 		float clampedDistance = Mathf.Max(0f, distance);
-
-		if (clampedDistance <= 0f)
-		{
-			return;
-		}
 
 		NavMeshAgent enemyAgent = enemy.GetComponent<NavMeshAgent>();
 		if (enemyAgent != null && enemyAgent.enabled)
@@ -701,11 +677,24 @@ public class PlayerCombat : MonoBehaviour
 		Rigidbody enemyRb = enemy.GetComponent<Rigidbody>();
 		if (enemyRb != null && !enemyRb.isKinematic)
 		{
-			enemyRb.AddForce(knockDir * clampedDistance / Mathf.Max(Time.fixedDeltaTime, 0.02f), ForceMode.VelocityChange);
+			float force = clampedDistance / Mathf.Max(Time.fixedDeltaTime, 0.02f);
+			enemyRb.AddForce(knockDir * force, ForceMode.VelocityChange);
 			return;
 		}
 
 		enemy.transform.position += knockDir * clampedDistance;
+	}
+
+	Vector3 GetNormalizedKnockbackDirection(Vector3 direction)
+	{
+		Vector3 knockDir = new Vector3(direction.x, 0f, direction.z);
+		
+		if (knockDir.sqrMagnitude < Mathf.Epsilon)
+		{
+			knockDir = transform.forward;
+		}
+		
+		return knockDir.normalized;
 	}
 	#endregion
 
@@ -714,16 +703,6 @@ public class PlayerCombat : MonoBehaviour
 	{
 		Vector3 origin = transform.position;
 		Vector3 forward = transform.forward;
-
-		// Basic attack range
-		float clampedAttackRange = Mathf.Max(0f, attackRange);
-		if (clampedAttackRange > 0f)
-		{
-			Vector3 attackCenter = origin + forward * (clampedAttackRange * 0.5f);
-			Gizmos.color = new Color(1f, 0.3f, 0.3f, 0.9f);
-			Gizmos.DrawWireSphere(attackCenter, clampedAttackRange);
-			Gizmos.DrawLine(origin, origin + forward * clampedAttackRange);
-		}
 
 		// Tail attack fan
 		Vector3 tailOrigin = origin + Vector3.up * tailHeightOffset;
@@ -780,6 +759,8 @@ public class PlayerCombat : MonoBehaviour
 
 	void DrawWireCapsule(Vector3 start, Vector3 end, float radius)
 	{
+		if (radius <= 0f) return;
+
 		Vector3 axis = end - start;
 		if (axis.sqrMagnitude < Mathf.Epsilon)
 		{
@@ -788,8 +769,8 @@ public class PlayerCombat : MonoBehaviour
 		}
 
 		Vector3 direction = axis.normalized;
-		Vector3 tangent = GetAnyPerpendicular(direction).normalized * radius;
-		Vector3 bitangent = Vector3.Cross(direction, tangent).normalized * radius;
+		Vector3 tangent = GetPerpendicularVector(direction) * radius;
+		Vector3 bitangent = Vector3.Cross(direction, tangent.normalized) * radius;
 
 		DrawWireCircle(start, direction, radius);
 		DrawWireCircle(end, direction, radius);
@@ -800,7 +781,7 @@ public class PlayerCombat : MonoBehaviour
 		Gizmos.DrawLine(start - bitangent, end - bitangent);
 	}
 
-	Vector3 GetAnyPerpendicular(Vector3 direction)
+	Vector3 GetPerpendicularVector(Vector3 direction)
 	{
 		if (direction.sqrMagnitude < Mathf.Epsilon) return Vector3.right;
 
@@ -810,24 +791,23 @@ public class PlayerCombat : MonoBehaviour
 			perpendicular = Vector3.Cross(direction, Vector3.right);
 		}
 
-		return perpendicular;
+		return perpendicular.normalized;
 	}
 
 	void DrawWireCircle(Vector3 center, Vector3 normal, float radius)
 	{
 		if (radius <= 0f) return;
 
-		normal = normal.normalized;
-		Vector3 tangent = GetAnyPerpendicular(normal).normalized;
-		Vector3 bitangent = Vector3.Cross(normal, tangent).normalized;
+		Vector3 tangent = GetPerpendicularVector(normal);
+		Vector3 bitangent = Vector3.Cross(normal.normalized, tangent);
 
 		float angleStep = 360f / GizmoCircleSegments;
 		Vector3 previousPoint = center + tangent * radius;
 
 		for (int i = 1; i <= GizmoCircleSegments; i++)
 		{
-			float rad = Mathf.Deg2Rad * angleStep * i;
-			Vector3 localPoint = (Mathf.Cos(rad) * tangent + Mathf.Sin(rad) * bitangent) * radius;
+			float radians = Mathf.Deg2Rad * angleStep * i;
+			Vector3 localPoint = (Mathf.Cos(radians) * tangent + Mathf.Sin(radians) * bitangent) * radius;
 			Vector3 nextPoint = center + localPoint;
 			Gizmos.DrawLine(previousPoint, nextPoint);
 			previousPoint = nextPoint;

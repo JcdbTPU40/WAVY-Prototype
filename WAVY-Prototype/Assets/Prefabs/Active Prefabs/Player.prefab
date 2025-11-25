@@ -94,12 +94,6 @@ PrefabInstance:
       addedObject: {fileID: 7443114770913126191}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bdb018215e83a4847a55063fb9643e1b, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 983085251327996706}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bdb018215e83a4847a55063fb9643e1b, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 7541620810039995918}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: bdb018215e83a4847a55063fb9643e1b, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 5502262396106215797}
   m_SourcePrefab: {fileID: 100100000, guid: bdb018215e83a4847a55063fb9643e1b, type: 3}
 --- !u!4 &2987770510674045885 stripped
@@ -136,14 +130,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 30741e065ae310043918deea87f3be08, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  speed: 2
-  turnSpeed: 20
-  cameraTransform: {fileID: 0}
-  gravity: 9.8
-  speedParameterName: Speed
-  movementTimeParameterName: time
-  attackTriggerName: Attack
-  attackTypeParameterName: AttackType
 --- !u!114 &6495216264112346069
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -157,15 +143,15 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackDamage: 20
-  attackRange: 2
   attackCooldown: 2
+  attackAnimationDuration: 0.5
   tailAttackDamage: 20
   tailAttackRadius: 2
-  tailAttackAngle: 100
-  tailAttackHitDelay: 0
+  tailAttackAngle: 90
+  tailAttackHitDelay: 0.8
   tailHeightOffset: 0
   tailKnockbackDistance: 3
-  beamPrefab: {fileID: 6319171772100809965, guid: 081386ade7196b3469062b4a8139ff95, type: 3}
+  beamPrefab: {fileID: 0}
   beamDuration: 2
   beamCooldown: 8
   beamOffset: {x: 0, y: 0, z: 0.1}
@@ -174,13 +160,24 @@ MonoBehaviour:
   beamRadius: 8
   beamHitDelay: 0.1
   beamKnockbackDistance: 2.5
+  throwProjectilePrefab: {fileID: 0}
+  throwRange: 4
+  throwAngleDeg: 45
+  throwSpawnOffset: {x: 0, y: 3, z: 3}
+  throwCooldown: 2
+  throwProjectileLifetime: 10
+  landingAreaPrefab: {fileID: 5395253572500375129, guid: cd601d1d51231a7488131361a3e81939, type: 3}
+  landingAreaRadius: 3
+  landingAreaDuration: 5
+  landingAreaDamagePerTick: 5
+  landingAreaTickInterval: 1
+  beamOrThrowMode: 1
   chargeDistance: 5
   chargeDuration: 0.4
   chargeCooldown: 5
   chargeHitRadius: 1.5
   chargeKnockbackDistance: 2
   chargeTowerHitInterval: 1
-  attackAnimationDuration: 0.5
   attackBoolName: Attack
   tailTriggerName: Tail
   beamTriggerName: Beam
@@ -201,8 +198,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   walkingSpeed: 2
-  runningSpeed: 7
+  runningSpeed: 5
   rotationSpeed: 15
+  gravity: 9.8
+  groundCheckDistance: 0.2
+  groundLayers:
+    serializedVersion: 2
+    m_Bits: 1
+  groundTag: Ground
+  speedParameterName: Speed
+  movementTimeParameterName: time
+  pushPower: 0
 --- !u!114 &2089232659621086585
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -269,56 +275,6 @@ MonoBehaviour:
   m_DefaultActionMap: Player
   m_SplitScreenIndex: -1
   m_Camera: {fileID: 0}
---- !u!136 &983085251327996706
-CapsuleCollider:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4222518874670096430}
-  m_Material: {fileID: 0}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_LayerOverridePriority: 0
-  m_IsTrigger: 0
-  m_ProvidesContacts: 0
-  m_Enabled: 1
-  serializedVersion: 2
-  m_Radius: 0.5
-  m_Height: 1
-  m_Direction: 1
-  m_Center: {x: 0, y: 0.4, z: 0}
---- !u!54 &7541620810039995918
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 4222518874670096430}
-  serializedVersion: 5
-  m_Mass: 1
-  m_LinearDamping: 0
-  m_AngularDamping: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 1
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 112
-  m_CollisionDetection: 0
 --- !u!143 &5502262396106215797
 CharacterController:
   m_ObjectHideFlags: 0
@@ -342,7 +298,7 @@ CharacterController:
   m_SlopeLimit: 45
   m_StepOffset: 0.3
   m_SkinWidth: 0.08
-  m_MinMoveDistance: 0.001
+  m_MinMoveDistance: 0
   m_Center: {x: 0, y: 0.4, z: 0}
 --- !u!1001 &4718960362443422150
 PrefabInstance:
@@ -358,7 +314,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2393817908272368249, guid: 26169785b8e30c944a512729256a05cd, type: 3}
       propertyPath: m_IsActive
-      value: 0
+      value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 3519140762433254316, guid: 26169785b8e30c944a512729256a05cd, type: 3}
       propertyPath: m_LocalScale.x

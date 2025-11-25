@@ -16,8 +16,12 @@ public class PlayerLocomotion : MonoBehaviour
     public float rotationSpeed = 15f;
 
     [Header("Gravity Settings")]
-    public float gravity = 9.8f;
-    private float verticalVelocity = 0f;
+    [SerializeField] float gravity = 9.8f;
+    [SerializeField] float groundCheckDistance = 0.2f;
+    [SerializeField] LayerMask groundLayers = ~0;
+    [SerializeField] string groundTag = "Ground";
+    float verticalVelocity;
+    RaycastHit lastGroundHit;
 
     [Header("Animator Parameters")]
     [SerializeField] string speedParameterName = "Speed";
@@ -57,37 +61,57 @@ public class PlayerLocomotion : MonoBehaviour
         UpdateAnimator();
     }
 
-    private void HandleMovement()
-    {
-        if (characterController == null || inputManager == null) return;
+private void HandleMovement()
+{
+    if (characterController == null || inputManager == null) return;
+    if (!EnsureCameraReference()) return;
 
-        // カメラ相対の移動方向を計算
-        moveDirection = cameraObject.forward * inputManager.verticalInput;
-        moveDirection += cameraObject.right * inputManager.horizontalInput;
+    // --- ① カメラ相対の移動方向 ---
+    moveDirection = cameraObject.forward * inputManager.verticalInput;
+    moveDirection += cameraObject.right * inputManager.horizontalInput;
+    moveDirection.y = 0f;
+
+    if (moveDirection.sqrMagnitude > 1f)
         moveDirection.Normalize();
-        moveDirection.y = 0;
 
-        // 速度を決定（走り/歩き）
-        float currentSpeed = inputManager.moveAmount > 0.5f ? runningSpeed : walkingSpeed;
-        Vector3 motion = moveDirection * currentSpeed * Time.deltaTime;
+    // --- ② 速度 ---
+    float currentSpeed = inputManager.moveAmount > 0.5f ? runningSpeed : walkingSpeed;
+    Vector3 horizontalVelocity = moveDirection * currentSpeed;
 
-        // 重力処理
-        if (characterController.isGrounded)
-        {
+    // --- ③ Ground 判定（Move 前）---
+    bool grounded = IsGrounded(out lastGroundHit);
+
+    if (grounded)
+    {
+        if (verticalVelocity < 0f)
             verticalVelocity = 0f;
-        }
-        else
-        {
-            verticalVelocity -= gravity * Time.deltaTime;
-        }
-
-        motion.y = verticalVelocity * Time.deltaTime;
-        characterController.Move(motion);
     }
+    else
+    {
+        verticalVelocity -= gravity * Time.deltaTime;
+    }
+
+    // --- ④ Move（重力込み）---
+    Vector3 velocity = horizontalVelocity;
+    velocity.y = verticalVelocity;
+
+    characterController.Move(velocity * Time.deltaTime);
+
+    // --- ⑤ Move 後の Ground 判定 & 吸着 ---
+    bool groundedAfterMove = IsGrounded(out lastGroundHit);
+
+    if (groundedAfterMove)
+    {
+        SnapToGround(lastGroundHit);
+        verticalVelocity = 0f;
+    }
+}
+
 
     private void HandleRotation()
     {
         if (inputManager == null) return;
+        if (!EnsureCameraReference()) return;
 
         Vector3 targetDirection = Vector3.zero;
         targetDirection = cameraObject.forward * inputManager.verticalInput;
@@ -173,5 +197,65 @@ public class PlayerLocomotion : MonoBehaviour
         }
 
         return false;
+    }
+
+    bool EnsureCameraReference()
+    {
+        if (cameraObject != null) return true;
+
+        Camera mainCamera = Camera.main;
+        if (mainCamera == null)
+        {
+            Debug.LogWarning("Camera.main が見つからないため、移動方向を計算できません", this);
+            return false;
+        }
+
+        cameraObject = mainCamera.transform;
+        return cameraObject != null;
+    }
+
+    bool IsGrounded(out RaycastHit groundHit)
+{
+    groundHit = default;
+    if (characterController == null) return false;
+
+    Bounds bounds = characterController.bounds;
+    Vector3 origin = bounds.center;
+    float radius = Mathf.Max(0.01f, characterController.radius - 0.02f);
+    float rayLength = bounds.extents.y + groundCheckDistance;
+
+    if (Physics.SphereCast(origin, radius, Vector3.down, out groundHit, rayLength, groundLayers, QueryTriggerInteraction.Ignore))
+    {
+        // Ground タグが設定されている場合だけフィルタする
+        if (!string.IsNullOrEmpty(groundTag))
+        {
+            if (!groundHit.collider.CompareTag(groundTag))
+            {
+                // Ground じゃないものに当たったら接地扱いしない
+                groundHit = default;
+                return false;
+            }
+        }
+
+        return true;
+    }
+
+    return false;
+}
+
+    void SnapToGround(RaycastHit groundHit)
+    {
+        if (characterController == null) return;
+        if (groundHit.collider == null) return;
+
+        Bounds bounds = characterController.bounds;
+        float bottom = bounds.center.y - bounds.extents.y;
+        float targetBottom = groundHit.point.y + characterController.skinWidth;
+        float offset = targetBottom - bottom;
+
+        if (offset > 0f)
+        {
+            characterController.Move(Vector3.up * offset);
+        }
     }
 }
