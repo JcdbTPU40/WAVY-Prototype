@@ -37,21 +37,22 @@ public class PlayerCombat : MonoBehaviour
 	[SerializeField] float tailKnockbackDistance = 3f;
 
 	[Header("Beam Attack Settings")]
-	[SerializeField] GameObject beamPrefab;
-	[SerializeField] float beamDuration = 2f;
-	[SerializeField] float beamCooldown = 3f;
-	[SerializeField] Vector3 beamOffset = new Vector3(0f, 0f, 2f);
-	[SerializeField] float beamDamage = 45f;
-	[SerializeField] float beamRange = 12f;
-	[SerializeField] float beamRadius = 1.2f;
-	[SerializeField] float beamHitDelay = 0.1f;
-	[SerializeField] float beamKnockbackDistance = 2.5f;
+	[SerializeField] public GameObject beamPrefab;
+	public float beamDuration = 2f;
+	public float beamCooldown = 3f;
+	public Vector3 beamOffset = new Vector3(0f, 0f, 2f);
+	public float beamDamage = 45f;
+	public float beamRange = 12f;
+	public float beamRadius = 1.2f;
+	public float beamHitDelay = 0.1f;
+	public float beamKnockbackDistance = 2.5f;
 
-	[Header("Throw Attack Settings")]
-	[SerializeField] GameObject throwProjectilePrefab;
-	[SerializeField, Min(0f)] float throwRange = 8f;
-	[SerializeField, Range(5f, 85f)] float throwAngleDeg = 45f;
-	[SerializeField] Vector3 throwSpawnOffset = new Vector3(0f, 3.0f, 3.0f);
+	// 投擲（Throw）関連（既存）
+	[Header("Throw (投擲) Attack Settings")]
+	[SerializeField] GameObject throwProjectilePrefab = null; // Rigidbody を持つ弾のプレハブ（ProjectileThrow コンポーネント推奨）
+	[SerializeField, Min(0f)] float throwRange = 8f;          // 水平射程（前方方向の距離）
+	[SerializeField, Range(5f, 85f)] float throwAngleDeg = 45f; // 発射角度（度）
+	[SerializeField] Vector3 throwSpawnOffset = new Vector3(0f, 3.0f, 3.0f); // ボス基準のスポーンオフセット
 	[SerializeField, Min(0f)] float throwCooldown = 2f;
 	[SerializeField, Min(0f)] float throwProjectileLifetime = 10f;
 	[SerializeField] GameObject landingAreaPrefab;
