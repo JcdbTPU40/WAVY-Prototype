@@ -27,7 +27,36 @@ public class CameraManager : MonoBehaviour
     private void Awake()
     {
         inputManager = Object.FindAnyObjectByType<InputManager>();
-        targetTransform = Object.FindAnyObjectByType<PlayerScript>().transform;
+        
+        // Player タグで検索（プロジェクト標準）
+        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+        if (playerObject != null)
+        {
+            targetTransform = playerObject.transform;
+        }
+        else
+        {
+            // フォールバック: PlayerScript または PlayerManager を検索
+            var playerScript = Object.FindAnyObjectByType<PlayerScript>();
+            if (playerScript != null)
+            {
+                targetTransform = playerScript.transform;
+            }
+            else
+            {
+                var playerManager = Object.FindAnyObjectByType<PlayerManager>();
+                if (playerManager != null)
+                {
+                    targetTransform = playerManager.transform;
+                }
+            }
+        }
+
+        if (targetTransform == null)
+        {
+            Debug.LogError("Player が見つかりません。Player に 'Player' タグを設定してください。", this);
+        }
+
         cameraTransform = Camera.main.transform;
         defaultPosition = cameraTransform.localPosition.z; // Store the default position of the camera
     }
