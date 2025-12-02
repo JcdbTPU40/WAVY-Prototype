@@ -2,6 +2,8 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
+using Unity.VisualScripting;
+
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -213,6 +215,30 @@ public class PlayerCombat : MonoBehaviour
 		StartCoroutine(TailAttackRoutine());
 
 		StartCoroutine(AttackCooldownRoutine());
+	}
+
+	public TailAttackHitBox tailAttackHitBox;
+
+	void PerformTailAttackHitBox()
+    {
+		isAttacking = true;
+		canAttack = false;
+
+		TriggerAttackAnimation(true, true, "Attack");
+
+		if(tailAttackHitBox != null)
+		tailAttackHitBox.active = true;
+
+		StartCoroutine(AttackCooldownRoutine());
+		StartCoroutine(TailAttackHitBoxRoutine());
+    }
+
+	IEnumerator TailAttackHitBoxRoutine()
+	{
+		yield return new WaitForSeconds(tailAttackHitDelay);
+
+		if(tailAttackHitBox != null)
+			tailAttackHitBox.active = false;
 	}
 
 	void TriggerAttackAnimation(bool useTailTrigger, bool useAttackBool, string fallbackAnimationName)

@@ -185,6 +185,9 @@ PrefabInstance:
       addedObject: {fileID: 18502275708871415}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 26b1327a142dd5e4fae60c8ccbae1aad, type: 3}
       insertIndex: -1
+      addedObject: {fileID: 2166414791189904413}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 26b1327a142dd5e4fae60c8ccbae1aad, type: 3}
+      insertIndex: -1
       addedObject: {fileID: 147607299055879781}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 26b1327a142dd5e4fae60c8ccbae1aad, type: 3}
       insertIndex: -1
@@ -280,6 +283,20 @@ MonoBehaviour:
     m_Bits: 4294967295
   liftBeforePhysics: 0.08
   groundRayLength: 2
+--- !u!114 &2166414791189904413
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2619998069855359508}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: d85595a0cd944f1458e96b834678a406, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  hp: 10
+  hitFxPrefab: {fileID: 0}
 --- !u!195 &147607299055879781
 NavMeshAgent:
   m_ObjectHideFlags: 0
