@@ -5552,6 +5552,14 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 1369868886770155855, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 2987770510674045885, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      propertyPath: m_ConstrainProportionsScale
+      value: 1
+      objectReference: {fileID: 0}
     - target: {fileID: 3590132135692319380, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -5599,7 +5607,7 @@ PrefabInstance:
     - target: {fileID: 6495216264112346069, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
       propertyPath: beamPrefab
       value: 
-      objectReference: {fileID: 0}
+      objectReference: {fileID: 6319171772100809965, guid: 081386ade7196b3469062b4a8139ff95, type: 3}
     - target: {fileID: 6495216264112346069, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
       propertyPath: attackCooldown
       value: 0
@@ -5610,7 +5618,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6495216264112346069, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
       propertyPath: tailAttackAngle
-      value: 360
+      value: 180
       objectReference: {fileID: 0}
     - target: {fileID: 6495216264112346069, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
       propertyPath: landingAreaPrefab
@@ -5620,8 +5628,7 @@ PrefabInstance:
       propertyPath: tailAttackHitDelay
       value: 0
       objectReference: {fileID: 0}
-    m_RemovedComponents:
-    - {fileID: 3768377352582204481, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+    m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
     m_AddedComponents:
