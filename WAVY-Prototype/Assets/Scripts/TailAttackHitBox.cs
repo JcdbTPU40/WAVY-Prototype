@@ -16,14 +16,14 @@ public class TailAttackHitBox : MonoBehaviour
 
     private void Start()
     {
-        prevPos = tipPoint != null ? tipPoint.position : transform.position;
+        prevPos = tipPoint != null ? tipPoint.position : transform.position; //尻尾の初期位置の確認
     }
 
     private void Update()
     {
-        if (!active || tipPoint == null) return;
+        if (!active || tipPoint == null) return; //攻撃状態じゃないと判定しない
 
-        Vector3 currentPos = tipPoint.position;
+        Vector3 currentPos = tipPoint.position; //現在の尻尾の位置
         Vector3 dir = currentPos - prevPos;
         float distance = dir.magnitude;
 
@@ -62,13 +62,12 @@ public class TailAttackHitBox : MonoBehaviour
             return;
         }
 
-        // SphereCastAllで判定（より確実）
         RaycastHit[] hits = Physics.SphereCastAll(
-            startPos,
-            hitRadius,
-            dir.normalized,
-            distance,
-            enemyLayer,
+            startPos, //開始位置
+            hitRadius, //太さ
+            dir.normalized, //方向
+            distance, //距離
+            enemyLayer, //レイヤー
             QueryTriggerInteraction.Collide
         );
         ProcessHits(hits);
@@ -85,7 +84,7 @@ public class TailAttackHitBox : MonoBehaviour
 
         foreach (var col in colliders)
         {
-            ProcessSingleHit(col, point);
+            ProcessHit(col, point);
         }
     }
 
@@ -93,11 +92,11 @@ public class TailAttackHitBox : MonoBehaviour
     {
         foreach (var hit in hits)
         {
-            ProcessSingleHit(hit.collider, hit.point, hit.normal);
+            ProcessHit(hit.collider, hit.point, hit.normal);
         }
     }
 
-    private void ProcessSingleHit(Collider hitCollider, Vector3? hitPoint = null, Vector3? hitNormal = null)
+    private void ProcessHit(Collider hitCollider, Vector3? hitPoint = null, Vector3? hitNormal = null)
     {
         if (hitCollider == null) return;
 
@@ -107,6 +106,7 @@ public class TailAttackHitBox : MonoBehaviour
 
         GameObject enemyRoot = enemy.gameObject;
 
+        //同じ攻撃が重複しないようにする
         if (hitEnemies.Contains(enemyRoot))
         {
             return;
@@ -115,7 +115,6 @@ public class TailAttackHitBox : MonoBehaviour
         Vector3 actualHitPoint = hitPoint ?? hitCollider.ClosestPoint(tipPoint.position);
         Vector3 actualHitNormal = hitNormal ?? (enemy.transform.position - actualHitPoint).normalized;
 
-        // ダメージを与える
         enemy.ApplyDamage(damage, actualHitPoint, actualHitNormal);
 
         hitEnemies.Add(enemyRoot);
@@ -134,5 +133,16 @@ public class TailAttackHitBox : MonoBehaviour
             Gizmos.color = Color.cyan;
             Gizmos.DrawLine(prevPos, tipPoint.position);
         }
+    }
+
+    public void ResetPreviousPosition()
+    {
+        if (tipPoint != null)
+            prevPos = tipPoint.position;
+    }
+
+    public void ClearHitEnemies()
+    {
+        hitEnemies.Clear();
     }
 }

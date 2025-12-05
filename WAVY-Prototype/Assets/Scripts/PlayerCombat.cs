@@ -170,7 +170,7 @@ public class PlayerCombat : MonoBehaviour
 	{
 		if (inputManager.tailInput && canAttack && !isAttacking && !isCharging)
 		{
-			PerformTailAttack();
+			PerformTailAttackHitBox();
 		}
 		inputManager.tailInput = false;
 	}
@@ -219,28 +219,28 @@ public class PlayerCombat : MonoBehaviour
 
 	public TailAttackHitBox tailAttackHitBox;
 
-	void PerformTailAttackHitBox()
-    {
-		isAttacking = true;
-		canAttack = false;
-
-		TriggerAttackAnimation(true, true, "Attack");
-
-		if(tailAttackHitBox != null)
-		tailAttackHitBox.active = true;
-
-		StartCoroutine(AttackCooldownRoutine());
-		StartCoroutine(TailAttackHitBoxRoutine());
-    }
-
-	IEnumerator TailAttackHitBoxRoutine()
+	public void PerformTailAttackHitBox()
 	{
-		yield return new WaitForSeconds(tailAttackHitDelay);
+    	isAttacking = true;
+    	canAttack = false;
 
-		if(tailAttackHitBox != null)
-			tailAttackHitBox.active = false;
+    	TriggerAttackAnimation(true, true, "Attack");
+
+    	StartCoroutine(TailAttackProcess());
+
+    	StartCoroutine(AttackCooldownRoutine());
 	}
 
+	IEnumerator TailAttackProcess()
+	{
+		tailAttackHitBox.ResetPreviousPosition(); 
+    	tailAttackHitBox.ClearHitEnemies();   
+
+    	yield return new WaitForSeconds(tailAttackHitDelay);
+    	tailAttackHitBox.active = true;
+    	yield return new WaitForSeconds(0.3f);
+    	tailAttackHitBox.active = false;
+	}
 	void TriggerAttackAnimation(bool useTailTrigger, bool useAttackBool, string fallbackAnimationName)
 	{
 		bool triggered = false;
