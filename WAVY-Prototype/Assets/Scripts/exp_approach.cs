@@ -44,10 +44,10 @@ public class exp_approach : MonoBehaviour
         GameObject player = GameObject.Find("Player");
 
         //プレイヤーに向かって進ませる
-        transform.position = Vector3.MoveTowards(transform.position, player.transform.position, speed);
+        transform.position = Vector3.MoveTowards(transform.position, player.transform.position, speed * Time.deltaTime);
 
         float distance = (player.transform.position - transform.position).magnitude;
-        Debug.Log($"Distance to player: {distance}");
+        //Debug.Log($"Distance to player: {distance}");
 
         //特定の距離まで近づいたら回収完了
         //var diff = player.transform.position - transform.position;

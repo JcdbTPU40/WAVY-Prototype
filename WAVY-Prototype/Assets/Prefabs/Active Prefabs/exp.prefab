@@ -13,6 +13,7 @@ GameObject:
   - component: {fileID: 836613763873824627}
   - component: {fileID: 2123443434270723610}
   - component: {fileID: 4205223150701455795}
+  - component: {fileID: 1909970982326231910}
   m_Layer: 0
   m_Name: exp
   m_TagString: Untagged
@@ -20,14 +21,13 @@ GameObject:
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
   m_IsActive: 1
---- !u!4 &1402950427050996088
-Transform:
+--- !u!224 &1402950427050996088
+RectTransform:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2360584092786099001}
-  serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.2, y: 0.2, z: 0.2}
@@ -35,6 +35,11 @@ Transform:
   m_Children: []
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+  m_AnchorMin: {x: 0.5, y: 0.5}
+  m_AnchorMax: {x: 0.5, y: 0.5}
+  m_AnchoredPosition: {x: 0, y: 0}
+  m_SizeDelta: {x: 3071.9998, y: 3071.9998}
+  m_Pivot: {x: 0.5, y: 0.5}
 --- !u!33 &4827799739809068261
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -122,9 +127,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   exp: {fileID: 2360584092786099001}
-  speed: 0.05
+  speed: 3
   maxTimer: 10
   collectDistance: 0.5
   yAxisOnly: 1
   rotationLerpSpeed: 0
   playerTag: Player
+--- !u!222 &1909970982326231910
+CanvasRenderer:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2360584092786099001}
+  m_CullTransparentMesh: 1
