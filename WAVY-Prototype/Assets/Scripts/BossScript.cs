@@ -1,5 +1,6 @@
 using UnityEngine;
 using UnityEngine.AI;
+using UnityEngine.SceneManagement;
 
 public class BossScript : MonoBehaviour
 {
@@ -18,6 +19,8 @@ public class BossScript : MonoBehaviour
     bool Two;
     void Start()
     {
+        boss_CurrentHP = boss_Max_HP;
+        boss_isDied = false;
         /*agent=GetComponent<NavMeshAgent>();
 
         if (!agent.isOnNavMesh)
@@ -31,8 +34,9 @@ public class BossScript : MonoBehaviour
 
     void Update()
     {
+        Debug.Log(boss_CurrentHP);
         //agent.SetDestination(O.position);
-        if(Two)
+        /*if(Two)
         {
             transform.position+=new Vector3(0.005f,0,0);
         //agent.SetDestination(O.position);
@@ -52,7 +56,7 @@ public class BossScript : MonoBehaviour
         Two=true;
         One=false;
         }
-        }
+        }*/
     }
 
     public void take_Damage(int damage)
@@ -80,7 +84,9 @@ public class BossScript : MonoBehaviour
         boss_isDied = true;
 
         // boss死亡時の処理
-        Destroy(gameObject);
+        Destroy(gameObject,5f);
+
+        SceneManager.LoadScene("End");
     }
 
     public void OnTowerDestroyed(Vector3 towerWorldPos, float stayDuration )

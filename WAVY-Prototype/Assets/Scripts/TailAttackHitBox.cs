@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 public class TailAttackHitBox : MonoBehaviour
 {
-    [SerializeField] private int damage = 10;
+    [SerializeField] private int damage = 30;
     [SerializeField] private LayerMask enemyLayer;       // Enemy レイヤーを指定
     [SerializeField] private float hitRadius = 0.5f;     // 尻尾の太さとして判定に使う
     [SerializeField] private Transform tipPoint;         // 尻尾の先端（攻撃位置）
@@ -13,6 +13,7 @@ public class TailAttackHitBox : MonoBehaviour
     public bool active = false;
     
     private HashSet<GameObject> hitEnemies = new HashSet<GameObject>();
+    private HashSet<GameObject> hitBosses = new HashSet<GameObject>();
 
     private void Start()
     {
@@ -102,22 +103,41 @@ public class TailAttackHitBox : MonoBehaviour
 
         // 敵のルートオブジェクトを取得
         var enemy = hitCollider.GetComponentInParent<EnemyScript>();
-        if (enemy == null) return;
-
-        GameObject enemyRoot = enemy.gameObject;
-
-        //同じ攻撃が重複しないようにする
-        if (hitEnemies.Contains(enemyRoot))
+        if (enemy != null)
         {
+            GameObject enemyRoot = enemy.gameObject;
+
+            //同じ攻撃が重複しないようにする
+            if (hitEnemies.Contains(enemyRoot))
+            {
+                return;
+            }
+
+            Vector3 actualHitPoint = hitPoint ?? hitCollider.ClosestPoint(tipPoint.position);
+            Vector3 actualHitNormal = hitNormal ?? (enemy.transform.position - actualHitPoint).normalized;
+
+            enemy.ApplyDamage(damage, actualHitPoint, actualHitNormal);
+
+            hitEnemies.Add(enemyRoot);
             return;
         }
 
-        Vector3 actualHitPoint = hitPoint ?? hitCollider.ClosestPoint(tipPoint.position);
-        Vector3 actualHitNormal = hitNormal ?? (enemy.transform.position - actualHitPoint).normalized;
+        // ボスのルートオブジェクトを取得
+        var boss = hitCollider.GetComponentInParent<BossScript>();
+        if (boss != null)
+        {
+            GameObject bossRoot = boss.gameObject;
 
-        enemy.ApplyDamage(damage, actualHitPoint, actualHitNormal);
+            //同じ攻撃が重複しないようにする
+            if (hitBosses.Contains(bossRoot))
+            {
+                return;
+            }
 
-        hitEnemies.Add(enemyRoot);
+            boss.take_Damage(damage);
+            hitBosses.Add(bossRoot);
+            return;
+        }
     }
 
     private void OnDrawGizmos()
@@ -144,5 +164,6 @@ public class TailAttackHitBox : MonoBehaviour
     public void ClearHitEnemies()
     {
         hitEnemies.Clear();
+        hitBosses.Clear();
     }
 }

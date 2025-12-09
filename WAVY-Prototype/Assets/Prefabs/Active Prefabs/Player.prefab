@@ -124,7 +124,7 @@ MonoBehaviour:
   damage: 10
   enemyLayer:
     serializedVersion: 2
-    m_Bits: 0
+    m_Bits: 256
   hitRadius: 0.5
   tipPoint: {fileID: 9102392853273790062}
   maxCheckDistance: 2
@@ -272,10 +272,10 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   attackDamage: 20
-  attackCooldown: 2
+  attackCooldown: 0
   attackAnimationDuration: 0.5
   tailAttackDamage: 20
-  tailAttackRadius: 2
+  tailAttackRadius: 0
   tailAttackAngle: 90
   tailAttackHitDelay: 0.8
   tailHeightOffset: 0
