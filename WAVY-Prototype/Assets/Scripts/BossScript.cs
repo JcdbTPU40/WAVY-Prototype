@@ -7,45 +7,51 @@ public class BossScript : MonoBehaviour
     [SerializeField]
     private int boss_Max_HP = 100; // ボスの最大体力
     private int boss_CurrentHP;    // ボスの現在体力
-    private bool boss_isDied;      // ボスの死亡判定    
+    private bool boss_isDied;      // ボスの死亡判定
 
-    float speed=20f;
+    [Header("移動関連")]
+    //private NavMeshAgent agent;
+    [SerializeField]Transform O;
+    [SerializeField]Transform O2;
 
-    
-
-    [Header("ボスの飛ぶ高さ")]
-    [SerializeField]
-    float flightHeight = 20.0f;
-
-    private NavMeshAgent agent;
-
+    bool One;
+    bool Two;
     void Start()
     {
-        agent = GetComponent<NavMeshAgent>();
-        if (agent != null)
-        {
-            agent.updatePosition = false;
-            agent.updateUpAxis = false;
-        }
+        /*agent=GetComponent<NavMeshAgent>();
 
-        boss_CurrentHP = boss_Max_HP;
+        if (!agent.isOnNavMesh)
+        {
+            Debug.LogError("BossがNavMesh上にいません！");
+        }*/
+
+        One=false;
+        Two=true;
     }
 
     void Update()
     {
-        // 調査モード等は削除。高さを flightHeight に保つだけの挙動にする。
-        Vector3 maintainPos = new Vector3(transform.position.x, flightHeight, transform.position.z);
-
-        if (agent != null)
+        //agent.SetDestination(O.position);
+        if(Two)
         {
-            // NavMeshAgent があれば agent.nextPosition を使って自然に高低を保つ
-            Vector3 nextPos = agent.nextPosition;
-            Vector3 targetPos = new Vector3(nextPos.x, flightHeight, nextPos.z);
-            transform.position = Vector3.MoveTowards(transform.position, targetPos, speed * Time.deltaTime);
+            transform.position+=new Vector3(0.005f,0,0);
+        //agent.SetDestination(O.position);
+        if(transform.position.x>=10)
+        {
+        Two=false;
+        One=true;
         }
-        else
+        }
+
+        if(One)
         {
-            transform.position = Vector3.MoveTowards(transform.position, maintainPos, speed * Time.deltaTime);
+            transform.position+=new Vector3(-0.005f,0,0);
+        //agent.SetDestination(O2.position);
+        if(transform.position.x<=-10)
+        {
+        Two=true;
+        One=false;
+        }
         }
     }
 

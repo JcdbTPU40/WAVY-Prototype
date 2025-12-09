@@ -106,6 +106,18 @@ PrefabInstance:
       value: 8
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
+      propertyPath: m_LocalScale.x
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
+      propertyPath: m_LocalScale.y
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: -8679921383154817045, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
       propertyPath: m_LocalPosition.x
       value: 0
       objectReference: {fileID: 0}
@@ -292,9 +304,6 @@ PrefabInstance:
     m_AddedComponents:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
       insertIndex: -1
-      addedObject: {fileID: -8072464578815411414}
-    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
-      insertIndex: -1
       addedObject: {fileID: 6052058895093225110}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
       insertIndex: -1
@@ -308,6 +317,15 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
       insertIndex: -1
       addedObject: {fileID: -5485591376123263235}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -131662600436028718}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: -3037875942784615015}
+    - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 4225415568510137943}
     - targetCorrespondingSourceObject: {fileID: 6107913692295745523, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
       insertIndex: -1
       addedObject: {fileID: 995908419508902628}
@@ -752,7 +770,7 @@ NavMeshAgent:
   m_Enabled: 1
   m_AgentTypeID: -1372625422
   m_Radius: 0.25
-  m_Speed: 3.5
+  m_Speed: 3
   m_Acceleration: 8
   avoidancePriority: 50
   m_AngularSpeed: 120
@@ -823,7 +841,7 @@ BoxCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 1
+  m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
@@ -856,6 +874,100 @@ Rigidbody:
   m_Interpolate: 0
   m_Constraints: 0
   m_CollisionDetection: 1
+--- !u!114 &-131662600436028718
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4492889921191898461}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 68d345cce25ce694594f2a53d35359fb, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  target: {fileID: 0}
+  radius: 5
+  jitter: 1
+--- !u!114 &-3037875942784615015
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4492889921191898461}
+  m_Enabled: 0
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 430aee48ddc93ed4ab5ad44a9aff39ec, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  exp_Prefab: {fileID: 0}
+  exp_Spawnpoint: []
+  EnemySpeed: 0
+  AtDistance: 0
+  AttackInterval: 0
+  AttackTimer: 1
+  MaxHP: 0
+  DeathTime: 2
+  ScoreOnDeath: 100
+  attackDamage: 10
+  hitFxPrefab: {fileID: 0}
+  hitFxOffset: {x: 0, y: 0.5, z: 0}
+  hitFxDelay: 0
+  ragdollController: {fileID: 0}
+  deathKnockbackForce: 12
+  deathKnockbackUpForce: 2
+  deathKnockbackAngle: 30
+  disableKnockbackAfterDeath: 1
+  hitKnockbackForce: 4
+  hitKnockbackUpForce: 1.5
+  hitKnockbackAngle: 20
+  hitKnockbackRecoveryDelay: 0.25
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  liftBeforePhysics: 0.08
+  groundRayLength: 2
+--- !u!114 &4225415568510137943
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4492889921191898461}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 35f79ab2e117bdf479563e72e39b7bc5, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  exp_Prefab: {fileID: 0}
+  exp_Spawnpoint: []
+  EnemySpeed: 3.5
+  AtDistance: 2
+  ChaseStartDistance: 3
+  AttackInterval: 1.5
+  AttackTimer: 1
+  MaxHP: 10
+  DeathTime: 2
+  ScoreOnDeath: 100
+  attackDamage: 10
+  hitFxPrefab: {fileID: 0}
+  hitFxOffset: {x: 0, y: 0.5, z: 0}
+  hitFxDelay: 0
+  ragdollController: {fileID: 5509398658302410200}
+  deathKnockbackForce: 12
+  deathKnockbackUpForce: 2
+  deathKnockbackAngle: 30
+  disableKnockbackAfterDeath: 1
+  hitKnockbackForce: 4
+  hitKnockbackUpForce: 1.5
+  hitKnockbackAngle: 20
+  hitKnockbackRecoveryDelay: 0.25
+  groundMask:
+    serializedVersion: 2
+    m_Bits: 4294967295
+  liftBeforePhysics: 0.08
+  groundRayLength: 2
 --- !u!1 &5134306523431569721 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8491575379566418229, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}
