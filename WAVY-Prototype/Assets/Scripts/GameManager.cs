@@ -8,6 +8,9 @@ public class GameManager : MonoBehaviour
     [SerializeField] private GameObject pauseMenuUI;
     [SerializeField] private bool manageCursorVisibility = true;
 
+    [Header("Pause Button Image")]
+    [SerializeField] private PopUpController pauseButtonController;
+
     [Header("Scenes")]
     [SerializeField] private string mainMenuSceneName = "Start";
 
@@ -83,12 +86,8 @@ public class GameManager : MonoBehaviour
         if (pauseMenuUI != null)
         {
             pauseMenuUI.SetActive(true);
+            pauseButtonController.UpdateButtonSprite(true);
         }
-        else
-        {
-            Debug.LogWarning("Pause menu UI is not assigned in the GameManager inspector.");
-        }
-
         UpdateCursorState();
     }
 
@@ -98,7 +97,7 @@ public class GameManager : MonoBehaviour
         {
             if (pauseMenuUI != null && pauseMenuUI.activeSelf)
             {
-                pauseMenuUI.SetActive(false);
+                pauseButtonController.UpdateButtonSprite(false);
             }
 
             UpdateCursorState();
@@ -111,6 +110,13 @@ public class GameManager : MonoBehaviour
         if (pauseMenuUI != null)
         {
             pauseMenuUI.SetActive(false);
+            pauseButtonController.UpdateButtonSprite(false);
+        }
+
+        if(pauseButtonController != null)
+        {   
+            pauseMenuUI.SetActive(false);
+            pauseButtonController.UpdateButtonSprite(false);
         }
 
         UpdateCursorState();

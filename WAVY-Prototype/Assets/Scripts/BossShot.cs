@@ -31,7 +31,7 @@ public class BossShot : MonoBehaviour
     {
         shotTime+=Time.deltaTime;
 
-        Debug.Log(shotTime);
+        //Debug.Log(shotTime);
         
         if(shotTime>=shotSpan)
         {
