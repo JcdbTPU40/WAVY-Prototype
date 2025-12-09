@@ -5,14 +5,14 @@ public class BossShot : MonoBehaviour
     [Header("弾")]
     [SerializeField] GameObject BeamPrefab;
     [SerializeField] GameObject BeamArea;
+    [SerializeField]float spawnOffset=3f;
+    [SerializeField]float spawnOffsetA=50f;//赤い予測線の位置調整
+    Quaternion beamRotation;
     GameObject beamArea;
     [Header("射撃関連")]
-    [SerializeField] float beamSpan=5f;
-    
-    [SerializeField] float shotSpan=2f;
+    [SerializeField] float beamSpan=5f;//beamを撃つまでの間隔（秒）
+    [SerializeField] float shotSpan=2f;//チャージ開始までの間隔（秒）
     public float shotTime=0f;
-    float spawnOffset=3f;
-    Quaternion beamRotation;
     public bool areaSpawned=false;
     public bool beamSpawned=false;
     
@@ -47,7 +47,7 @@ public class BossShot : MonoBehaviour
             beamRotation=Quaternion.LookRotation(ray);
 
             sPawnPosition=transform.position + transform.forward * spawnOffset+ transform.up * 3f;
-            Vector3 areaSpawnPosition=transform.position + transform.forward * 75 ;
+            Vector3 areaSpawnPosition=transform.position + transform.forward * spawnOffsetA ;
 
             if(!areaSpawned)
             {

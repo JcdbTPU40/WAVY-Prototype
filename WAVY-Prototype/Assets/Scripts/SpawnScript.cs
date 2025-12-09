@@ -14,11 +14,13 @@ public class SpawnScript : MonoBehaviour
     [Header("湧きペース：秒 (この秒数ごとに敵を生成)")]
     [SerializeField, Min(MinRepeatInterval)] private float repeat = 2.0f; // 最小値は定数で管理し、Inspector上でも同じ制約を共有
 
-    [Header("スポーン位置の右方向オフセット (ローカルX方向)")]
-    [SerializeField] private float spawnOffset = 1.5f;    // 自身の transform.right * offset だけずらして配置
+    [Header("スポーン位置のプレハブ")]
+    [SerializeField] Transform[] spawnPoints;
 
     [Header("時間経過：秒 (経過時間の内部カウンタ)")]
     private float elapsedTime = 0f;                       // 経過秒数を累積し、repeat 到達でリセット
+    [Header("ボス")]
+    [SerializeField] Transform target;
 
     private bool isEnemyPrefabMissing = false;            // プレハブ欠落時に true → Update 内で早期 return して無駄呼び出し防止
 
@@ -70,11 +72,16 @@ public class SpawnScript : MonoBehaviour
             return;
         }
 
+        int rnd=Random.Range(0,spawnPoints.Length);
+        Vector3 spawnPoint=spawnPoints[rnd].position;
         // 自身の位置から右方向（ローカル X 軸）にオフセットした地点に生成
-        Vector3 spawnPosition = transform.position + transform.forward * spawnOffset;
+        //Vector3 spawnPosition = transform.position + transform.forward;
 
         // 回転はこのオブジェクトの回転をそのまま継承
-        Instantiate(enemy, spawnPosition, transform.rotation);
+        GameObject zako=Instantiate(enemy, spawnPoint, transform.rotation);
+
+        SwarmNavAgent agent = zako.GetComponent<SwarmNavAgent>();
+        agent.target = target;
     }
 
     /// <summary>
