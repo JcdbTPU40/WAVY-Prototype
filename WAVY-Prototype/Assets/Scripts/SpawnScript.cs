@@ -72,7 +72,7 @@ public class SpawnScript : MonoBehaviour
             return;
         }
 
-        int rnd=Random.Range(0,spawnPoints.Length);
+        int rnd=Random.Range(0,spawnPoints.Length-1);
         Vector3 spawnPoint=spawnPoints[rnd].position;
         // 自身の位置から右方向（ローカル X 軸）にオフセットした地点に生成
         //Vector3 spawnPosition = transform.position + transform.forward;

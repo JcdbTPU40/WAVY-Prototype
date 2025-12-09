@@ -18,6 +18,9 @@ public class EnemyScript : MonoBehaviour
     [Header("攻撃範囲")]
     public float AtDistance;                         // この距離以内に入ると追跡を止める（将来：攻撃に遷移予定）
 
+    [Header("追跡開始距離")]
+    [SerializeField, Min(0f)] public float ChaseStartDistance = 15f; // この距離以内に入ったときだけプレイヤーを追跡開始
+
     [Header("攻撃間隔")]
     public float AttackInterval;                     // 攻撃間隔（未使用：将来実装用）
     [Header("攻撃時間")]
@@ -113,37 +116,58 @@ public class EnemyScript : MonoBehaviour
         if (Target != null)
         {
             float dis = Vector3.Distance(Target.transform.position, transform.position);
-            transform.LookAt(Target.transform);
-
-            if (agent != null && agent.enabled && agent.isOnNavMesh)
+            
+            // 追跡開始距離の判定：この距離以内に入ったときだけ追跡する
+            if (dis <= ChaseStartDistance)
             {
-                if (dis > AtDistance)
-                {
-                    if (agent.isStopped)
-                    {
-                        agent.isStopped = false;
-                    }
-                    agent.SetDestination(Target.transform.position);
+                transform.LookAt(Target.transform);
 
-                    if (animator != null)
+                if (agent != null && agent.enabled && agent.isOnNavMesh)
+                {
+                    if (dis > AtDistance)
                     {
-                        animator.SetBool("IsWalking", true);
+                        // 攻撃範囲外：追跡続行
+                        if (agent.isStopped)
+                        {
+                            agent.isStopped = false;
+                        }
+                        agent.SetDestination(Target.transform.position);
+
+                        if (animator != null)
+                        {
+                            animator.SetBool("IsWalking", true);
+                        }
+                    }
+                    else
+                    {
+                        // 攻撃範囲内：停止して攻撃
+                        if (!agent.isStopped)
+                        {
+                            agent.ResetPath();
+                            agent.isStopped = true;
+                        }
+
+                        if (animator != null)
+                        {
+                            animator.SetBool("IsWalking", false);
+                        }
+
+                        TryAttackPlayer();
                     }
                 }
-                else
+            }
+            else
+            {
+                // 追跡範囲外：待機状態
+                if (agent != null && agent.enabled && !agent.isStopped)
                 {
-                    if (!agent.isStopped)
-                    {
-                        agent.ResetPath();
-                        agent.isStopped = true;
-                    }
+                    agent.ResetPath();
+                    agent.isStopped = true;
+                }
 
-                    if (animator != null)
-                    {
-                        animator.SetBool("IsWalking", false);
-                    }
-
-                    TryAttackPlayer();
+                if (animator != null)
+                {
+                    animator.SetBool("IsWalking", false);
                 }
             }
         }
@@ -185,6 +209,7 @@ public class EnemyScript : MonoBehaviour
     /// <param name="damage">減算するHP量。0以下の場合は無視。</param>
     public void ApplyDamage(int damage, Vector3? hitPoint = null, Vector3? hitNormal = null)
     {
+        
         if (hasDied || damage <= 0)
         {
             return;
