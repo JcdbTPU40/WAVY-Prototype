@@ -206,17 +206,7 @@ public class PlayerCombat : MonoBehaviour
 	#endregion
 
 	#region Attack Execution
-	void PerformTailAttack()
-	{
-		isAttacking = true;
-		canAttack = false;
-
-		TriggerAttackAnimation(true, true, "Attack");
-		StartCoroutine(TailAttackRoutine());
-
-		StartCoroutine(AttackCooldownRoutine());
-	}
-
+	
 	public TailAttackHitBox tailAttackHitBox;
 
 	public void PerformTailAttackHitBox()

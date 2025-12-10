@@ -854,7 +854,7 @@ MonoBehaviour:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4492889921191898461}
-  m_Enabled: 0
+  m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: 35f79ab2e117bdf479563e72e39b7bc5, type: 3}
   m_Name: 
@@ -880,7 +880,7 @@ MonoBehaviour:
   deathKnockbackForce: 12
   deathKnockbackUpForce: 2
   deathKnockbackAngle: 30
-  disableKnockbackAfterDeath: 1
+  disableKnockbackAfterDeath: 0
   hitKnockbackForce: 4
   hitKnockbackUpForce: 1.5
   hitKnockbackAngle: 20
