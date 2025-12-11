@@ -830,7 +830,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4e9f679f7a6fd264e88344d90ab386d1, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  firstStageSceneName: Mario Stage
+  firstStageSceneName: Mario Stage 1
 --- !u!4 &1139699823
 Transform:
   m_ObjectHideFlags: 0

@@ -1,6 +1,8 @@
+using Unity.VisualScripting;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
+using TMPro;
 
 public class PlayerHealth : MonoBehaviour
 {
@@ -8,6 +10,14 @@ public class PlayerHealth : MonoBehaviour
     [SerializeField] Slider healthSlider;
     [SerializeField] string endSceneName = "End";
 
+    [Header("HP画像")]
+    [SerializeField] Image hpImage;
+    [SerializeField] Sprite hp25PercentSprite;
+    [SerializeField] Sprite hp50PercentSprite;
+    [SerializeField] Sprite hp75PercentSprite;
+    [SerializeField] Sprite hp100PercentSprite;
+
+    [SerializeField] private TMP_Text HPPercentText;
     int currentHealth;
     bool isDead;
 
@@ -19,11 +29,13 @@ public class PlayerHealth : MonoBehaviour
         maxHealth = Mathf.Max(1, maxHealth);
         currentHealth = maxHealth;
         SyncSlider();
+        UpdateHpImage();
     }
 
     void OnEnable()
     {
         SyncSlider();
+        UpdateHpImage();
     }
 
     public void TakeDamage(int amount)
@@ -35,6 +47,7 @@ public class PlayerHealth : MonoBehaviour
 
         currentHealth = Mathf.Max(0, currentHealth - amount);
         SyncSlider();
+        UpdateHpImage();
 
         if (currentHealth <= 0)
         {
@@ -51,6 +64,7 @@ public class PlayerHealth : MonoBehaviour
 
         currentHealth = Mathf.Clamp(currentHealth + amount, 0, maxHealth);
         SyncSlider();
+        UpdateHpImage();
     }
 
     void SyncSlider()
@@ -71,6 +85,40 @@ public class PlayerHealth : MonoBehaviour
         }
 
         healthSlider.value = currentHealth;
+
+        if(HPPercentText != null)
+        {
+            float percent = ((float)currentHealth / maxHealth) * 100f;
+            HPPercentText.text = Mathf.RoundToInt(percent).ToString() + "%";
+        }
+    }
+
+
+    void UpdateHpImage()
+    {
+        if(hpImage == null)
+        {
+            return;
+        }
+
+        float healthPercent = (float)currentHealth / maxHealth;
+
+        if(healthPercent >= 0.75f)
+        {
+            hpImage.sprite = hp100PercentSprite;
+        }
+        else if(healthPercent >= 0.5f)
+        {
+            hpImage.sprite = hp75PercentSprite;
+        }
+        else if(healthPercent >= 0.25f)
+        {
+            hpImage.sprite = hp50PercentSprite;
+        }
+        else
+        {
+            hpImage.sprite = hp25PercentSprite;
+        }
     }
 
     void HandleDeath()
