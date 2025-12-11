@@ -1,56 +1,49 @@
-# WAVY-Prototype: AI agent quickstart (Unity URP)
+# WAVY-Prototype: AI agent quickstart (Unity 6 URP)
 
-Unity 6 URP prototype featuring player vs enemies/towers, ragdoll deaths, and score UI.
+Unity URP action prototype: player vs enemies/towers with ragdoll deaths, score UI, and Input System.
 
 ## Project shape
-- Scenes: Start.unity (main menu entry), Main.unity / Stage1.unity for gameplay; playmode starts from Start.
-	- Additional test scenes exist (Mario Stage.unity, spawner_destruction.unity, Boss_Input.unity). Legacy: Main(Deprecated).unity / Main Menu(Deprecated).unity.
-- Packages (from Packages/manifest.json):
-	- URP com.unity.render-pipelines.universal 17.1.0
-	- Input System com.unity.inputsystem 1.14.0
-	- AI Navigation com.unity.ai.navigation 2.0.7
-	- UGUI com.unity.ugui 2.0.0
-- Core scripts live in Assets/Scripts; keep generated PlayerInputActions.cs untouched—edit PlayerInputActions.inputactions then regenerate. Note: InputSystem_Actions.inputactions also exists but code uses PlayerInputActions.
-- Prefabs expect `Player` tag for lookups (`EnemyScript`, `EnemyTowerHealth`, UI heart facing via `CanvasLookIntoPlayerCamera`).
+- Scenes: `Start.unity` (entry), `Main.unity` / `Stage1.unity` for play; test scenes exist (`Mario Stage`, `spawner_destruction`, `Boss_Input`). Legacy: `Main(Deprecated)`, `Main Menu(Deprecated)`.
+- Packages: URP 17.1.0, Input System 1.14.0, AI Navigation 2.0.7, UGUI 2.0.0.
+- Scripts live in `Assets/Scripts`. Do **not** edit `PlayerInputActions.cs`; change `PlayerInputActions.inputactions` then regenerate via inspector. `InputSystem_Actions.inputactions` exists but gameplay uses `PlayerInputActions`.
+- Prefabs and AI rely on `Player` tag for lookups (enemy chase/damage, tower hearts facing, camera target).
 
-## Player systems
-- Pipeline: `PlayerManager.Update()` calls `InputManager.HandleAllInputs()` then `PlayerCombat.HandleAllCombatInput()`; `CameraManager.HandleAllCameraMovement()` runs in `LateUpdate`.
-- `InputManager` captures action booleans (`attackInput`, `beamInput`, `chargeInput`, `tailInput`) as one-frame flags—combat scripts must reset them after consumption (done at the end of each handler in `PlayerCombat`).
-- `PlayerCombat` gates tail/beam/charge via cooldown coroutines; tail uses `Physics.OverlapSphere` + angle filter, beam spawns `beamPrefab` and hits via `Physics.OverlapCapsule`, charge moves with `CharacterController.Move` and caches tower hit timestamps to prevent multi-hits.
-- Animator hooks are optional: triggers/bools are checked (`Attack` bool, `Tail`/`Beam`/`Charge` triggers) before fallback to `AnimatorManager.PlayTargetAnimation`.
+## Player loop and input
+- Frame order: `PlayerManager.Update()` -> `InputManager.HandleAllInputs()` -> `PlayerCombat.HandleAllCombatInput()`; `PlayerLocomotion.HandleAllMovement()` in `FixedUpdate`; `CameraManager.HandleAllCameraMovement()` in `LateUpdate`.
+- `InputManager` sets one-frame flags (`attackInput`, `beamInput`, `chargeInput`, `tailInput`) and movement/camera axes; combat handlers must clear flags (done inside `PlayerCombat`).
+- `CameraManager` auto-finds `Player` tag (fallback to `PlayerScript`/`PlayerManager`); handles follow/rotate/collision. Keep `cameraPivot` assigned and collision layers set.
+- `GameManager` wires Input System `Pause` action; toggles `Time.timeScale`, cursor lock, and pause menu. Use `ReturnToMainMenu` to load `Start` scene.
 
-## Damage patterns
-- Preferred enemy flow: call `EnemyScript.ApplyDamage(int, Vector3?, Vector3?)` to manage HP, FX, knockback, ragdoll, score, and EXP spawn.
-- Interface flow: `WeaponHitbox` invokes `IDamageable.TakeDamage`; some enemies only implement `EnemyScript` so dual-support collisions as needed.
-- Legacy projectiles rely on `DamegeScript` (intentional spelling; see `DamageScript.cs`) detected inside `EnemyScript.OnTriggerEnter`.
+## Combat patterns (`PlayerCombat`)
+- Tail: uses `TailAttackHitBox` component toggled via coroutine; angle+radius filter with `Physics.OverlapSphere`; knockback via `ApplyKnockback` (NavMeshAgent.Move or Rigidbody.AddForce fallback).
+- Beam/Throw: mode switch `beamOrThrowMode` (Beam=spawn `beamPrefab` at `beamOffset` with capsule damage after `beamHitDelay`; Throw=spawn `throwProjectilePrefab` with ballistic velocity, optional `LandingArea`). Cooldowns per mode.
+- Charge: moves via `CharacterController.Move` for `chargeDuration`; caches hit enemies/bosses/towers to avoid repeated hits (`chargeTowerHitInterval`).
+- Animator use is optional: checks `Tail`/`Beam`/`Charge` triggers and `Attack` bool before falling back to `AnimatorManager.PlayTargetAnimation`.
+- Layer filtering: `enemyLayers` defaults to all; adjust when adding new enemy layers.
 
-## Enemy behaviour
-- `EnemyScript` uses `NavMeshAgent` to chase until `AtDistance`, then locks on and optionally attacks via `Target.SendMessage("TakeDamage", attackDamage)`.
-- Knockback toggles the agent/Rigidbody, lifts slightly (`liftBeforePhysics`), and restores after `hitKnockbackRecoveryDelay`; death flips to ragdoll and optionally zeroes forces via `disableKnockbackAfterDeath`.
-- Ensure NavMesh is baked and agents are on the NavMesh (`agent.isOnNavMesh`); inspector `EnemySpeed`, `AtDistance`, and score fields drive runtime behaviour.
+## Enemies and damage
+- Preferred entry point: `EnemyScript.ApplyDamage(int, Vector3?, Vector3?)` handles HP, hit FX (optional delay), knockback gating, ragdoll, score, EXP spawn, and corpse layer swap when `disableKnockbackAfterDeath` is true.
+- AI: `EnemyScript` chases via `NavMeshAgent` once player within `ChaseStartDistance`; stops at `AtDistance` and attacks via `Target.SendMessage("TakeDamage", attackDamage)` if tagged `Player`. Ensure agents are on baked NavMesh.
+- Ragdoll: `SimpleRagdoll.Die` called on death; lifts slightly (`liftBeforePhysics`) to avoid ground overlap. Honors `deathKnockback` settings.
+- Legacy hits: `DamegeScript` (spelling intentional) still detected in `OnTriggerEnter`; `WeaponHitbox` + `IDamageable` also present.
 
 ## Towers and spawns
-- `EnemyTowerHealth` tracks up to 3 hearts × 2 HP, auto-populates heart images from `heartContainer`, and faces the player/camera each frame.
-- Towers self-damage when `Physics.OverlapSphere` detects colliders tagged `Player`; adjust `playerAttackLayers` or tag to integrate new attacks.
-- On death the tower optionally instantiates `deathSpawnPrefab` in a radius and destroys itself.
+- `EnemyTowerHealth` holds up to 3 hearts × 2 HP; auto-fills heart images from `heartContainer` if inspector list empty; faces player/camera each frame.
+- Self-damage when `Physics.OverlapSphere` finds colliders tagged `Player` on `playerAttackLayers`; tune `detectionRadius`/`damageInterval` to integrate new attacks.
+- On destroy: optional `deathSpawnPrefab` radial instantiation, notifies every `BossScript` via `OnTowerDestroyed(position, stayDuration)`, then destroys self.
 
 ## Score and UI
-- `ScoreManager` is a singleton (`DontDestroyOnLoad`) firing `ScoreChanged` UnityEvent; call `ScoreManager.Instance?.AddScore(amount)` on kill events.
-- `ScoreUI` listens to the event and formats `Score: {value}`; ensure TMP reference is assigned in the inspector.
+- `ScoreManager` is a singleton (`DontDestroyOnLoad` when configured) exposing `ScoreChanged` UnityEvent; call `ScoreManager.Instance?.AddScore(amount)` on kills. Starting score set in inspector; static `CurrentScore` holds value.
+- `ScoreUI` listens to `ScoreManager.ScoreChanged` to display `Score: {value}`; ensure TMP reference set. `ShowScore`/`PopUpController` used in menus.
 
-## Ragdolls and physics
-- `SimpleRagdoll.SetRagdoll(true)` disables animator/agent, enables child rigidbodies with continuous collision, and applies impulses in `Die`.
-- When you add forces, lift the character slightly (`LiftAboveGround`) before enabling physics to avoid tunneling.
-- Keep corpse cleanup consistent by honoring `disableKnockbackAfterDeath` and `autoDestroySec`.
-
-## Workflow tips
-- Play from Start.unity; verify player input via new Input System (Player action map). When editing `PlayerInputActions.inputactions`, regenerate the C# class from the asset’s inspector (Generate C# Class) to update `PlayerInputActions.cs`.
-- No automated tests; iteration happens in the Unity Editor. If AI-origin changes touch input or navmesh, include repro steps for manual validation.
-- Git repo may be dirty; avoid reverting user changes. Document new instructions or patterns in this file when adding systems.
+## Workflow notes
+- Play from `Start.unity`; confirm player object is tagged `Player` and has `InputManager`/`PlayerCombat`/`PlayerLocomotion` (as needed) plus `CharacterController` for charge.
+- When editing input actions, regenerate `PlayerInputActions.cs` from the asset inspector (Generate C# Class) so bindings update; avoid touching the generated file directly.
+- No automated tests; validate changes in the Unity Editor. If modifying navmesh agents or camera collisions, include manual repro steps in PRs/issues.
+- Repo may be dirty; do not revert unrelated changes. Document new patterns here when adding systems.
 
 ## Quick manual validation
-- Open `Assets/Scenes/Start.unity`, press Play.
-- Ensure the Player GameObject is tagged `Player` so enemies/towers can find it.
-- Make sure a NavMesh is baked for the active scene and enemies are placed on it.
-- Confirm `ScoreManager` exists in the scene or as a bootstrap in Start; verify `ScoreUI` has a TMP reference.
-- Test attacks: Tail/Beam/Charge should fire once per input and respect cooldowns; towers should decrement hearts when the player overlaps.
+- Load `Start.unity`, press Play; ensure `ScoreManager` exists in scene or as bootstrap.
+- Verify movement/camera, pause/resume, and that attacks fire once per input respecting cooldowns.
+- Check enemies chase only within `ChaseStartDistance`, stop at `AtDistance`, and add score on death; corpses ragdoll without clipping.
+- Destroy a tower: hearts decrement, overlap damage triggers, death spawns (if set) and bosses receive `OnTowerDestroyed`.
