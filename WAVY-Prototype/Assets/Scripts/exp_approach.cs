@@ -6,6 +6,7 @@ public class exp_approach : MonoBehaviour
     [SerializeField] float speed = 0.4f;
     [SerializeField] float maxTimer = 10.0f;
     [SerializeField] float collectDistance = 1.0f;
+    [SerializeField, Min(0)] int healAmount = 10;
 
     [Header("ビルボード")]
     public bool yAxisOnly = false;
@@ -13,12 +14,15 @@ public class exp_approach : MonoBehaviour
     public string playerTag = "Player"; //Playerタグ配下から探索
 
     private Transform cam;
+    private Transform player;
+    private PlayerHealth playerHealth;
     private float timer = 0.0f;
     private bool isCollect = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
+        ResolvePlayer();
         collect();
     }
 
@@ -41,12 +45,18 @@ public class exp_approach : MonoBehaviour
             return;
         }
 
-        GameObject player = GameObject.Find("Player");
+        if (player == null || !player.gameObject.activeInHierarchy)
+        {
+            if (!ResolvePlayer())
+            {
+                return;
+            }
+        }
 
         //プレイヤーに向かって進ませる
-        transform.position = Vector3.MoveTowards(transform.position, player.transform.position, speed * Time.deltaTime);
+        transform.position = Vector3.MoveTowards(transform.position, player.position, speed * Time.deltaTime);
 
-        float distance = (player.transform.position - transform.position).magnitude;
+        float distance = (player.position - transform.position).magnitude;
         //Debug.Log($"Distance to player: {distance}");
 
         //特定の距離まで近づいたら回収完了
@@ -119,6 +129,32 @@ public class exp_approach : MonoBehaviour
         }
     }
 
+    bool ResolvePlayer()
+    {
+        GameObject candidate = null;
+
+        if (!string.IsNullOrEmpty(playerTag))
+        {
+            candidate = GameObject.FindGameObjectWithTag(playerTag);
+        }
+
+        if (candidate == null)
+        {
+            candidate = GameObject.Find("Player");
+        }
+
+        if (candidate == null)
+        {
+            player = null;
+            playerHealth = null;
+            return false;
+        }
+
+        player = candidate.transform;
+        playerHealth = candidate.GetComponent<PlayerHealth>();
+        return true;
+    }
+
     public void collect()
     {
         timer = 0.0f;
@@ -128,8 +164,27 @@ public class exp_approach : MonoBehaviour
     {
         Debug.Log("FinishCollect called");
         isCollect = false;
-        
+        TryHealPlayer();
+
         Destroy(this.gameObject);
 	
+    }
+
+    void TryHealPlayer()
+    {
+        if (player == null || playerHealth == null)
+        {
+            if (!ResolvePlayer())
+            {
+                return;
+            }
+        }
+
+        if (playerHealth == null)
+        {
+            return;
+        }
+
+        playerHealth.Heal(healAmount);
     }
 }
