@@ -19,4 +19,9 @@ public class ToMainMenu : MonoBehaviour
     {
         SceneManager.LoadScene("Start");
     }
+
+    public void RetryBtn() 
+    {
+        SceneManager.LoadScene("Mario Stage 1");
+    }
 }

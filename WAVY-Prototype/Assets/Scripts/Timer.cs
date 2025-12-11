@@ -5,6 +5,10 @@ using UnityEngine;
 using UnityEngine.UI;
 using TMPro;
 using UnityEngine.Events;
+using UnityEditor.SearchService;
+using UnityEngine.SceneManagement;
+using UnityEditor;
+using UnityEngine.XR;
 
 
 public class Timer : MonoBehaviour
@@ -62,6 +66,9 @@ public class Timer : MonoBehaviour
     bool timerRunning = false;
     bool timerPaused = false;
     public double timeRemaining;
+
+    [SerializeField] private string gameOverscneName = "GameOver";
+
     
 
     private void Awake()
@@ -189,6 +196,7 @@ public class Timer : MonoBehaviour
             timeRemaining = 0;
             timerRunning = false;
             onTimerEnd.Invoke();
+            HandleTimerEnd();
             DisplayInTextObject();
         }
     }
@@ -204,6 +212,7 @@ public class Timer : MonoBehaviour
         {
             //Timer has ended from counting upwards
             onTimerEnd.Invoke();
+            HandleTimerEnd();
             timeRemaining = ReturnTotalSeconds();
             DisplayInTextObject();
             timerRunning = false;
@@ -387,5 +396,14 @@ public class Timer : MonoBehaviour
     private void OnValidate()
     {
         timeRemaining = ConvertToTotalSeconds(hours, minutes, seconds);
+    }
+
+    private void HandleTimerEnd()
+    {
+        // カーソルを表示＆ロック解除
+        Cursor.visible = true;
+        Cursor.lockState = CursorLockMode.None;
+
+        SceneManager.LoadScene(gameOverscneName);
     }
 }

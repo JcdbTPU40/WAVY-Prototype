@@ -50,7 +50,7 @@ MonoBehaviour:
   maxTimer: 10
   collectDistance: 1
   healAmount: 10
-  yAxisOnly: 0
+  yAxisOnly: 1
   rotationLerpSpeed: 0
   playerTag: Player
 --- !u!1 &6722632908803977911
