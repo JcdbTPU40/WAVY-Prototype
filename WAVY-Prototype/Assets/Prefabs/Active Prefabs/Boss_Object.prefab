@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 593522055330096569}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Left_toeBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -44,7 +44,7 @@ GameObject:
   - component: {fileID: 8899819352919326361}
   - component: {fileID: 7705305249117240420}
   - component: {fileID: 4419019392426300197}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: wing1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -128,7 +128,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3834043305380971330}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: head
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -159,7 +159,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4047775208545167907}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SpawnPoint (3)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -190,7 +190,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2755363434527598244}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SpawnPoint
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -223,7 +223,7 @@ GameObject:
   - component: {fileID: 5802367380508376771}
   - component: {fileID: 3509180230767957996}
   - component: {fileID: 1552528221266459843}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: wingparts1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -307,7 +307,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 538200340582768805}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: hip
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -342,7 +342,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3233111763625412774}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Left_foot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -373,7 +373,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 7775502883475022021}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Right_upleg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -407,7 +407,7 @@ GameObject:
   - component: {fileID: 1685104294612695770}
   - component: {fileID: 5353863037962132575}
   - component: {fileID: 1874873453828653084}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: FOOTparts1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -491,7 +491,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2422393544417019551}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Left_upleg
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -523,7 +523,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2033747883196738290}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Right_wing1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -555,7 +555,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2169412172543569047}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Right_wingtop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -586,7 +586,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2690212668507036612}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SpawnPoint (1)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -619,7 +619,7 @@ GameObject:
   - component: {fileID: 8143271677687779741}
   - component: {fileID: 5980770935764660101}
   - component: {fileID: 2145607668974532058}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: wingparts3
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -703,7 +703,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 6229626930625265490}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Left_wing1
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -737,7 +737,7 @@ GameObject:
   - component: {fileID: 6097546361680252761}
   - component: {fileID: 2346079948000407102}
   - component: {fileID: 2930844978395699968}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: FOOT
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -823,7 +823,7 @@ GameObject:
   - component: {fileID: 6230558144011103651}
   - component: {fileID: 6217686370634215095}
   - component: {fileID: 8414218365333034143}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: wingparts2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -907,7 +907,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3996798955402371944}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Right_toeBase
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -940,7 +940,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8298798559481353596}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Right_foot
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -971,7 +971,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8404936674635597386}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Left_wingtop
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1002,7 +1002,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 5131242222922135971}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Left_toe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1033,7 +1033,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3229933547987692653}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: Right_toe
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1066,7 +1066,7 @@ GameObject:
   - component: {fileID: 2732483654838501533}
   - component: {fileID: 5660111399764790259}
   - component: {fileID: 6690374930164284104}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: body
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1155,7 +1155,8 @@ GameObject:
   - component: {fileID: 7432288259703776864}
   - component: {fileID: 2636865518856689078}
   - component: {fileID: 4241874707476175759}
-  m_Layer: 0
+  - component: {fileID: -3822172285646769979}
+  m_Layer: 8
   m_Name: Boss_Object
   m_TagString: Enemy
   m_Icon: {fileID: 0}
@@ -1216,7 +1217,7 @@ BoxCollider:
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3
-  m_Size: {x: 4, y: 3, z: 2}
+  m_Size: {x: 2, y: 3, z: 2}
   m_Center: {x: 0, y: 1.5, z: 0}
 --- !u!195 &7432288259703776864
 NavMeshAgent:
@@ -1225,7 +1226,7 @@ NavMeshAgent:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 8247867192681850051}
-  m_Enabled: 1
+  m_Enabled: 0
   m_AgentTypeID: -1372625422
   m_Radius: 0.5
   m_Speed: 3
@@ -1259,6 +1260,7 @@ MonoBehaviour:
   - {fileID: 2690212668507036612}
   - {fileID: 3465620758001519147}
   - {fileID: 4047775208545167907}
+  target: {fileID: 0}
 --- !u!114 &4241874707476175759
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1281,6 +1283,22 @@ MonoBehaviour:
   areaSpawned: 0
   beamSpawned: 0
   parent: {fileID: 22870139057609278}
+--- !u!208 &-3822172285646769979
+NavMeshObstacle:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 8247867192681850051}
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Shape: 1
+  m_Extents: {x: 1, y: 1.5, z: 1}
+  m_MoveThreshold: 0.1
+  m_Carve: 1
+  m_CarveOnlyStationary: 0
+  m_Center: {x: 0, y: 1.5, z: 0}
+  m_TimeToStationary: 0.5
 --- !u!1 &8447254874651694255
 GameObject:
   m_ObjectHideFlags: 0
@@ -1290,7 +1308,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 3465620758001519147}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: SpawnPoint (2)
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1321,7 +1339,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 4391090716291468526}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: boss
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1360,7 +1378,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 9036865546488444847}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: boss_b4
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1393,7 +1411,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 241359561501679810}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: shouder
   m_TagString: Untagged
   m_Icon: {fileID: 0}
@@ -1428,7 +1446,7 @@ GameObject:
   - component: {fileID: 4780332650890760386}
   - component: {fileID: 3247580892935206848}
   - component: {fileID: 770448723637509763}
-  m_Layer: 0
+  m_Layer: 8
   m_Name: FOOTparts2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
