@@ -27,7 +27,7 @@ EditorBuildSettings:
     path: Assets/Scenes/GameOver.unity
     guid: c1d01a3a81acf8a4680301c62b107018
   - enabled: 1
-    path: Assets/Scenes/Mario stage 1.unity
+    path: Assets/Scenes/Mario Stage 1.unity
     guid: 811f19c750ba3594081c0513b321153a
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 04ca315ef5c38ff49bb842044661b625, type: 3}

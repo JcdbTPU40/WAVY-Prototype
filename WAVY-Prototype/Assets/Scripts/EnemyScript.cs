@@ -37,6 +37,7 @@ public class EnemyScript : MonoBehaviour
     public int ScoreOnDeath = 100;                   // スコア加算量（ScoreScript未使用）
 
     [Header("攻撃設定")]
+    PlayerHealth damage;
     [SerializeField] int attackDamage = 10;
     private float lastAttackTime;
 
@@ -510,6 +511,8 @@ public class EnemyScript : MonoBehaviour
     void PerformAttack()
     {
         animator?.SetTrigger("Attack");
+        damage = Target.GetComponent<PlayerHealth>();
+        damage.TakeDamage(attackDamage);
         Target.SendMessage("TakeDamage", attackDamage, SendMessageOptions.DontRequireReceiver);
     }
 
