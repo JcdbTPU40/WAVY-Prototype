@@ -3,6 +3,7 @@ using System.Collections.Generic;
 
 public class TailAttackHitBox : MonoBehaviour
 {
+    [SerializeField] TailScalebyHealth scale;
     [SerializeField] private int damage = 30;
     [SerializeField] private LayerMask enemyLayer;       // Enemy レイヤーを指定
     [SerializeField] private float hitRadius = 0.5f;     // 尻尾の太さとして判定に使う
@@ -22,6 +23,8 @@ public class TailAttackHitBox : MonoBehaviour
 
     private void Update()
     {
+        hitRadius=scale.size/8f; //尻尾の太さを更新
+
         if (!active || tipPoint == null) return; //攻撃状態じゃないと判定しない
 
         Vector3 currentPos = tipPoint.position; //現在の尻尾の位置

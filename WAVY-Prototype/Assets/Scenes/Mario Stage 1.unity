@@ -119,36 +119,6 @@ NavMeshSettings:
     debug:
       m_Flags: 0
   m_NavMeshData: {fileID: 0}
---- !u!1 &68650511 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 4121584918668108405, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
-  m_PrefabInstance: {fileID: 7448846436230383638}
-  m_PrefabAsset: {fileID: 0}
---- !u!4 &68650512 stripped
-Transform:
-  m_CorrespondingSourceObject: {fileID: 9102392853273790062, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
-  m_PrefabInstance: {fileID: 7448846436230383638}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &68650513
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 68650511}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 7b4d5cedb17a2aa47ba6ece2daae014d, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  damage: 10
-  enemyLayer:
-    serializedVersion: 2
-    m_Bits: 256
-  hitRadius: 0.5
-  tipPoint: {fileID: 68650512}
-  maxCheckDistance: 2
-  active: 0
 --- !u!1 &79570926
 GameObject:
   m_ObjectHideFlags: 0
@@ -2140,6 +2110,26 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1655173353}
   m_SourcePrefab: {fileID: 100100000, guid: b5fead16552398740975db22e4f9d9e8, type: 3}
+--- !u!1 &759151374 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 6006585686191742931, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+  m_PrefabInstance: {fileID: 7448846436230383638}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &759151376
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 759151374}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: a154af3f980dce746a380bf476c9b57e, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  playerHealth: {fileID: 1847775635}
+  smoothSpeed: 5
+  size: 0
 --- !u!1001 &870141578
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -2306,6 +2296,10 @@ PrefabInstance:
       propertyPath: enemy
       value: 
       objectReference: {fileID: 4492889921191898461, guid: 4680414e4628f174aa72c0e990c01839, type: 3}
+    - target: {fileID: 2636865518856689078, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
+      propertyPath: repeat
+      value: 3
+      objectReference: {fileID: 0}
     - target: {fileID: 2636865518856689078, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
       propertyPath: target
       value: 
@@ -3446,6 +3440,17 @@ Transform:
   m_CorrespondingSourceObject: {fileID: -8679921383154817045, guid: e1f2750b8656f3947ba4dda12901679f, type: 3}
   m_PrefabInstance: {fileID: 870141578}
   m_PrefabAsset: {fileID: 0}
+--- !u!114 &1145013766 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 9153583850242303972, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+  m_PrefabInstance: {fileID: 7448846436230383638}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7b4d5cedb17a2aa47ba6ece2daae014d, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1146448650
 GameObject:
   m_ObjectHideFlags: 0
@@ -5939,8 +5944,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls: []
   hours: 0
-  minutes: 0
-  seconds: 2
+  minutes: 3
+  seconds: 0
   startAtRuntime: 1
   hoursDisplay: 0
   minutesDisplay: 1
@@ -5951,7 +5956,7 @@ MonoBehaviour:
   textMeshProText: {fileID: 0}
   standardSlider: {fileID: 0}
   dialSlider: {fileID: 0}
-  timeRemaining: 2
+  timeRemaining: 180
   gameOverscneName: GameOver
 --- !u!1 &1847775626 stripped
 GameObject:
@@ -7881,7 +7886,7 @@ PrefabInstance:
     - target: {fileID: 6495216264112346069, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
       propertyPath: tailAttackHitBox
       value: 
-      objectReference: {fileID: 68650513}
+      objectReference: {fileID: 1145013766}
     - target: {fileID: 6495216264112346069, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
       propertyPath: enemyLayers.m_Bits
       value: 256
@@ -7894,6 +7899,14 @@ PrefabInstance:
       propertyPath: m_Enabled
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7483579952556174829, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      propertyPath: m_Enabled
+      value: 1
+      objectReference: {fileID: 0}
+    - target: {fileID: 7483579952556174829, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      propertyPath: playerHealth
+      value: 
+      objectReference: {fileID: 1847775635}
     - target: {fileID: 7752933930604977084, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
       propertyPath: tipPoint
       value: 
@@ -7918,8 +7931,18 @@ PrefabInstance:
       propertyPath: m_LocalPosition.x
       value: -0.4
       objectReference: {fileID: 0}
+    - target: {fileID: 9153583850242303972, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      propertyPath: scale
+      value: 
+      objectReference: {fileID: 759151376}
+    - target: {fileID: 9153583850242303972, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      propertyPath: enemyLayer.m_Bits
+      value: 256
+      objectReference: {fileID: 0}
     m_RemovedComponents:
     - {fileID: 0}
+    - {fileID: 8051352269543809889, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+    - {fileID: 7483579952556174829, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
     m_RemovedGameObjects: []
     m_AddedGameObjects:
     - targetCorrespondingSourceObject: {fileID: 3590132135692319380, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
@@ -7929,9 +7952,9 @@ PrefabInstance:
     - targetCorrespondingSourceObject: {fileID: 4222518874670096430, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1847775635}
-    - targetCorrespondingSourceObject: {fileID: 4121584918668108405, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+    - targetCorrespondingSourceObject: {fileID: 6006585686191742931, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 68650513}
+      addedObject: {fileID: 759151376}
   m_SourcePrefab: {fileID: 100100000, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
 --- !u!1660057539 &9223372036854775807
 SceneRoots:
