@@ -1,15 +1,16 @@
 using UnityEngine;
 using UnityEngine.UI;
+using TMPro;
 
 public class ShowScore : MonoBehaviour
 {
-    public Text scoreText;
+    public TextMeshProUGUI scoreText; 
 
     void OnEnable()
     {
         // 初期表示
         int current = ScoreManager.Instance != null ? ScoreManager.Instance.CurrentScore : 0;
-        if (scoreText != null) scoreText.text = "Score: " + current.ToString();
+        if (scoreText != null) scoreText.text =  current.ToString();
 
         // 以降の更新を購読（別シーンで表示する場合にも対応）
         if (ScoreManager.Instance != null)

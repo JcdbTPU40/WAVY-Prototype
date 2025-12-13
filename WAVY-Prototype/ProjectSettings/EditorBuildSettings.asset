@@ -20,15 +20,18 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Start.unity
     guid: 8163a48c0cf2fab48a801a8ae237e40a
-  - enabled: 0
-    path: Assets/Scenes/Mario Stage.unity
-    guid: 480d4e862e5fd0443a1cc462f3ba2c0b
+  - enabled: 1
+    path: Assets/Scenes/Mario Stage 1.unity
+    guid: 811f19c750ba3594081c0513b321153a
   - enabled: 1
     path: Assets/Scenes/GameOver.unity
     guid: c1d01a3a81acf8a4680301c62b107018
   - enabled: 1
-    path: Assets/Scenes/Mario stage 1.unity
-    guid: 811f19c750ba3594081c0513b321153a
+    path: Assets/Scenes/GameClear.unity
+    guid: 6e5b1dca85afa384b92c2787e21a1820
+  - enabled: 0
+    path: Assets/Scenes/Mario Stage.unity
+    guid: 480d4e862e5fd0443a1cc462f3ba2c0b
   m_configObjects:
     com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 04ca315ef5c38ff49bb842044661b625, type: 3}
   m_UseUCBPForAssetBundles: 0

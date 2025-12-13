@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.SceneManagement;
-using UnityEngine.InputSystem; // New Input System integration
+using UnityEngine.InputSystem;
+using UnityEditor; // New Input System integration
 
 public class GameManager : MonoBehaviour
 {
@@ -12,8 +13,8 @@ public class GameManager : MonoBehaviour
     [SerializeField] private PopUpController pauseButtonController;
 
     [Header("Scenes")]
+    
     [SerializeField] private string mainMenuSceneName = "Start";
-
     public static GameManager Instance { get; private set; }
 
     public bool IsPaused { get; private set; }
