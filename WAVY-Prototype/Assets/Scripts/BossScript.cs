@@ -3,6 +3,7 @@ using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
 using UnityEngine.SocialPlatforms.GameCenter;
+using UnityEngine.UI;
 
 public class BossScript : MonoBehaviour
 {
@@ -17,6 +18,8 @@ public class BossScript : MonoBehaviour
     [SerializeField]Transform O;
     [SerializeField]Transform O2;
 
+    [SerializeField] Slider healthSlider;
+
     bool One;
     bool Two;
     void Start()
@@ -30,6 +33,8 @@ public class BossScript : MonoBehaviour
             Debug.LogError("BossがNavMesh上にいません！");
         }*/
 
+        SyncSlider();
+
         One=false;
         Two=true;
     }
@@ -37,10 +42,10 @@ public class BossScript : MonoBehaviour
     void Update()
     {
         Debug.Log(boss_CurrentHP);
-        //agent.SetDestination(O.position);
-        /*if(Two)
+        //NavMeshAgent.SetDestination(O.position);
+        if(Two)
         {
-            transform.position+=new Vector3(0.005f,0,0);
+            transform.position+=new Vector3(0.01f,0,0);
         //agent.SetDestination(O.position);
         if(transform.position.x>=10)
         {
@@ -51,14 +56,14 @@ public class BossScript : MonoBehaviour
 
         if(One)
         {
-            transform.position+=new Vector3(-0.005f,0,0);
+            transform.position+=new Vector3(-0.01f,0,0);
         //agent.SetDestination(O2.position);
         if(transform.position.x<=-10)
         {
         Two=true;
         One=false;
         }
-        }*/
+        }
     }
 
     public void take_Damage(int damage)
@@ -70,9 +75,34 @@ public class BossScript : MonoBehaviour
 
         boss_CurrentHP -= damage;
 
+        SyncSlider();
+
         if (boss_CurrentHP <= 0)
         {
             died_process();
+        }
+    }
+
+    public void SyncSlider()
+    {
+        if (healthSlider == null)
+        {
+            return;
+        }
+
+        if (!Mathf.Approximately(healthSlider.maxValue, boss_Max_HP))
+        {
+            healthSlider.maxValue = boss_Max_HP;
+        }
+
+        if (!Mathf.Approximately(healthSlider.minValue, 0f))
+        {
+            healthSlider.minValue = 0f;
+        }
+
+        if (!Mathf.Approximately(healthSlider.value, boss_CurrentHP))
+        {
+            healthSlider.value = boss_CurrentHP;
         }
     }
 
