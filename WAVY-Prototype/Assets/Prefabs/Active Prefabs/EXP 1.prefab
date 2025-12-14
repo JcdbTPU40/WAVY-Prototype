@@ -9,7 +9,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 8499169461125753046}
-  - component: {fileID: 1808925133838372056}
+  - component: {fileID: 242526899221706968}
   m_Layer: 0
   m_Name: EXP 1
   m_TagString: Untagged
@@ -25,7 +25,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 476946058308155533}
   serializedVersion: 2
-  m_LocalRotation: {x: -0.057598624, y: -0.08516898, z: -0.004931813, w: 0.9946881}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
@@ -33,7 +33,7 @@ Transform:
   - {fileID: 6444218276011707522}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1808925133838372056
+--- !u!114 &242526899221706968
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
@@ -46,11 +46,11 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   exp: {fileID: 476946058308155533}
-  speed: 0.4
+  speed: 3
   maxTimer: 10
-  collectDistance: 1
+  collectDistance: 0.5
   healAmount: 10
-  yAxisOnly: 1
+  yAxisOnly: 0
   rotationLerpSpeed: 0
   playerTag: Player
 --- !u!1 &6722632908803977911
@@ -63,7 +63,6 @@ GameObject:
   m_Component:
   - component: {fileID: 6444218276011707522}
   - component: {fileID: 950384414140429197}
-  - component: {fileID: 8617603744593850221}
   - component: {fileID: 4632563425528106383}
   m_Layer: 0
   m_Name: Exp_Billboard_texture_Sunami
@@ -80,7 +79,7 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 6722632908803977911}
   serializedVersion: 2
-  m_LocalRotation: {x: -1.110223e-17, y: 0, z: -0, w: 1}
+  m_LocalRotation: {x: -1.110223e-17, y: -0, z: -0, w: 1}
   m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 0.01, y: 0.01, z: 0}
   m_ConstrainProportionsScale: 0
@@ -142,26 +141,6 @@ SpriteRenderer:
   m_WasSpriteAssigned: 1
   m_MaskInteraction: 0
   m_SpriteSortPoint: 0
---- !u!114 &8617603744593850221
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 6722632908803977911}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: ce84777614e62fb4a8e4d1aca9cefe7a, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  exp: {fileID: 476946058308155533}
-  speed: 3
-  maxTimer: 10
-  collectDistance: 0.5
-  healAmount: 10
-  yAxisOnly: 1
-  rotationLerpSpeed: 0
-  playerTag: Player
 --- !u!70 &4632563425528106383
 CapsuleCollider2D:
   m_ObjectHideFlags: 0
