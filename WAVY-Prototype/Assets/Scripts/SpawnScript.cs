@@ -80,8 +80,8 @@ public class SpawnScript : MonoBehaviour
         // 回転はこのオブジェクトの回転をそのまま継承
         GameObject zako=Instantiate(enemy, spawnPoint, transform.rotation);
 
-        SwarmNavAgent agent = zako.GetComponent<SwarmNavAgent>();
-        agent.target = target;
+        BossEnemy agent = zako.GetComponent<BossEnemy>();
+        agent.targetBoss = target;
     }
 
     /// <summary>

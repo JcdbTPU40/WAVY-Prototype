@@ -36,7 +36,7 @@ public class SwarmNavAgent : MonoBehaviour
 
     void Update()
     {
-        // 到達したら再配置する（常に群がらせたい場合）
+        // 到達したら再配置する
         if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.1f)
             MoveToRandomAroundTarget();
     }
