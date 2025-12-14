@@ -8,6 +8,11 @@ using UnityEngine.AI;
 /// </summary>
 public class BossEnemy : MonoBehaviour
 {
+    [Header("ボスに群がる挙動設定")]
+    public float radius = 5.0f;
+    public float jitter = 1f; // 到達点のランダムズレ
+    public Transform targetBoss;
+
     [Header("経験値プレハブと生成位置")]
     [SerializeField] GameObject exp_Prefab;          // 倒された際に生成する経験値オブジェクト
     [SerializeField] Transform[] exp_Spawnpoint;     // 経験値の生成位置（複数対応）
@@ -24,7 +29,7 @@ public class BossEnemy : MonoBehaviour
     [Header("攻撃間隔")]
     public float AttackInterval;                     // 攻撃間隔（未使用：将来実装用）
     [Header("攻撃時間")]
-    public float AttackTimer = 1.0f;                 // 攻撃アニメーション時間などの想定（未使用）
+    public float AttackTimer = 0.5f;                 // 攻撃アニメーション時間などの想定（未使用）
 
     [Header("最大HP")]
     public int MaxHP;                                // 最大HP
@@ -37,8 +42,10 @@ public class BossEnemy : MonoBehaviour
     public int ScoreOnDeath = 100;                   // スコア加算量（ScoreScript未使用）
 
     [Header("攻撃設定")]
+    PlayerHealth damage;
     [SerializeField] int attackDamage = 10;
     private float lastAttackTime;
+    bool isAttacking=false;
 
     [Header("ヒット演出")]
     [SerializeField] private GameObject hitFxPrefab;
@@ -93,6 +100,7 @@ public class BossEnemy : MonoBehaviour
             agent.speed = EnemySpeed;                // エージェント速度を設定
         }
         currentHP = MaxHP;                           // 現在HP初期化
+        
         Target = GameObject.FindGameObjectWithTag("Player"); // Playerタグから追跡対象取得
     }
 
@@ -135,6 +143,7 @@ public class BossEnemy : MonoBehaviour
 
                         if (animator != null)
                         {
+                            Debug.Log("歩いてるよ");
                             animator.SetBool("IsWalking", true);
                         }
                     }
@@ -158,7 +167,8 @@ public class BossEnemy : MonoBehaviour
             }
             else
             {
-                // 追跡範囲外：待機状態
+                MoveToRandomAroundTarget();
+                /*// 追跡範囲外：待機状態
                 if (agent != null && agent.enabled && !agent.isStopped)
                 {
                     agent.ResetPath();
@@ -168,7 +178,7 @@ public class BossEnemy : MonoBehaviour
                 if (animator != null)
                 {
                     animator.SetBool("IsWalking", false);
-                }
+                }*/
             }
         }
         else
@@ -229,7 +239,6 @@ public class BossEnemy : MonoBehaviour
 
         if (currentHP <= 0)
         {
-            
             HandleDeath();
         }
         else
@@ -266,7 +275,6 @@ public class BossEnemy : MonoBehaviour
 
     private void HandleDeath()
     {
-        
         if (hasDied)
         {
             return;
@@ -294,7 +302,6 @@ public class BossEnemy : MonoBehaviour
                 agent.ResetPath();
                 agent.isStopped = true;
             }
-            //Debug.Log("C");
             agent.enabled = false;
         }
 
@@ -507,13 +514,24 @@ public class BossEnemy : MonoBehaviour
         }
 
         lastAttackTime = Time.time;
-        PerformAttack();
+        StartCoroutine(PerformAttack());
     }
 
-    void PerformAttack()
+    IEnumerator PerformAttack()
     {
+        if(isAttacking) yield break;
+
+        isAttacking = true;
+
         animator?.SetTrigger("Attack");
+        damage = Target.GetComponent<PlayerHealth>();
+
+        yield return new WaitForSeconds(AttackTimer);
+
+        damage.TakeDamage(attackDamage);
         Target.SendMessage("TakeDamage", attackDamage, SendMessageOptions.DontRequireReceiver);
+
+        isAttacking=false;
     }
 
     void ApplyHitKnockback()
@@ -669,6 +687,23 @@ public class BossEnemy : MonoBehaviour
             {
                 SetLayerRecursively(c.gameObject, layer);
             }
+        }
+    }
+
+    public void MoveToRandomAroundTarget()
+    {
+        Vector3 dir = Random.insideUnitCircle.normalized;
+        Vector3 dest = targetBoss.position + new Vector3(dir.x, 0, dir.y) * Random.Range(4.0f, radius);
+        // small jitter
+        dest += new Vector3(Random.Range(-jitter, jitter), 0, Random.Range(-jitter, jitter));
+        NavMeshHit hit;
+        if (NavMesh.SamplePosition(dest, out hit, 1.5f, NavMesh.AllAreas))
+        {
+            agent.SetDestination(hit.position);
+        }
+        else
+        {
+            agent.SetDestination(dest);
         }
     }
 }

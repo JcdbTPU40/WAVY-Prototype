@@ -24,7 +24,7 @@ public class EnemyScript : MonoBehaviour
     [Header("攻撃間隔")]
     public float AttackInterval;                     // 攻撃間隔（未使用：将来実装用）
     [Header("攻撃時間")]
-    public float AttackTimer = 1.0f;                 // 攻撃アニメーション時間などの想定（未使用）
+    public float AttackTimer = 0.5f;                 // 攻撃アニメーション時間などの想定（未使用）
 
     [Header("最大HP")]
     public int MaxHP;                                // 最大HP
@@ -40,6 +40,7 @@ public class EnemyScript : MonoBehaviour
     PlayerHealth damage;
     [SerializeField] int attackDamage = 10;
     private float lastAttackTime;
+    bool isAttacking=false;
 
     [Header("ヒット演出")]
     [SerializeField] private GameObject hitFxPrefab;
@@ -94,6 +95,7 @@ public class EnemyScript : MonoBehaviour
             agent.speed = EnemySpeed;                // エージェント速度を設定
         }
         currentHP = MaxHP;                           // 現在HP初期化
+        
         Target = GameObject.FindGameObjectWithTag("Player"); // Playerタグから追跡対象取得
     }
 
@@ -136,6 +138,7 @@ public class EnemyScript : MonoBehaviour
 
                         if (animator != null)
                         {
+                            Debug.Log("歩いてるよ");
                             animator.SetBool("IsWalking", true);
                         }
                     }
@@ -505,15 +508,24 @@ public class EnemyScript : MonoBehaviour
         }
 
         lastAttackTime = Time.time;
-        PerformAttack();
+        StartCoroutine(PerformAttack());
     }
 
-    void PerformAttack()
+    IEnumerator PerformAttack()
     {
+        if(isAttacking) yield break;
+
+        isAttacking = true;
+
         animator?.SetTrigger("Attack");
         damage = Target.GetComponent<PlayerHealth>();
+
+        yield return new WaitForSeconds(AttackTimer);
+
         damage.TakeDamage(attackDamage);
         Target.SendMessage("TakeDamage", attackDamage, SendMessageOptions.DontRequireReceiver);
+
+        isAttacking=false;
     }
 
     void ApplyHitKnockback()
