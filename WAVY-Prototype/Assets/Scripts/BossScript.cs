@@ -1,6 +1,8 @@
+using System.Collections;
 using UnityEngine;
 using UnityEngine.AI;
 using UnityEngine.SceneManagement;
+using UnityEngine.SocialPlatforms.GameCenter;
 
 public class BossScript : MonoBehaviour
 {
@@ -83,10 +85,14 @@ public class BossScript : MonoBehaviour
 
         boss_isDied = true;
 
-        // boss死亡時の処理
-        Destroy(gameObject,5f);
+        StartCoroutine(GameClearSquence());
+    }
 
-        SceneManager.LoadScene("End");
+    IEnumerator GameClearSquence()
+    {
+        // ゲームクリア画面に遷移
+        yield return new WaitForSeconds(2f); // 2秒待機（任意で調整可能）
+        SceneManager.LoadScene("GameClear");
     }
 
     public void OnTowerDestroyed(Vector3 towerWorldPos, float stayDuration )
