@@ -1,12 +1,16 @@
 using UnityEngine;
 using TMPro;
+using System.Collections;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class ScoreUI : MonoBehaviour
 {
     [SerializeField] private TMP_Text scoreText;
 
-    private void Start()
+    IEnumerator Start()
     {
+        yield return null;
+
         if (ScoreManager.Instance != null)
         {
             ScoreManager.Instance.ScoreChanged.AddListener(UpdateScoreUI);
@@ -16,9 +20,9 @@ public class ScoreUI : MonoBehaviour
 
     public void UpdateScoreUI(int newScore)
     {
-        if (scoreText != null)
+        if (scoreText != null )
         {
-            scoreText.text = $"Score: {newScore}";
+            scoreText.text = $"{newScore}";
         }
     }
 }

@@ -1,20 +1,25 @@
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 using UnityEngine.UI;
+
 
 public class ShowScore : MonoBehaviour
 {
     public Text scoreText;
 
+    
+
     void OnEnable()
     {
         // 初期表示
         int current = ScoreManager.Instance != null ? ScoreManager.Instance.CurrentScore : 0;
-        if (scoreText != null) scoreText.text = "Score: " + current.ToString();
+        if (scoreText != null) scoreText.text = current.ToString();
 
         // 以降の更新を購読（別シーンで表示する場合にも対応）
         if (ScoreManager.Instance != null)
         {
             ScoreManager.Instance.ScoreChanged.AddListener(OnScoreChanged);
+            OnScoreChanged(ScoreManager.Instance.CurrentScore);
         }
     }
 
