@@ -10,7 +10,7 @@ public class exp_approach : MonoBehaviour
 
     [Header("ビルボード")]
     public bool yAxisOnly = false;
-    [Min(0f)] public float rotationLerpSpeed = 0f;　//回転スムーズ速度
+    [Min(0f)] public float rotationLerpSpeed = 0f; //回転スムーズ速度
     public string playerTag = "Player"; //Playerタグ配下から探索
 
     private Transform cam;
@@ -23,14 +23,13 @@ public class exp_approach : MonoBehaviour
     void Start()
     {
         ResolvePlayer();
+        ResolveCamera(true);
         collect();
     }
 
     // Update is called once per frame
     void Update()
     {
-        Billboard();
-
         if (!isCollect)
         {
             return;
@@ -68,9 +67,15 @@ public class exp_approach : MonoBehaviour
         }
     }
 
+    void LateUpdate()
+    {
+        // カメラが LateUpdate で動く構成（CameraManager）なので、ビルボードも LateUpdate で追従させる
+        Billboard();
+    }
+
     private void Billboard() //オブジェクトが常にカメラの方を向くようにする
     {
-          if (exp == null) return;
+        if (exp == null) return;
 
         if (cam == null || !cam.gameObject.activeInHierarchy)
         {
@@ -78,8 +83,8 @@ public class exp_approach : MonoBehaviour
             if (cam == null) return;
         }
 
-        Vector3 targetPos = cam.position;
-        Vector3 dir = targetPos - exp.transform.position;
+        // 「表面がカメラを向く」：オブジェクトの forward をカメラ方向へ
+        Vector3 dir = cam.position - exp.transform.position;
 
         if (yAxisOnly)
         {
@@ -88,7 +93,8 @@ public class exp_approach : MonoBehaviour
 
         if (dir.sqrMagnitude < 1e-6f) return;
 
-        Quaternion targetRot = Quaternion.LookRotation(dir.normalized, Vector3.up);
+        Vector3 up = (yAxisOnly || cam == null) ? Vector3.up : cam.up;
+        Quaternion targetRot = Quaternion.LookRotation(dir.normalized, up);
 
         if (rotationLerpSpeed > 0f)
         {
@@ -106,6 +112,39 @@ public class exp_approach : MonoBehaviour
 
     private void ResolveCamera(bool firstTry)
     {
+        // プロジェクトの三人称カメラ（CameraManager）を最優先
+        var cameraManager = Object.FindAnyObjectByType<CameraManager>();
+        if (cameraManager != null)
+        {
+            if (cameraManager.cameraTransform != null)
+            {
+                cam = cameraManager.cameraTransform;
+                return;
+            }
+
+            var cmCam = cameraManager.GetComponentInChildren<Camera>(true);
+            if (cmCam != null)
+            {
+                cam = cmCam.transform;
+                return;
+            }
+        }
+
+        // まずは MainCamera タグを最優先（一般的な三人称カメラ構成）
+        if (Camera.main != null)
+        {
+            cam = Camera.main.transform;
+            return;
+        }
+
+        // シーン内の任意のCameraをフォールバック（MainCamera未設定対策）
+        var anyCam = Object.FindFirstObjectByType<Camera>();
+        if (anyCam != null)
+        {
+            cam = anyCam.transform;
+            return;
+        }
+
         // Playerタグ配下から探索
         if (!string.IsNullOrEmpty(playerTag))
         {
@@ -121,12 +160,7 @@ public class exp_approach : MonoBehaviour
             }
         }
 
-        // Camera.main をフォールバックとして使用
-        if (Camera.main != null)
-        {
-            cam = Camera.main.transform;
-            return;
-        }
+        // ここまでで見つからなければ cam は null のまま
     }
 
     bool ResolvePlayer()
