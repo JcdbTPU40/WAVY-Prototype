@@ -1,5 +1,6 @@
 using UnityEngine;
 using System.Collections.Generic;
+using Mono.Cecil.Cil;
 
 public class TailAttackHitBox : MonoBehaviour
 {
@@ -106,6 +107,7 @@ public class TailAttackHitBox : MonoBehaviour
 
         // 敵のルートオブジェクトを取得
         var enemy = hitCollider.GetComponentInParent<EnemyScript>();
+        
         if (enemy != null)
         {
             GameObject enemyRoot = enemy.gameObject;
@@ -120,6 +122,27 @@ public class TailAttackHitBox : MonoBehaviour
             Vector3 actualHitNormal = hitNormal ?? (enemy.transform.position - actualHitPoint).normalized;
 
             enemy.ApplyDamage(damage, actualHitPoint, actualHitNormal);
+
+            hitEnemies.Add(enemyRoot);
+            return;
+        }
+        
+        var bossenemy = hitCollider.GetComponentInParent<BossEnemy>();
+
+            if (bossenemy != null)
+        {
+            GameObject enemyRoot = bossenemy.gameObject;
+
+            //同じ攻撃が重複しないようにする
+            if (hitEnemies.Contains(enemyRoot))
+            {
+                return;
+            }
+
+            Vector3 actualHitPoint = hitPoint ?? hitCollider.ClosestPoint(tipPoint.position);
+            Vector3 actualHitNormal = hitNormal ?? (enemy.transform.position - actualHitPoint).normalized;
+
+            bossenemy.ApplyDamage(damage, actualHitPoint, actualHitNormal);
 
             hitEnemies.Add(enemyRoot);
             return;
