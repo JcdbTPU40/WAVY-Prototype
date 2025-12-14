@@ -13,6 +13,10 @@ public class BossEnemy : MonoBehaviour
     public float jitter = 1f; // 到達点のランダムズレ
     public Transform targetBoss;
 
+    [Header("targetBoss未設定時の徘徊")]
+    [SerializeField, Min(0f)] private float wanderRadiusWhenNoBoss = 10f;
+    private Vector3 homePosition;
+
     [Header("経験値プレハブと生成位置")]
     [SerializeField] GameObject exp_Prefab;          // 倒された際に生成する経験値オブジェクト
     [SerializeField] Transform[] exp_Spawnpoint;     // 経験値の生成位置（複数対応）
@@ -100,6 +104,8 @@ public class BossEnemy : MonoBehaviour
             agent.speed = EnemySpeed;                // エージェント速度を設定
         }
         currentHP = MaxHP;                           // 現在HP初期化
+
+        homePosition = transform.position;
         
         Target = GameObject.FindGameObjectWithTag("Player"); // Playerタグから追跡対象取得
     }
@@ -692,8 +698,27 @@ public class BossEnemy : MonoBehaviour
 
     public void MoveToRandomAroundTarget()
     {
+        if (agent == null || !agent.enabled || !agent.isOnNavMesh)
+        {
+            return;
+        }
+
+        // 毎フレーム新規目的地を出すと挙動が不安定になりやすいので、到達したら次を決める
+        if (agent.pathPending)
+        {
+            return;
+        }
+        if (agent.hasPath && agent.remainingDistance > 0.8f)
+        {
+            return;
+        }
+
+        Vector3 anchorPosition = targetBoss != null ? targetBoss.position : homePosition;
+        float useRadius = targetBoss != null ? Mathf.Max(0f, radius) : wanderRadiusWhenNoBoss;
+        float minRadius = targetBoss != null ? Mathf.Min(4.0f, useRadius) : 0f;
+
         Vector3 dir = Random.insideUnitCircle.normalized;
-        Vector3 dest = targetBoss.position + new Vector3(dir.x, 0, dir.y) * Random.Range(4.0f, radius);
+        Vector3 dest = anchorPosition + new Vector3(dir.x, 0, dir.y) * Random.Range(minRadius, useRadius);
         // small jitter
         dest += new Vector3(Random.Range(-jitter, jitter), 0, Random.Range(-jitter, jitter));
         NavMeshHit hit;

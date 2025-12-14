@@ -11,6 +11,10 @@ public class GameManager : MonoBehaviour
     [Header("Pause Button Image")]
     [SerializeField] private PopUpController pauseButtonController;
 
+    [Header("Cursor")]
+    [Tooltip("These scenes will force cursor visible/unlocked even when not paused.")]
+    [SerializeField] private string[] forceCursorVisibleSceneNames = new[] { "Start", "GameOver", "GameClear", "End" };
+
     [Header("Scenes")]
     [SerializeField] private string mainMenuSceneName = "Start";
 
@@ -49,11 +53,15 @@ public class GameManager : MonoBehaviour
         inputActions.Player.Pause.performed -= OnPausePerformed;
         inputActions.Player.Pause.performed += OnPausePerformed;
         inputActions.Enable();
+
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+        SceneManager.activeSceneChanged += OnActiveSceneChanged;
     }
 
     private void Start()
     {
         ResumeGame();
+        ApplyCursorStateForScene(SceneManager.GetActiveScene().name);
     }
 
     private void OnPausePerformed(InputAction.CallbackContext ctx)
@@ -162,6 +170,42 @@ public class GameManager : MonoBehaviour
             inputActions.Player.Pause.performed -= OnPausePerformed;
             inputActions.Disable();
         }
+
+        SceneManager.activeSceneChanged -= OnActiveSceneChanged;
+    }
+
+    private void OnActiveSceneChanged(Scene oldScene, Scene newScene)
+    {
+        ApplyCursorStateForScene(newScene.name);
+    }
+
+    private void ApplyCursorStateForScene(string sceneName)
+    {
+        UpdateCursorState(forceVisible: ShouldForceCursorVisibleForScene(sceneName));
+    }
+
+    private bool ShouldForceCursorVisibleForScene(string sceneName)
+    {
+        if (string.IsNullOrWhiteSpace(sceneName) || forceCursorVisibleSceneNames == null)
+        {
+            return false;
+        }
+
+        for (int i = 0; i < forceCursorVisibleSceneNames.Length; i++)
+        {
+            string forcedSceneName = forceCursorVisibleSceneNames[i];
+            if (string.IsNullOrWhiteSpace(forcedSceneName))
+            {
+                continue;
+            }
+
+            if (string.Equals(sceneName, forcedSceneName, System.StringComparison.Ordinal))
+            {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     private void UpdateCursorState(bool forceVisible = false)

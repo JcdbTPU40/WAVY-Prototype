@@ -841,6 +841,7 @@ MonoBehaviour:
   radius: 5
   jitter: 1
   targetBoss: {fileID: 0}
+  wanderRadiusWhenNoBoss: 5
   exp_Prefab: {fileID: 476946058308155533, guid: 03b6a7e0e3b4784419753ccf4dea5cbb, type: 3}
   exp_Spawnpoint:
   - {fileID: 7510829430201587031}
