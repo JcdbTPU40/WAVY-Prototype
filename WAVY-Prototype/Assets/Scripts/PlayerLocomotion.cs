@@ -10,6 +10,10 @@ public class PlayerLocomotion : MonoBehaviour
     CharacterController characterController; // CharacterController を使用（プロジェクト標準）
     Animator animator;
 
+    [Header("Ult")]
+    [SerializeField] PlayerHealth Ult;
+    [SerializeField] float ultSpeed;
+
     [Header("Movement Speeds")]
     public float walkingSpeed = 2f;
     public float runningSpeed = 7f;
@@ -75,8 +79,17 @@ private void HandleMovement()
         moveDirection.Normalize();
 
     // --- ② 速度 ---
-    float currentSpeed = inputManager.moveAmount > 0.5f ? runningSpeed : walkingSpeed;
-    Vector3 horizontalVelocity = moveDirection * currentSpeed;
+    float currentSpeed;
+    
+    if(Ult.IsUlt)
+        {
+            currentSpeed=ultSpeed;
+        }
+        else
+        {
+            currentSpeed = inputManager.moveAmount > 0.5f ? runningSpeed : walkingSpeed;
+        }
+        Vector3 horizontalVelocity = moveDirection * currentSpeed;
 
     // --- ③ Ground 判定（Move 前）---
     bool grounded = IsGrounded(out lastGroundHit);

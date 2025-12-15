@@ -2826,8 +2826,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a154af3f980dce746a380bf476c9b57e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cameraOffset: {fileID: 1018851619}
+  cameraPullFactor: 4
   playerHealth: {fileID: 1847775635}
   smoothSpeed: 5
+  Ult: {fileID: 1847775635}
   size: 0
 --- !u!1 &792651598
 GameObject:
@@ -3295,16 +3298,20 @@ PrefabInstance:
     m_TransformParent: {fileID: 0}
     m_Modifications:
     - target: {fileID: 22870139057609278, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
+      propertyPath: m_LocalScale.z
+      value: 2
+      objectReference: {fileID: 0}
+    - target: {fileID: 22870139057609278, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
       propertyPath: m_LocalPosition.x
-      value: 0.36830902
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22870139057609278, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
       propertyPath: m_LocalPosition.y
-      value: 0.29925632
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 22870139057609278, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 22.6
+      value: 22
       objectReference: {fileID: 0}
     - target: {fileID: 22870139057609278, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
       propertyPath: m_LocalRotation.w
@@ -3340,7 +3347,7 @@ PrefabInstance:
       objectReference: {fileID: 4492889921191898461, guid: 4680414e4628f174aa72c0e990c01839, type: 3}
     - target: {fileID: 2636865518856689078, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
       propertyPath: repeat
-      value: 3
+      value: 0.1
       objectReference: {fileID: 0}
     - target: {fileID: 2636865518856689078, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
       propertyPath: target
@@ -3365,6 +3372,10 @@ PrefabInstance:
     - target: {fileID: 8265303397351646028, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
       propertyPath: O2
       value: 
+      objectReference: {fileID: 0}
+    - target: {fileID: 8265303397351646028, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
+      propertyPath: boss_Max_HP
+      value: 200
       objectReference: {fileID: 0}
     - target: {fileID: 8265303397351646028, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
       propertyPath: healthSlider
@@ -4313,6 +4324,17 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1012991313}
   m_CullTransparentMesh: 1
+--- !u!114 &1018851619 stripped
+MonoBehaviour:
+  m_CorrespondingSourceObject: {fileID: 7172093155660444874, guid: 6b06835da017aba4992fe0aa40ca4fed, type: 3}
+  m_PrefabInstance: {fileID: 7148709529651329676}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ba4ddcffc47ee5445acee73f7c13b38c, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &1026801199
 GameObject:
   m_ObjectHideFlags: 0
@@ -8229,7 +8251,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: d4424470456e1a34e8221290c653041d, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  maxHealth: 100
+  ultTailSize: 30
+  keepTime: 5
+  ultTime: 5
+  IsUlt: 0
+  startHealth: 100
+  maxHealth: 150
   healthSlider: {fileID: 79570928}
   endSceneName: GameOver
   hpImage: {fileID: 917383935}
@@ -10291,6 +10318,14 @@ PrefabInstance:
     - target: {fileID: 5502262396106215797, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
       propertyPath: m_SkinWidth
       value: 0.03
+      objectReference: {fileID: 0}
+    - target: {fileID: 5773821786348908580, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      propertyPath: Ult
+      value: 
+      objectReference: {fileID: 1847775635}
+    - target: {fileID: 5773821786348908580, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
+      propertyPath: ultSpeed
+      value: 10
       objectReference: {fileID: 0}
     - target: {fileID: 5773821786348908580, guid: 37eac0201d17fba4f808fe7272267f41, type: 3}
       propertyPath: runningSpeed
