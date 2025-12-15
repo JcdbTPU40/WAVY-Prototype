@@ -860,7 +860,7 @@ MonoBehaviour:
   deathKnockbackUpForce: 10
   deathKnockbackAngle: 30
   disableKnockbackAfterDeath: 0
-  hitKnockbackForce: 20
+  hitKnockbackForce: 100
   hitKnockbackUpForce: 10
   hitKnockbackAngle: 30
   hitKnockbackRecoveryDelay: 0.25
