@@ -1,6 +1,5 @@
 using UnityEngine;
 using System.Collections.Generic;
-using Mono.Cecil.Cil;
 
 public class TailAttackHitBox : MonoBehaviour
 {
@@ -17,14 +16,38 @@ public class TailAttackHitBox : MonoBehaviour
     private HashSet<GameObject> hitEnemies = new HashSet<GameObject>();
     private HashSet<GameObject> hitBosses = new HashSet<GameObject>();
 
+    private Transform playerTransform;
+
+    public void SetDamage(int newDamage)
+    {
+        damage = Mathf.Max(0, newDamage);
+    }
+
     private void Start()
     {
         prevPos = tipPoint != null ? tipPoint.position : transform.position; //尻尾の初期位置の確認
+        playerTransform = ResolvePlayerTransform();
+    }
+
+    private Transform ResolvePlayerTransform()
+    {
+        var player = GameObject.FindGameObjectWithTag("Player");
+        if (player != null)
+        {
+            return player.transform;
+        }
+
+        return transform.root != null ? transform.root : transform;
     }
 
     private void Update()
     {
         hitRadius=scale.size/8f; //尻尾の太さを更新
+
+        if (playerTransform == null)
+        {
+            playerTransform = ResolvePlayerTransform();
+        }
 
         if (!active || tipPoint == null) return; //攻撃状態じゃないと判定しない
 
@@ -123,6 +146,13 @@ public class TailAttackHitBox : MonoBehaviour
 
             enemy.ApplyDamage(damage, actualHitPoint, actualHitNormal);
 
+            // 尻尾攻撃：プレイヤーから離れる方向へ吹っ飛ばす
+            if (playerTransform != null)
+            {
+                Vector3 away = (enemy.transform.position - playerTransform.position);
+                enemy.ApplyTailKnockback(away, actualHitPoint);
+            }
+
             hitEnemies.Add(enemyRoot);
             return;
         }
@@ -140,9 +170,16 @@ public class TailAttackHitBox : MonoBehaviour
             }
 
             Vector3 actualHitPoint = hitPoint ?? hitCollider.ClosestPoint(tipPoint.position);
-            Vector3 actualHitNormal = hitNormal ?? (enemy.transform.position - actualHitPoint).normalized;
+            Vector3 actualHitNormal = hitNormal ?? (bossenemy.transform.position - actualHitPoint).normalized;
 
             bossenemy.ApplyDamage(damage, actualHitPoint, actualHitNormal);
+
+            // 尻尾攻撃：プレイヤーから離れる方向へ吹っ飛ばす
+            if (playerTransform != null)
+            {
+                Vector3 away = (bossenemy.transform.position - playerTransform.position);
+                bossenemy.ApplyTailKnockback(away, actualHitPoint);
+            }
 
             hitEnemies.Add(enemyRoot);
             return;

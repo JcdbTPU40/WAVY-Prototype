@@ -25,10 +25,10 @@ public class PlayerCombat : MonoBehaviour
 	#endregion
 
 	#region Attack Settings
-	[Header("Basic Attack Settings")]
-	[SerializeField] float attackDamage = 20f;
-	[SerializeField] float attackCooldown = 1f;
-	[SerializeField] float attackAnimationDuration = 0.5f;
+	// [Header("Basic Attack Settings")]
+	// [SerializeField] float attackDamage = 20f;
+	// [SerializeField] float attackCooldown = 1f;
+	// [SerializeField] float attackAnimationDuration = 0.5f;
 
 	[Header("Tail Attack Settings")]
 	[SerializeField] float tailAttackDamage = 35f;
@@ -37,37 +37,40 @@ public class PlayerCombat : MonoBehaviour
 	[SerializeField] float tailAttackHitDelay = 0.2f;
 	[SerializeField] float tailHeightOffset = 0.5f;
 	[SerializeField] float tailKnockbackDistance = 3f;
+	[SerializeField, Min(0f)] float tailAttackCooldown = 1f;
+	[SerializeField, Min(0f)] float tailAttackAnimationDuration = 0.5f;
 
-	[Header("Beam Attack Settings")]
-	[SerializeField] public GameObject beamPrefab;
-	public float beamDuration = 2f;
-	public float beamCooldown = 3f;
-	public Vector3 beamOffset = new Vector3(0f, 0f, 2f);
-	public float beamDamage = 45f;
-	public float beamRange = 12f;
-	public float beamRadius = 1.2f;
-	public float beamHitDelay = 0.1f;
-	public float beamKnockbackDistance = 2.5f;
+	// [Header("Beam Attack Settings")]
+	// [SerializeField] public GameObject beamPrefab;
+	// public float beamDuration = 2f;
+	// public float beamCooldown = 3f;
+	// public Vector3 beamOffset = new Vector3(0f, 0f, 2f);
+	// public float beamDamage = 45f;
+	// public float beamRange = 12f;
+	// public float beamRadius = 1.2f;
+	// public float beamHitDelay = 0.1f;
+	// public float beamKnockbackDistance = 2.5f;
 
 	// 投擲（Throw）関連（既存）
-	[Header("Throw (投擲) Attack Settings")]
-	[SerializeField] GameObject throwProjectilePrefab = null; // Rigidbody を持つ弾のプレハブ（ProjectileThrow コンポーネント推奨）
-	[SerializeField, Min(0f)] float throwRange = 8f;          // 水平射程（前方方向の距離）
-	[SerializeField, Range(5f, 85f)] float throwAngleDeg = 45f; // 発射角度（度）
-	[SerializeField] Vector3 throwSpawnOffset = new Vector3(0f, 3.0f, 3.0f); // ボス基準のスポーンオフセット
-	[SerializeField, Min(0f)] float throwCooldown = 2f;
-	[SerializeField, Min(0f)] float throwProjectileLifetime = 10f;
-	[SerializeField] GameObject landingAreaPrefab;
-	[SerializeField, Min(0f)] float landingAreaRadius = 3f;
-	[SerializeField, Min(0f)] float landingAreaDuration = 5f;
-	[SerializeField, Min(0f)] int landingAreaDamagePerTick = 5;
-	[SerializeField, Min(0f)] float landingAreaTickInterval = 1f;
-
-	public enum BeamOrThrowMode { Beam = 0, Throw = 1 }
-	[Header("Beam / Throw Mode")]
-	[SerializeField] BeamOrThrowMode beamOrThrowMode = BeamOrThrowMode.Beam;
+	// [Header("Throw (投擲) Attack Settings")]
+	// [SerializeField] GameObject throwProjectilePrefab = null; // Rigidbody を持つ弾のプレハブ（ProjectileThrow コンポーネント推奨）
+	// [SerializeField, Min(0f)] float throwRange = 8f;          // 水平射程（前方方向の距離）
+	// [SerializeField, Range(5f, 85f)] float throwAngleDeg = 45f; // 発射角度（度）
+	// [SerializeField] Vector3 throwSpawnOffset = new Vector3(0f, 3.0f, 3.0f); // ボス基準のスポーンオフセット
+	// [SerializeField, Min(0f)] float throwCooldown = 2f;
+	// [SerializeField, Min(0f)] float throwProjectileLifetime = 10f;
+	// [SerializeField] GameObject landingAreaPrefab;
+	// [SerializeField, Min(0f)] float landingAreaRadius = 3f;
+	// [SerializeField, Min(0f)] float landingAreaDuration = 5f;
+	// [SerializeField, Min(0f)] int landingAreaDamagePerTick = 5;
+	// [SerializeField, Min(0f)] float landingAreaTickInterval = 1f;
+	//
+	// public enum BeamOrThrowMode { Beam = 0, Throw = 1 }
+	// [Header("Beam / Throw Mode")]
+	// [SerializeField] BeamOrThrowMode beamOrThrowMode = BeamOrThrowMode.Beam;
 
 	[Header("Charge Attack Settings")]
+	[SerializeField] float chargeDamage = 20f;
 	[SerializeField] float chargeDistance = 5f;
 	[SerializeField] float chargeDuration = 0.4f;
 	[SerializeField] float chargeCooldown = 3f;
@@ -78,7 +81,7 @@ public class PlayerCombat : MonoBehaviour
 	[Header("Animator Parameters")]
 	[SerializeField] string attackBoolName = "Attack";
 	[SerializeField] string tailTriggerName = "Tail";
-	[SerializeField] string beamTriggerName = "Beam";
+	// [SerializeField] string beamTriggerName = "Beam";
 	[SerializeField] string chargeTriggerName = "Charge";
 
 	[Header("Target Filtering")]
@@ -87,19 +90,17 @@ public class PlayerCombat : MonoBehaviour
 
 	#region State Management
 	bool canAttack = true;
-	bool canBeam = true;
 	bool canCharge = true;
-	bool canThrow = true;
 	bool isAttacking;
 	bool isCharging;
 
 	bool hasAttackBool;
 	bool hasTailTrigger;
-	bool hasBeamTrigger;
 	bool hasChargeTrigger;
 
 	readonly Dictionary<EnemyTowerHealth, float> towerHitTimestamps = new Dictionary<EnemyTowerHealth, float>();
 	readonly HashSet<EnemyScript> chargeHitEnemies = new HashSet<EnemyScript>();
+	readonly HashSet<BossEnemy> chargeHitBossEnemies = new HashSet<BossEnemy>();
 	readonly HashSet<BossScript> chargeHitBosses = new HashSet<BossScript>();
 	#endregion
 
@@ -126,7 +127,6 @@ public class PlayerCombat : MonoBehaviour
 		{
 			hasAttackBool = HasParameter(attackBoolName, AnimatorControllerParameterType.Bool);
 			hasTailTrigger = HasParameter(tailTriggerName, AnimatorControllerParameterType.Trigger);
-			hasBeamTrigger = HasParameter(beamTriggerName, AnimatorControllerParameterType.Trigger);
 			hasChargeTrigger = HasParameter(chargeTriggerName, AnimatorControllerParameterType.Trigger);
 		}
 	}
@@ -157,7 +157,7 @@ public class PlayerCombat : MonoBehaviour
 
 		HandleAttackInput();
 		HandleTailInput();
-		HandleBeamInput();
+		// HandleBeamInput(); // 仕様からBeam/Throwが削除されたため
 		HandleChargeInput();
 	}
 
@@ -175,25 +175,11 @@ public class PlayerCombat : MonoBehaviour
 		inputManager.tailInput = false;
 	}
 
-	void HandleBeamInput()
-	{
-		if (!inputManager.beamInput || isAttacking || isCharging)
-		{
-			inputManager.beamInput = false;
-			return;
-		}
-
-		if (beamOrThrowMode == BeamOrThrowMode.Beam && canBeam)
-		{
-			PerformBeamAttack();
-		}
-		else if (beamOrThrowMode == BeamOrThrowMode.Throw && canThrow)
-		{
-			PerformThrowAttack();
-		}
-
-		inputManager.beamInput = false;
-	}
+	// void HandleBeamInput()
+	// {
+	// 	// 仕様からBeam/Throwが削除されたため無効化
+	// 	inputManager.beamInput = false;
+	// }
 
 	void HandleChargeInput()
 	{
@@ -211,20 +197,31 @@ public class PlayerCombat : MonoBehaviour
 
 	public void PerformTailAttackHitBox()
 	{
-    	isAttacking = true;
-    	canAttack = false;
+		if (tailAttackHitBox == null)
+		{
+			Debug.LogWarning("TailAttackHitBox が設定されていません", this);
+			inputManager.tailInput = false;
+			return;
+		}
+
+		tailAttackHitBox.SetDamage(Mathf.RoundToInt(tailAttackDamage));
+
+		isAttacking = true;
+		canAttack = false;
 
     	TriggerAttackAnimation(true, true, "Attack");
 
     	StartCoroutine(TailAttackProcess());
 
-    	StartCoroutine(AttackCooldownRoutine());
+		StartCoroutine(AttackCooldownRoutine());
 	}
 
 	IEnumerator TailAttackProcess()
 	{
-		tailAttackHitBox.ResetPreviousPosition(); 
-    	tailAttackHitBox.ClearHitEnemies();   
+		if (tailAttackHitBox == null) yield break;
+
+		tailAttackHitBox.ResetPreviousPosition();
+		tailAttackHitBox.ClearHitEnemies();
 
     	yield return new WaitForSeconds(tailAttackHitDelay);
     	tailAttackHitBox.active = true;
@@ -255,56 +252,13 @@ public class PlayerCombat : MonoBehaviour
 		}
 	}
 
-	void PerformBeamAttack()
-	{
-		canBeam = false;
-		TriggerBeamAnimation();
-		SpawnBeamVisual();
-		StartCoroutine(BeamDamageRoutine());
-		StartCoroutine(BeamCooldownRoutine());
-	}
-
-	void TriggerBeamAnimation()
-	{
-		bool triggered = false;
-
-		if (animator != null)
-		{
-			if (hasBeamTrigger)
-			{
-				animator.SetTrigger(beamTriggerName);
-				triggered = true;
-			}
-			else if (hasChargeTrigger)
-			{
-				animator.SetTrigger(chargeTriggerName);
-				triggered = true;
-			}
-		}
-
-		if (!triggered && animatorManager != null)
-		{
-			animatorManager.PlayTargetAnimation("Beam", true);
-		}
-	}
-
-	void SpawnBeamVisual()
-	{
-		if (beamPrefab == null)
-		{
-			Debug.LogWarning("Beam prefab が設定されていません", this);
-			return;
-		}
-
-		Vector3 spawnPosition = transform.position + transform.TransformDirection(beamOffset);
-		Quaternion spawnRotation = transform.rotation * Quaternion.Euler(90f, 0f, 0f);
-		GameObject beamInstance = Instantiate(beamPrefab, spawnPosition, spawnRotation);
-		beamInstance.transform.localScale = new Vector3(10f, 100f, 10f);
-		StartCoroutine(DestroyAfterDelay(beamInstance, beamDuration));
-	}
+	// void PerformBeamAttack() { }
+	// void TriggerBeamAnimation() { }
+	// void SpawnBeamVisual() { }
 	void PerformChargeAttack()
 	{
 		chargeHitEnemies.Clear();
+		chargeHitBossEnemies.Clear();
 		chargeHitBosses.Clear();
 		isCharging = true;
 		canCharge = false;
@@ -325,88 +279,18 @@ public class PlayerCombat : MonoBehaviour
 			animatorManager.PlayTargetAnimation("Charge", true);
 		}
 	}
-	void PerformThrowAttack()
-	{
-		if (throwProjectilePrefab == null)
-		{
-			Debug.LogWarning("Throw projectile prefab が設定されていません", this);
-			return;
-		}
-
-		canThrow = false;
-		TriggerAttackAnimation(false, true, "Attack");
-
-		Vector3 spawnPos = transform.position + transform.TransformDirection(throwSpawnOffset);
-		Vector3 initialVelocity = CalculateThrowVelocity();
-		SpawnThrowProjectile(spawnPos, initialVelocity);
-		
-		StartCoroutine(ThrowCooldownRoutine());
-	}
-
-	Vector3 CalculateThrowVelocity()
-	{
-		float angleRad = Mathf.Deg2Rad * Mathf.Clamp(throwAngleDeg, 5f, 85f);
-		Vector3 horizontalDir = GetHorizontalDirection(transform.forward);
-		float gravity = Mathf.Abs(Physics.gravity.y);
-		float distance = Mathf.Max(MinimumRange, throwRange);
-		float speed = CalculateProjectileSpeed(angleRad, distance, gravity);
-		
-		return horizontalDir * (speed * Mathf.Cos(angleRad)) + Vector3.up * (speed * Mathf.Sin(angleRad));
-	}
-
-	Vector3 GetHorizontalDirection(Vector3 forward)
-	{
-		Vector3 horizontalDir = new Vector3(forward.x, 0f, forward.z).normalized;
-		return horizontalDir.sqrMagnitude < Mathf.Epsilon ? Vector3.forward : horizontalDir;
-	}
-
-	float CalculateProjectileSpeed(float angleRad, float distance, float gravity)
-	{
-		float denom = Mathf.Sin(2f * angleRad);
-		if (Mathf.Abs(denom) > 0.0001f)
-		{
-			return Mathf.Sqrt(Mathf.Max(0f, distance * gravity / denom));
-		}
-		return 10f;
-	}
-
-	void SpawnThrowProjectile(Vector3 spawnPos, Vector3 initialVelocity)
-	{
-		GameObject projectile = Instantiate(throwProjectilePrefab, spawnPos, Quaternion.LookRotation(initialVelocity.normalized));
-		if (projectile == null) return;
-
-		Rigidbody rb = projectile.GetComponent<Rigidbody>();
-		if (rb != null)
-		{
-			rb.linearVelocity = initialVelocity;
-		}
-
-		ConfigureProjectileThrow(projectile);
-
-		if (throwProjectileLifetime > 0f)
-		{
-			Destroy(projectile, throwProjectileLifetime);
-		}
-	}
-
-	void ConfigureProjectileThrow(GameObject projectile)
-	{
-		ProjectileThrow pt = projectile.GetComponent<ProjectileThrow>();
-		if (pt != null)
-		{
-			pt.landingAreaPrefab = landingAreaPrefab;
-			pt.landingAreaRadius = landingAreaRadius;
-			pt.landingAreaDuration = landingAreaDuration;
-			pt.landingAreaDamagePerTick = landingAreaDamagePerTick;
-			pt.landingAreaTickInterval = landingAreaTickInterval;
-		}
-	}
+	// void PerformThrowAttack() { }
+	// Vector3 CalculateThrowVelocity() { return Vector3.zero; }
+	// Vector3 GetHorizontalDirection(Vector3 forward) { return Vector3.forward; }
+	// float CalculateProjectileSpeed(float angleRad, float distance, float gravity) { return 0f; }
+	// void SpawnThrowProjectile(Vector3 spawnPos, Vector3 initialVelocity) { }
+	// void ConfigureProjectileThrow(GameObject projectile) { }
 	#endregion
 
 	#region Coroutines
 	IEnumerator AttackCooldownRoutine()
 	{
-		yield return new WaitForSeconds(attackAnimationDuration);
+		yield return new WaitForSeconds(tailAttackAnimationDuration);
 		isAttacking = false;
 
 		if (animator != null && hasAttackBool)
@@ -414,20 +298,8 @@ public class PlayerCombat : MonoBehaviour
 			animator.SetBool(attackBoolName, false);
 		}
 
-		yield return new WaitForSeconds(Mathf.Max(0f, attackCooldown - attackAnimationDuration));
+		yield return new WaitForSeconds(Mathf.Max(0f, tailAttackCooldown - tailAttackAnimationDuration));
 		canAttack = true;
-	}
-
-	IEnumerator BeamCooldownRoutine()
-	{
-		yield return new WaitForSeconds(beamCooldown);
-		canBeam = true;
-	}
-
-	IEnumerator ThrowCooldownRoutine()
-	{
-		yield return new WaitForSeconds(Mathf.Max(0f, throwCooldown));
-		canThrow = true;
 	}
 
 	IEnumerator ChargeCooldownRoutine()
@@ -438,25 +310,11 @@ public class PlayerCombat : MonoBehaviour
 
 	IEnumerator TailAttackRoutine()
 	{
-		float waitTime = Mathf.Max(0f, Mathf.Min(tailAttackHitDelay, attackAnimationDuration));
-		if (waitTime > 0f)
-		{
-			yield return new WaitForSeconds(waitTime);
-		}
-
-		ApplyTailDamage();
+		// Tailの当たり判定は TailAttackHitBox へ移行
+		yield break;
 	}
 
-	IEnumerator BeamDamageRoutine()
-	{
-		float waitTime = Mathf.Max(0f, beamHitDelay);
-		if (waitTime > 0f)
-		{
-			yield return new WaitForSeconds(waitTime);
-		}
-
-		ApplyBeamDamage();
-	}
+	// IEnumerator BeamDamageRoutine() { yield break; }
 
 	IEnumerator ChargeMoveRoutine()
 	{
@@ -478,6 +336,7 @@ public class PlayerCombat : MonoBehaviour
 		DetectAndRemoveEnemies();
 		isCharging = false;
 		chargeHitEnemies.Clear();
+		chargeHitBossEnemies.Clear();
 		chargeHitBosses.Clear();
 	}
 
@@ -513,16 +372,43 @@ public class PlayerCombat : MonoBehaviour
 	void DetectAndRemoveEnemies()
 	{
 		CleanupTowerHitCache();
-		Collider[] colliders = Physics.OverlapSphere(transform.position, chargeHitRadius);
+		int mask = GetValidLayerMask();
+		Collider[] colliders = GetChargeHitColliders(mask);
 		
 		foreach (Collider collider in colliders)
 		{
 			if (collider == null) continue;
+			if (IsSelfCollider(collider)) continue;
 
 			if (TryHitEnemy(collider)) continue;
+			if (TryHitBossEnemy(collider)) continue;
 			if (TryHitBoss(collider)) continue;
 			TryHitTower(collider);
 		}
+	}
+
+	Collider[] GetChargeHitColliders(int mask)
+	{
+		float clampedRadius = Mathf.Max(0.01f, chargeHitRadius);
+		if (characterController == null)
+		{
+			return Physics.OverlapSphere(transform.position, clampedRadius, mask, QueryTriggerInteraction.Collide);
+		}
+
+		Vector3 worldCenter = transform.TransformPoint(characterController.center);
+		float radius = Mathf.Max(clampedRadius, characterController.radius);
+		float height = Mathf.Max(characterController.height, radius * 2f);
+		float half = Mathf.Max(0f, (height * 0.5f) - radius);
+		Vector3 p1 = worldCenter + Vector3.up * half;
+		Vector3 p2 = worldCenter - Vector3.up * half;
+
+		return Physics.OverlapCapsule(p1, p2, radius, mask, QueryTriggerInteraction.Collide);
+	}
+
+	bool IsSelfCollider(Collider collider)
+	{
+		if (collider == null) return true;
+		return collider.transform == transform || collider.transform.IsChildOf(transform);
 	}
 
 	bool TryHitEnemy(Collider collider)
@@ -530,9 +416,28 @@ public class PlayerCombat : MonoBehaviour
 		EnemyScript enemy = collider.GetComponentInParent<EnemyScript>();
 		if (enemy == null || !chargeHitEnemies.Add(enemy)) return false;
 
-		enemy.ApplyDamage(Mathf.RoundToInt(attackDamage));
+		int damage = Mathf.RoundToInt(chargeDamage);
+		Vector3 hitPoint = collider.ClosestPoint(transform.position);
+		Vector3 hitNormal = (enemy.transform.position - hitPoint).sqrMagnitude > Mathf.Epsilon
+			? (enemy.transform.position - hitPoint).normalized
+			: transform.forward * -1f;
+		enemy.ApplyDamage(damage, hitPoint, hitNormal);
 		Vector3 fromPlayer = enemy.transform.position - transform.position;
 		ApplyKnockback(enemy, fromPlayer, chargeKnockbackDistance);
+		return true;
+	}
+
+	bool TryHitBossEnemy(Collider collider)
+	{
+		BossEnemy bossEnemy = collider.GetComponentInParent<BossEnemy>();
+		if (bossEnemy == null || !chargeHitBossEnemies.Add(bossEnemy)) return false;
+
+		int damage = Mathf.RoundToInt(chargeDamage);
+		Vector3 hitPoint = collider.ClosestPoint(transform.position);
+		Vector3 hitNormal = (bossEnemy.transform.position - hitPoint).sqrMagnitude > Mathf.Epsilon
+			? (bossEnemy.transform.position - hitPoint).normalized
+			: transform.forward * -1f;
+		bossEnemy.ApplyDamage(damage, hitPoint, hitNormal);
 		return true;
 	}
 
@@ -541,7 +446,7 @@ public class PlayerCombat : MonoBehaviour
 		BossScript boss = collider.GetComponentInParent<BossScript>();
 		if (boss == null || !chargeHitBosses.Add(boss)) return false;
 
-		boss.take_Damage(Mathf.RoundToInt(attackDamage));
+		boss.take_Damage(Mathf.RoundToInt(chargeDamage));
 		return true;
 	}
 
@@ -579,58 +484,10 @@ public class PlayerCombat : MonoBehaviour
 
 	void ApplyTailDamage()
 	{
-		int mask = GetValidLayerMask();
-		Vector3 origin = transform.position + Vector3.up * tailHeightOffset;
-		Collider[] hits = Physics.OverlapSphere(origin, tailAttackRadius, mask, QueryTriggerInteraction.Ignore);
-		
-		if (hits == null || hits.Length == 0) return;
-
-		float halfAngle = tailAttackAngle * 0.5f;
-		HashSet<Transform> damagedTargets = new HashSet<Transform>();
-
-		foreach (Collider hit in hits)
-		{
-			if (hit == null) continue;
-
-			var components = GetTargetComponents(hit);
-			Transform targetTransform = GetTargetTransform(components.enemy, components.boss, components.tower);
-			
-			if (targetTransform == null || damagedTargets.Contains(targetTransform)) continue;
-
-			Vector3 toTarget = GetDirectionToTarget(origin, targetTransform.position);
-			float angle = Vector3.Angle(transform.forward, toTarget);
-			
-			if (angle > halfAngle) continue;
-
-			ApplyDamageToTarget(components.enemy, components.boss, components.tower, tailAttackDamage, toTarget, tailKnockbackDistance);
-			damagedTargets.Add(targetTransform);
-		}
+		// Tailの当たり判定は TailAttackHitBox へ移行
 	}
 
-	void ApplyBeamDamage()
-	{
-		int mask = GetValidLayerMask();
-		Vector3 start = transform.position + transform.TransformDirection(beamOffset);
-		Vector3 end = start + transform.forward * Mathf.Max(0f, beamRange);
-		Collider[] hits = Physics.OverlapCapsule(start, end, Mathf.Max(MinimumRadius, beamRadius), mask, QueryTriggerInteraction.Ignore);
-		
-		if (hits == null || hits.Length == 0) return;
-
-		HashSet<Transform> damagedTargets = new HashSet<Transform>();
-		foreach (Collider hit in hits)
-		{
-			if (hit == null) continue;
-
-			var components = GetTargetComponents(hit);
-			Transform targetTransform = GetTargetTransform(components.enemy, components.boss, components.tower);
-			
-			if (targetTransform == null || damagedTargets.Contains(targetTransform)) continue;
-
-			Vector3 toTarget = GetDirectionToTarget(start, targetTransform.position);
-			ApplyDamageToTarget(components.enemy, components.boss, components.tower, beamDamage, toTarget, beamKnockbackDistance);
-			damagedTargets.Add(targetTransform);
-		}
-	}
+	// void ApplyBeamDamage() { }
 
 	int GetValidLayerMask()
 	{
@@ -729,6 +586,12 @@ public class PlayerCombat : MonoBehaviour
 			Gizmos.color = new Color(1f, 0.85f, 0f, 0.85f);
 			Gizmos.DrawWireSphere(tailOrigin, clampedTailRadius);
 
+			float clampedKnockbackDistance = Mathf.Max(0f, tailKnockbackDistance);
+			if (clampedKnockbackDistance > 0f)
+			{
+				Gizmos.DrawLine(tailOrigin, tailOrigin + forward.normalized * clampedKnockbackDistance);
+			}
+
 #if UNITY_EDITOR
 			if (tailAttackAngle > 0f)
 			{
@@ -755,15 +618,7 @@ public class PlayerCombat : MonoBehaviour
 		}
 
 		// Beam capsule
-		Vector3 beamStart = origin + transform.TransformDirection(beamOffset);
-		float clampedBeamRange = Mathf.Max(0f, beamRange);
-		float clampedBeamRadius = Mathf.Max(0.01f, beamRadius);
-		if (clampedBeamRange > 0f)
-		{
-			Vector3 beamEnd = beamStart + forward * clampedBeamRange;
-			Gizmos.color = new Color(0.2f, 0.6f, 1f, 0.9f);
-			DrawWireCapsule(beamStart, beamEnd, clampedBeamRadius);
-		}
+		// 仕様からBeam/Throwが削除されたため表示無効
 
 		// Charge hit radius
 		float clampedChargeRadius = Mathf.Max(0f, chargeHitRadius);

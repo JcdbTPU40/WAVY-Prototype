@@ -16,7 +16,6 @@ public class InputManager : MonoBehaviour
     public float horizontalInput;
 
     public bool attackInput;
-    public bool beamInput;
     public bool chargeInput;
     public bool tailInput;
 
@@ -34,7 +33,7 @@ public class InputManager : MonoBehaviour
             playerControls.Player.Move.performed += i => movementInput = i.ReadValue<Vector2>();
             playerControls.Player.Camera.performed += i => cameraInput = i.ReadValue<Vector2>();
             playerControls.Player.Attack.performed += i => attackInput = true;
-            playerControls.Player.Beam.performed += i => beamInput = true;
+            // playerControls.Player.Beam は仕様から削除（Beam/Throw廃止）のため入力フラグも廃止
             playerControls.Player.Charge.performed += i => chargeInput = true;
             playerControls.Player.Tail.performed += i => tailInput = true;
         }

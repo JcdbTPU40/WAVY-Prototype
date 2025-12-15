@@ -19,6 +19,9 @@ public class SwarmNavAgent : MonoBehaviour
 
     public void MoveToRandomAroundTarget()
     {
+        if (target == null) return;
+        if (agent == null || !agent.enabled || !agent.isOnNavMesh) return;
+
         Vector3 dir = Random.insideUnitCircle.normalized;
         Vector3 dest = target.position + new Vector3(dir.x, 0, dir.y) * Random.Range(4.0f, radius);
         // small jitter
@@ -36,6 +39,9 @@ public class SwarmNavAgent : MonoBehaviour
 
     void Update()
     {
+        if (target == null) return;
+        if (agent == null || !agent.enabled || !agent.isOnNavMesh) return;
+
         // 到達したら再配置する
         if (!agent.pathPending && agent.remainingDistance <= agent.stoppingDistance + 0.1f)
             MoveToRandomAroundTarget();

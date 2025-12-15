@@ -22,6 +22,7 @@ public class MainMenuController : MonoBehaviour
         Time.timeScale = 1f; // 念のため（ポーズ解除）
         if (!string.IsNullOrWhiteSpace(firstStageSceneName))
         {
+            ScoreManager.ResetScoreGlobal(0);
             SceneManager.LoadScene(firstStageSceneName);
         }
         else

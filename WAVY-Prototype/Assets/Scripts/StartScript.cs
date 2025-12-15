@@ -17,6 +17,7 @@ public class StartScript : MonoBehaviour
 
     public void StartBtn() //�X�^�[�g�{�^�����\�b�h�������Main���Ăяo��
     {
-        SceneManager.LoadScene("Main");
+       ScoreManager.ResetScoreGlobal(0);
+       SceneManager.LoadScene("Main");
     }
 }

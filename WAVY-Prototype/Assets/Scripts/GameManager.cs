@@ -15,6 +15,11 @@ public class GameManager : MonoBehaviour
     [Tooltip("These scenes will force cursor visible/unlocked even when not paused.")]
     [SerializeField] private string[] forceCursorVisibleSceneNames = new[] { "Start", "GameOver", "GameClear", "End" };
 
+    [Header("Virtual Cursor")]
+    [Tooltip("If assigned, enables the gamepad virtual cursor while paused (except force-visible scenes).")]
+    [SerializeField] private GamepadVirtualCursor virtualCursor;
+    [SerializeField] private bool useVirtualCursorOnPause = true;
+
     [Header("Scenes")]
     [SerializeField] private string mainMenuSceneName = "Start";
 
@@ -144,6 +149,7 @@ public class GameManager : MonoBehaviour
 
         if (!string.IsNullOrWhiteSpace(mainMenuSceneName))
         {
+            ScoreManager.ResetScoreGlobal(0);
             SceneManager.LoadScene(mainMenuSceneName);
         }
         else
@@ -215,8 +221,32 @@ public class GameManager : MonoBehaviour
             return;
         }
 
+        if (useVirtualCursorOnPause && virtualCursor == null)
+        {
+            // シーン跨ぎで保持される想定なので、無ければ都度探す
+#if UNITY_2023_1_OR_NEWER || UNITY_6000_0_OR_NEWER
+            virtualCursor = Object.FindFirstObjectByType<GamepadVirtualCursor>(FindObjectsInactive.Include);
+#else
+            virtualCursor = FindObjectOfType<GamepadVirtualCursor>(true);
+#endif
+        }
+
         bool showCursor = forceVisible || IsPaused;
-        Cursor.visible = showCursor;
         Cursor.lockState = showCursor ? CursorLockMode.None : CursorLockMode.Locked;
+
+        // ポーズ中は仮想カーソル側に Cursor.visible を任せる（GameManager が毎回上書きしない）
+        if (useVirtualCursorOnPause && virtualCursor != null)
+        {
+            bool desiredVirtualCursor = (IsPaused && !forceVisible) || virtualCursor.IsAlwaysOnCurrentScene;
+            virtualCursor.SetVirtualCursorEnabled(desiredVirtualCursor);
+
+            if (desiredVirtualCursor)
+            {
+                // visible は VirtualCursor 側が制御
+                return;
+            }
+        }
+
+        Cursor.visible = showCursor;
     }
 }

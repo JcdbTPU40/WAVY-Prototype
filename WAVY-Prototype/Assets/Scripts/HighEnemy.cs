@@ -404,10 +404,9 @@ public class HighEnemy : MonoBehaviour
         }
 
         float elapsed = 0f;
-        bool interrupted = false;
         while (elapsed < hitKnockbackRecoveryDelay)
         {
-            if (hasDied) { interrupted = true; break; }
+            if (hasDied) { break; }
             elapsed += Time.deltaTime;
             yield return null;
         }

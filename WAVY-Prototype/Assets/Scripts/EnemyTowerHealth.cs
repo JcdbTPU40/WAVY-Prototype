@@ -166,7 +166,11 @@ public class EnemyTowerHealth : MonoBehaviour
     void NotifyBossesOfDestruction(Vector3 towerWorldPos, float stayDuration)
     {
         // シーン内のすべての BossScript に通知（複数ボス対応）
+#if UNITY_2023_1_OR_NEWER || UNITY_6000_0_OR_NEWER
+        BossScript[] bosses = Object.FindObjectsByType<BossScript>(FindObjectsSortMode.None);
+#else
         BossScript[] bosses = FindObjectsOfType<BossScript>();
+#endif
         if (bosses == null || bosses.Length == 0) return;
 
         foreach (var boss in bosses)
