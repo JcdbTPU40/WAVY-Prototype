@@ -60,7 +60,7 @@ Canvas:
   m_AdditionalShaderChannelsFlag: 0
   m_UpdateRectTransformForStandalone: 0
   m_SortingLayerID: 0
-  m_SortingOrder: 0
+  m_SortingOrder: 10
   m_TargetDisplay: 0
 --- !u!114 &3744442413819502087
 MonoBehaviour:
@@ -111,7 +111,6 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 2281132797487246080}
-  - component: {fileID: 5865705087438201325}
   m_Layer: 0
   m_Name: InputCursorManager
   m_TagString: Untagged
@@ -133,15 +132,48 @@ Transform:
   m_ConstrainProportionsScale: 0
   m_Children:
   - {fileID: 4402698998789089432}
+  - {fileID: 3113224095916133307}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &5865705087438201325
+--- !u!1 &3351907316444820752
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 3113224095916133307}
+  - component: {fileID: 1955467647987044470}
+  m_Layer: 0
+  m_Name: GameObject
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &3113224095916133307
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 3351907316444820752}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 2281132797487246080}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &1955467647987044470
 MonoBehaviour:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2145515503442059212}
+  m_GameObject: {fileID: 3351907316444820752}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: aec340122fc40f64897733af975f5c4a, type: 3}
@@ -149,8 +181,13 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   cursorRect: {fileID: 8469128470883051890}
   cursorCanvas: {fileID: 8813749487842691947}
+  virtualCursorEnabled: 1
   cursorSpeed: 1200
   deadZone: 0.15
+  alwaysOnScenes:
+  - Start
+  - GameClear
+  - GameOver
 --- !u!1001 &7048373494362621334
 PrefabInstance:
   m_ObjectHideFlags: 0

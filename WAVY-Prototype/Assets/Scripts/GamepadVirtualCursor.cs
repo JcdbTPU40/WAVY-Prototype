@@ -3,13 +3,15 @@ using UnityEngine.InputSystem;
 using UnityEngine.InputSystem.LowLevel;
 using UnityEngine.InputSystem.Users;
 using UnityEngine.SceneManagement;
-using UnityEngine.UI;
 
 public class GamepadVirtualCursor : MonoBehaviour
 {
     [Header("UI Cursor")]
     [SerializeField] private RectTransform cursorRect;
     [SerializeField] private Canvas cursorCanvas;
+
+    [Header("Enable")]
+    public bool virtualCursorEnabled = false;
 
     [Header("Move")]
     [SerializeField] private float cursorSpeed = 1200f;   // px/sec
@@ -20,8 +22,15 @@ public class GamepadVirtualCursor : MonoBehaviour
 
     private MouseState virtualMouseState;
 
+    [Header("Always enable Virtual Cursor in these scenes")]
+    [SerializeField] private string[] alwaysOnScenes = { "MainMenu", "GameOver", "GameClear" };
+
+    public bool IsAlwaysOnCurrentScene { get; private set; }
+
     private Vector2 virtualPos;      // screen position
     private bool usingGamepadCursor; // 今どっちを使ってるか
+
+    private bool lastPress;
 
     private const float MouseMoveThresholdSqr = 0.01f;
 
@@ -35,12 +44,8 @@ public class GamepadVirtualCursor : MonoBehaviour
         InputSystem.onDeviceChange += OnDeviceChange;
 
         SceneManager.sceneLoaded += OnSceneLoaded;
-        // いまのシーンでも一回探す
-        FindCursorInScene();
-
-        // 起動時に接続済みを拾う
-        if (Gamepad.current != null) EnableGamepadCursor(Gamepad.current);
-        else EnableMouseCursor();
+        RefreshByScene();
+        RefreshByDevices();
     }
 
     void OnDisable()
@@ -48,16 +53,68 @@ public class GamepadVirtualCursor : MonoBehaviour
         InputSystem.onDeviceChange -= OnDeviceChange;
 
         SceneManager.sceneLoaded -= OnSceneLoaded;
-        DisableVirtualMouse();
+        DisableVirtualCursor();
     }
 
     void OnSceneLoaded(Scene scene, LoadSceneMode mode)
     {
-        FindCursorInScene();
+        RefreshByScene();
+        RefreshByDevices();
+    }
+
+    void RefreshByScene()
+    {
+        string sceneName = SceneManager.GetActiveScene().name;
+        IsAlwaysOnCurrentScene = IsAlwaysOnScene(sceneName);
+
+        if (IsAlwaysOnCurrentScene)
+        {
+            // このシーンは「ゲームパッドなら常時VirtualCursor」
+            virtualCursorEnabled = true;
+        }
+        else
+        {
+            // プレイ中などは常時OFF（PauseでONにする）
+            virtualCursorEnabled = false;
+            DisableVirtualCursor();
+        }
+    }
+
+    bool IsAlwaysOnScene(string sceneName)
+    {
+        if (alwaysOnScenes == null) return false;
+
+        for (int i = 0; i < alwaysOnScenes.Length; i++)
+        {
+            if (string.IsNullOrWhiteSpace(alwaysOnScenes[i])) continue;
+            if (alwaysOnScenes[i] == sceneName) return true;
+        }
+
+        return false;
+    }
+
+    void RefreshByDevices()
+    {
+        if (!virtualCursorEnabled) return;
+
+        if (Gamepad.current != null)
+            EnableVirtualCursor();
+        else
+            DisableVirtualCursor(); // Gamepad無いなら使わない（マウスに任せる）
     }
 
     void Update()
     {
+        if (!virtualCursorEnabled)
+        {
+            // Virtual Mouse を使わない状態
+            if (cursorRect) cursorRect.gameObject.SetActive(false);
+            if (virtualMouse != null) DisableVirtualMouse();
+            usingGamepadCursor = false;
+            pairedGamepad = null;
+            return;
+        }
+
         // 入力デバイスの“触った方”に寄せてモードを切り替える
         bool mouseMoved = Mouse.current != null && Mouse.current.delta.ReadValue().sqrMagnitude > MouseMoveThresholdSqr;
 
@@ -99,7 +156,11 @@ public class GamepadVirtualCursor : MonoBehaviour
 
         // buttonEast(A/×) で左クリック
         bool press = pairedGamepad.buttonEast.isPressed;
-        virtualMouseState = virtualMouseState.WithButton(MouseButton.Left, press);
+        if (press != lastPress)
+        {
+            virtualMouseState = virtualMouseState.WithButton(MouseButton.Left, press);
+            lastPress = press;
+        }
 
         InputState.Change(virtualMouse, virtualMouseState);
     }
@@ -133,6 +194,8 @@ public class GamepadVirtualCursor : MonoBehaviour
 
     private void OnDeviceChange(InputDevice device, InputDeviceChange change)
     {
+        if (!virtualCursorEnabled) return;
+
         if (device is Gamepad gp)
         {
             if (change == InputDeviceChange.Added || change == InputDeviceChange.Reconnected)
@@ -192,6 +255,48 @@ public class GamepadVirtualCursor : MonoBehaviour
         DisableVirtualMouse();
     }
 
+    public void EnableVirtualCursor()
+    {
+        virtualCursorEnabled = true;
+        Cursor.visible = false;
+
+        if (cursorRect)
+            cursorRect.gameObject.SetActive(true);
+
+        if (Gamepad.current != null)
+            EnableGamepadCursor(Gamepad.current);
+        else
+            Debug.LogWarning("[VirtualCursor] EnableVirtualCursor called but no Gamepad is connected.");
+    }
+
+    public void DisableVirtualCursor()
+    {
+        virtualCursorEnabled = false;
+        Cursor.visible = true;
+
+        if (cursorRect)
+            cursorRect.gameObject.SetActive(false);
+
+        usingGamepadCursor = false;
+        pairedGamepad = null;
+        DisableVirtualMouse();
+    }
+
+    // ここは「Pause中だけON」にしたいときに外から呼べるようにしておく
+    public void SetVirtualCursorEnabled(bool enabled)
+    {
+        virtualCursorEnabled = enabled;
+
+        if (!enabled)
+        {
+            DisableVirtualCursor();
+        }
+        else
+        {
+            RefreshByDevices();
+        }
+    }
+
     private void DisableVirtualMouse()
     {
         if (virtualMouse != null)
@@ -210,19 +315,4 @@ public class GamepadVirtualCursor : MonoBehaviour
         cursorRect.position = screenPos;
     }
 
-    void FindCursorInScene()
-    {
-        // 名前で探す（Hierarchyの名前が GamepadCursor 想定）
-        var go = GameObject.Find("GamepadCursor");
-        if (go != null)
-        {
-            cursorRect = go.GetComponent<RectTransform>();
-            cursorCanvas = go.GetComponentInParent<Canvas>();
-            Debug.Log($"[VirtualCursor] Rebind cursor in scene: {SceneManager.GetActiveScene().name}");
-        }
-        else
-        {
-            Debug.LogWarning($"[VirtualCursor] GamepadCursor not found in scene: {SceneManager.GetActiveScene().name}");
-        }
-    }
 }

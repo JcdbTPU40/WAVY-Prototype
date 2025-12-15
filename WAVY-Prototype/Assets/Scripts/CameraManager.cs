@@ -26,43 +26,81 @@ public class CameraManager : MonoBehaviour
 
     private void Awake()
     {
-        inputManager = Object.FindAnyObjectByType<InputManager>();
-        
-        // Player タグで検索（プロジェクト標準）
-        GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
-        if (playerObject != null)
+        if (inputManager == null)
         {
-            targetTransform = playerObject.transform;
+            inputManager = Object.FindAnyObjectByType<InputManager>();
         }
-        else
+
+        if (inputManager == null)
         {
-            // フォールバック: PlayerScript または PlayerManager を検索
-            var playerScript = Object.FindAnyObjectByType<PlayerScript>();
-            if (playerScript != null)
+            Debug.LogError("InputManager が見つかりません。CameraManager を無効化します。", this);
+            enabled = false;
+            return;
+        }
+
+        if (targetTransform == null)
+        {
+            // Player タグで検索（プロジェクト標準）
+            GameObject playerObject = GameObject.FindGameObjectWithTag("Player");
+            if (playerObject != null)
             {
-                targetTransform = playerScript.transform;
+                targetTransform = playerObject.transform;
             }
             else
             {
-                var playerManager = Object.FindAnyObjectByType<PlayerManager>();
-                if (playerManager != null)
+                // フォールバック: PlayerScript または PlayerManager を検索
+                var playerScript = Object.FindAnyObjectByType<PlayerScript>();
+                if (playerScript != null)
                 {
-                    targetTransform = playerManager.transform;
+                    targetTransform = playerScript.transform;
+                }
+                else
+                {
+                    var playerManager = Object.FindAnyObjectByType<PlayerManager>();
+                    if (playerManager != null)
+                    {
+                        targetTransform = playerManager.transform;
+                    }
                 }
             }
         }
 
         if (targetTransform == null)
         {
-            Debug.LogError("Player が見つかりません。Player に 'Player' タグを設定してください。", this);
+            Debug.LogError("Player が見つかりません。Player に 'Player' タグを設定してください。CameraManager を無効化します。", this);
+            enabled = false;
+            return;
         }
 
-        cameraTransform = Camera.main.transform;
+        if (cameraPivot == null)
+        {
+            Debug.LogError("cameraPivot が未設定です。CameraManager を無効化します。", this);
+            enabled = false;
+            return;
+        }
+
+        if (cameraTransform == null)
+        {
+            var mainCamera = Camera.main;
+            if (mainCamera != null)
+            {
+                cameraTransform = mainCamera.transform;
+            }
+        }
+
+        if (cameraTransform == null)
+        {
+            Debug.LogError("Camera.main が見つかりません（MainCamera タグを確認）。CameraManager を無効化します。", this);
+            enabled = false;
+            return;
+        }
+
         defaultPosition = cameraTransform.localPosition.z; // Store the default position of the camera
     }
 
     public void HandleAllCameraMovement()
     {
+        if (!enabled) return;
         FollowTarget();
         RotateCamera();
         HandleCameraCollisions();

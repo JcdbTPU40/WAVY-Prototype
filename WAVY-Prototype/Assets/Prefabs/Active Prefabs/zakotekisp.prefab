@@ -838,10 +838,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 35f79ab2e117bdf479563e72e39b7bc5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  radius: 5
-  jitter: 1
-  targetBoss: {fileID: 0}
-  wanderRadiusWhenNoBoss: 5
   exp_Prefab: {fileID: 476946058308155533, guid: 03b6a7e0e3b4784419753ccf4dea5cbb, type: 3}
   exp_Spawnpoint:
   - {fileID: 7510829430201587031}
@@ -860,19 +856,26 @@ MonoBehaviour:
   hitFxOffset: {x: 0, y: 0.5, z: 0}
   hitFxDelay: 0
   ragdollController: {fileID: 5509398658302410200}
-  deathKnockbackForce: 12
-  deathKnockbackUpForce: 2
+  deathKnockbackForce: 20
+  deathKnockbackUpForce: 10
   deathKnockbackAngle: 30
-  disableKnockbackAfterDeath: 1
-  hitKnockbackForce: 2
-  hitKnockbackUpForce: 1.5
-  hitKnockbackAngle: 89
+  disableKnockbackAfterDeath: 0
+  hitKnockbackForce: 20
+  hitKnockbackUpForce: 10
+  hitKnockbackAngle: 30
   hitKnockbackRecoveryDelay: 0.25
+  enableTailKnockback: 1
+  tailKnockbackForceMultiplier: 20
+  tailKnockbackUpForceMultiplier: 10
   groundMask:
     serializedVersion: 2
     m_Bits: 4294967295
   liftBeforePhysics: 0.08
   groundRayLength: 2
+  radius: 5
+  jitter: 1
+  targetBoss: {fileID: 0}
+  wanderRadiusWhenNoBoss: 5
 --- !u!1 &5134306523431569721 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 8491575379566418229, guid: ccf349cdbaf82c140abba6afd496e3a7, type: 3}

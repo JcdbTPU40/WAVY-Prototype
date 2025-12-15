@@ -19,6 +19,20 @@ public class ScoreManager : MonoBehaviour
 
     static int currentScore;
 
+    /// <summary>
+    /// Instance の有無に関わらずスコアをリセットします。
+    /// 既に ScoreManager が存在する場合はイベントも発火します。
+    /// </summary>
+    public static void ResetScoreGlobal(int newScore = 0)
+    {
+        currentScore = Mathf.Max(0, newScore);
+
+        if (Instance != null)
+        {
+            Instance.scoreChanged.Invoke(currentScore);
+        }
+    }
+
     void Awake()
     {
         if (Instance != null && Instance != this)

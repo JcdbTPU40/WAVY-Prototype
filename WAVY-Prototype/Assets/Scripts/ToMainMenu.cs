@@ -17,11 +17,13 @@ public class ToMainMenu : MonoBehaviour
     
     public void MenuBtn() //�X�^�[�g�{�^�����\�b�h�������Main���Ăяo��
     {
+        ScoreManager.ResetScoreGlobal(0);
         SceneManager.LoadScene("Start");
     }
 
     public void RetryBtn() 
     {
+        ScoreManager.ResetScoreGlobal(0);
         SceneManager.LoadScene("Mario Stage 1");
     }
 }
