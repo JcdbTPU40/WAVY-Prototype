@@ -8,6 +8,33 @@ public class ScoreManager : MonoBehaviour
 {
     public static ScoreManager Instance { get; private set; }
 
+    [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+    private static void EnsureInstanceExists()
+    {
+        // 初回プレイ時に「開始シーンに ScoreManager が置かれていない」場合でも
+        // 敵の死亡処理などで AddScore がスキップされないように、最初に1つ用意する。
+        if (Instance != null)
+        {
+            return;
+        }
+
+#if UNITY_2023_1_OR_NEWER || UNITY_6000_0_OR_NEWER
+        var existing = Object.FindFirstObjectByType<ScoreManager>(FindObjectsInactive.Include);
+#else
+        var existing = Object.FindObjectOfType<ScoreManager>(true);
+#endif
+
+        if (existing != null)
+        {
+            return;
+        }
+
+        var go = new GameObject(nameof(ScoreManager));
+        var manager = go.AddComponent<ScoreManager>();
+        manager.persistAcrossScenes = true;
+        manager.startingScore = currentScore;
+    }
+
     [Header("初期設定")]
     [SerializeField] private bool persistAcrossScenes = true;
     [SerializeField] private int startingScore = 0;
