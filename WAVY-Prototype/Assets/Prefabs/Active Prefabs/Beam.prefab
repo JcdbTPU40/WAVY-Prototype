@@ -602,7 +602,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   beamLimit: 20
-  beamSpeed: 3
+  beamSpeed: 4
 --- !u!136 &6949201428039874785
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -639,4 +639,4 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damageAmount: 10
-  damageInterval: 0.5
+  damageInterval: 0.1

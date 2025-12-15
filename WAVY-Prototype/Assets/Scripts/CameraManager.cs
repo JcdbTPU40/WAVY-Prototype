@@ -24,6 +24,8 @@ public class CameraManager : MonoBehaviour
     public float minimumPivotAngle = -35; // Minimum angle for camera pivot
     public float maximumPivotAngle = 35; // Maximum angle for camera pivot
 
+    public float cameraTailOffset = 0f;
+
     private void Awake()
     {
         if (inputManager == null)
@@ -149,6 +151,8 @@ public class CameraManager : MonoBehaviour
         {
             targetPosition -= minimumCollisionOffSet;
         }
+
+        targetPosition += cameraTailOffset;
 
         cameraVectorPosition.z = Mathf.Lerp(cameraTransform.localPosition.z, targetPosition, 0.2f);
         cameraTransform.localPosition = cameraVectorPosition;

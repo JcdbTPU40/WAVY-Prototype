@@ -12,7 +12,7 @@ public class SpawnScript : MonoBehaviour
     [SerializeField] private GameObject enemy;            // 生成対象。未設定だと起動時に警告を出し停止
 
     [Header("湧きペース：秒 (この秒数ごとに敵を生成)")]
-    [SerializeField, Min(MinRepeatInterval)] private float repeat = 2.0f; // 最小値は定数で管理し、Inspector上でも同じ制約を共有
+    [SerializeField] private float repeat = 2.0f; // 最小値は定数で管理し、Inspector上でも同じ制約を共有
 
     [Header("スポーン位置のプレハブ")]
     [SerializeField] Transform[] spawnPoints;

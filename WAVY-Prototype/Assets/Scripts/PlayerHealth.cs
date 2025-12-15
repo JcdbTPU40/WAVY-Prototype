@@ -6,7 +6,16 @@ using TMPro;
 
 public class PlayerHealth : MonoBehaviour
 {
-    [SerializeField, Min(1)] int maxHealth = 100;
+    [Header("Ult設定")]
+    [SerializeField]public float ultTailSize=30f;
+    [SerializeField]float keepTime=5f;
+    [SerializeField]float ultTime=5f;
+    float keepCount;
+    public bool IsUlt;
+
+    [Header("体力設定")]
+    [SerializeField,Min(1)] int startHealth=100;
+    [SerializeField, Min(1)] int maxHealth = 150;
     [SerializeField] Slider healthSlider;
     [SerializeField] string endSceneName = "End";
 
@@ -26,8 +35,11 @@ public class PlayerHealth : MonoBehaviour
 
     void Awake()
     {
-        maxHealth = Mathf.Max(1, maxHealth);
-        currentHealth = maxHealth;
+        startHealth = Mathf.Max(1, startHealth);
+        currentHealth = startHealth;
+        keepCount=0;
+        IsUlt=false;
+
         SyncSlider();
         UpdateHpImage();
     }
@@ -38,6 +50,32 @@ public class PlayerHealth : MonoBehaviour
         UpdateHpImage();
     }
 
+    void Update()
+    {
+        if(currentHealth>=150f)
+        {
+            keepCount+=Time.deltaTime;
+        }
+        else
+        {
+            keepCount=0;
+            IsUlt=false;
+        }
+
+        if(keepCount>=keepTime)
+        {
+            IsUlt=true;
+        }
+
+        if(keepCount-keepTime>=ultTime)
+        {
+            keepCount=0;
+            IsUlt=false;
+            currentHealth=100;
+            SyncSlider();
+            UpdateHpImage();
+        }
+    }
     public void TakeDamage(int amount)
     {
         if (isDead || amount <= 0)
@@ -88,8 +126,10 @@ public class PlayerHealth : MonoBehaviour
 
         if(HPPercentText != null)
         {
-            float percent = ((float)currentHealth / maxHealth) * 100f;
-            HPPercentText.text = Mathf.RoundToInt(percent).ToString() + "%";
+            float percent = (float)currentHealth / startHealth * 100f;
+            percent = Mathf.Clamp(percent, 0f, (float)maxHealth / startHealth * 100f);
+            Debug.Log(percent);
+            HPPercentText.text = Mathf.RoundToInt(percent) + "%";
         }
     }
 
@@ -101,7 +141,7 @@ public class PlayerHealth : MonoBehaviour
             return;
         }
 
-        float healthPercent = (float)currentHealth / maxHealth;
+        float healthPercent = (float)currentHealth / startHealth;
 
         if(healthPercent >= 0.75f)
         {

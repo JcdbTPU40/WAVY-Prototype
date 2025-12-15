@@ -46,7 +46,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   exp: {fileID: 476946058308155533}
-  speed: 3
+  speed: 4
   maxTimer: 10
   collectDistance: 0.5
   healAmount: 10
