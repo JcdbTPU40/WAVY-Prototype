@@ -97,7 +97,7 @@ private void HandleMovement()
     if (grounded)
     {
         if (verticalVelocity < 0f)
-            verticalVelocity = 0f;
+            verticalVelocity = -2f;
     }
     else
     {
@@ -234,6 +234,7 @@ private void HandleMovement()
 
     Bounds bounds = characterController.bounds;
     Vector3 origin = bounds.center;
+    origin.y=characterController.bounds.min.y + characterController.radius + 0.1f;
     float radius = Mathf.Max(0.01f, characterController.radius - 0.02f);
     float rayLength = bounds.extents.y + groundCheckDistance;
 
@@ -257,18 +258,19 @@ private void HandleMovement()
 }
 
     void SnapToGround(RaycastHit groundHit)
+{
+    if (characterController == null) return;
+    if (groundHit.collider == null) return;
+
+    Bounds bounds = characterController.bounds;
+    float bottom = bounds.min.y;
+    float targetBottom = groundHit.point.y + characterController.skinWidth;
+    float offset = targetBottom - bottom;
+
+    // 上方向への補正は禁止
+    if (offset < 0f)
     {
-        if (characterController == null) return;
-        if (groundHit.collider == null) return;
-
-        Bounds bounds = characterController.bounds;
-        float bottom = bounds.center.y - bounds.extents.y;
-        float targetBottom = groundHit.point.y + characterController.skinWidth;
-        float offset = targetBottom - bottom;
-
-        if (offset > 0f)
-        {
-            characterController.Move(Vector3.up * offset);
-        }
+        characterController.Move(Vector3.up * offset);
     }
+}
 }
