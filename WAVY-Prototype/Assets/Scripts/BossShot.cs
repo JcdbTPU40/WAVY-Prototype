@@ -8,12 +8,15 @@ public class BossShot : MonoBehaviour
     [SerializeField] AudioClip beamShotSE;
 
     [Header("弾")]
+    [SerializeField] GameObject BeamDecisionPrefab;
     [SerializeField] GameObject BeamPrefab;
     [SerializeField] GameObject BeamArea;
+    [SerializeField] GameObject BeamChargePrefab;
     [SerializeField]float spawnOffset=3f;
     [SerializeField]float spawnOffsetA=50f;//赤い予測線の位置調整
     Quaternion beamRotation;
     GameObject beamArea;
+    GameObject beamCharge;
     [Header("射撃関連")]
     [SerializeField] float beamSpan=5f;//beamを撃つまでの間隔（秒）
     [SerializeField] float shotSpan=2f;//チャージ開始までの間隔（秒）
@@ -60,8 +63,10 @@ public class BossShot : MonoBehaviour
                 PlaySE(chargeStartSE);
 
                 beamArea=Instantiate(BeamArea,areaSpawnPosition,beamRotation,parent);
+                beamCharge=Instantiate(BeamChargePrefab,sPawnPosition,beamRotation,parent);
 
                 Destroy(beamArea,5f);
+                Destroy(beamCharge,5f);
 
                 areaSpawned=true;
             }
@@ -70,7 +75,8 @@ public class BossShot : MonoBehaviour
         {
             if(!beamSpawned)
             {
-            Instantiate(BeamPrefab,sPawnPosition,beamRotation,parent);
+            Instantiate(BeamPrefab,sPawnPosition,beamRotation* Quaternion.Euler(0, 180, 0));
+            Instantiate(BeamDecisionPrefab,sPawnPosition,beamRotation,parent);
 
             PlaySE(beamShotSE);
 

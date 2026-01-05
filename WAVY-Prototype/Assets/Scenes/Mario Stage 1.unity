@@ -3344,6 +3344,10 @@ PrefabInstance:
       value: 1
       objectReference: {fileID: 0}
     - target: {fileID: 4241874707476175759, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
+      propertyPath: BeamPrefab
+      value: 
+      objectReference: {fileID: 1545700952936938149, guid: f3118ab86e3919c4abde172209ff0211, type: 3}
+    - target: {fileID: 4241874707476175759, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
       propertyPath: beamShotSE
       value: 
       objectReference: {fileID: 8300000, guid: 65ff86345f4c32c40887e2017e7cc9b2, type: 3}
@@ -3351,6 +3355,14 @@ PrefabInstance:
       propertyPath: chargeStartSE
       value: 
       objectReference: {fileID: 8300000, guid: 0a3690d926cfc364f9e8e1c3ef5d6729, type: 3}
+    - target: {fileID: 4241874707476175759, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
+      propertyPath: BeamChargePrefab
+      value: 
+      objectReference: {fileID: 3663711843397311887, guid: fa18bf339372f6f439d48202f921c728, type: 3}
+    - target: {fileID: 4241874707476175759, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
+      propertyPath: BeamDecisionPrefab
+      value: 
+      objectReference: {fileID: 6319171772100809965, guid: 081386ade7196b3469062b4a8139ff95, type: 3}
     - target: {fileID: 7432288259703776864, guid: d4d142092c4847e4e93442c544d07f2c, type: 3}
       propertyPath: m_AutoTraverseOffMeshLink
       value: 0
