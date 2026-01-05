@@ -1,4 +1,5 @@
 using System.Collections;
+using UnityEditor;
 using UnityEngine;
 using UnityEngine.AI;
 
@@ -9,6 +10,10 @@ using UnityEngine.AI;
 /// </summary>
 public abstract class EnemyBase : MonoBehaviour
 {
+    [Header("SE")]
+    [SerializeField] AudioSource seSource;
+    [SerializeField] AudioClip hitSE;
+
     [Header("経験値プレハブと生成位置")]
     [SerializeField] GameObject exp_Prefab;
     [SerializeField] Transform[] exp_Spawnpoint;
@@ -492,6 +497,12 @@ public abstract class EnemyBase : MonoBehaviour
         StartCoroutine(PerformAttack());
     }
 
+    void PlaySE(AudioClip clip)
+    {
+    if (clip == null || seSource == null) return;
+    seSource.PlayOneShot(clip);
+    }
+
     private IEnumerator PerformAttack()
     {
         if (isAttacking) yield break;
@@ -505,6 +516,7 @@ public abstract class EnemyBase : MonoBehaviour
 
         if (damage != null)
         {
+            PlaySE(hitSE);
             damage.TakeDamage(attackDamage);
         }
         Target.SendMessage("TakeDamage", attackDamage, SendMessageOptions.DontRequireReceiver);
