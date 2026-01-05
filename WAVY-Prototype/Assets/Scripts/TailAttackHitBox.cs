@@ -3,6 +3,10 @@ using System.Collections.Generic;
 
 public class TailAttackHitBox : MonoBehaviour
 {
+    [Header("SE")]
+    [SerializeField] AudioSource seSource;
+    [SerializeField] AudioClip tailHitSE;
+
     [SerializeField] TailScalebyHealth scale;
     [SerializeField] private int damage = 30;
     [SerializeField] private LayerMask enemyLayer;       // Enemy レイヤーを指定
@@ -124,6 +128,12 @@ public class TailAttackHitBox : MonoBehaviour
         }
     }
 
+    void PlaySE(AudioClip clip)
+    {
+    if (clip == null || seSource == null) return;
+    seSource.PlayOneShot(clip);
+    }
+
     private void ProcessHit(Collider hitCollider, Vector3? hitPoint = null, Vector3? hitNormal = null)
     {
         if (hitCollider == null) return;
@@ -145,6 +155,8 @@ public class TailAttackHitBox : MonoBehaviour
             Vector3 actualHitNormal = hitNormal ?? (enemy.transform.position - actualHitPoint).normalized;
 
             enemy.ApplyDamage(damage, actualHitPoint, actualHitNormal);
+
+            PlaySE(tailHitSE);
 
             // 尻尾攻撃：プレイヤーから離れる方向へ吹っ飛ばす
             if (playerTransform != null)
@@ -174,6 +186,8 @@ public class TailAttackHitBox : MonoBehaviour
 
             bossenemy.ApplyDamage(damage, actualHitPoint, actualHitNormal);
 
+            PlaySE(tailHitSE);
+
             // 尻尾攻撃：プレイヤーから離れる方向へ吹っ飛ばす
             if (playerTransform != null)
             {
@@ -198,6 +212,9 @@ public class TailAttackHitBox : MonoBehaviour
             }
 
             boss.take_Damage(damage);
+
+            PlaySE(tailHitSE);
+            
             hitBosses.Add(bossRoot);
             return;
         }

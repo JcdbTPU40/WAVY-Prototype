@@ -30,6 +30,12 @@ public class PlayerCombat : MonoBehaviour
 	// [SerializeField] float attackCooldown = 1f;
 	// [SerializeField] float attackAnimationDuration = 0.5f;
 
+	[Header("SE")]
+	[SerializeField] AudioSource seSource;
+	[SerializeField] AudioClip chargeHitSE;
+	[SerializeField] AudioClip tailStartSE;
+	[SerializeField] AudioClip chargeStartSE;
+
 	[Header("Tail Attack Settings")]
 	[SerializeField] float tailAttackDamage = 35f;
 	[SerializeField] float tailAttackRadius = 2f;
@@ -204,6 +210,8 @@ public class PlayerCombat : MonoBehaviour
 			return;
 		}
 
+		PlaySE(tailStartSE);
+
 		tailAttackHitBox.SetDamage(Mathf.RoundToInt(tailAttackDamage));
 
 		isAttacking = true;
@@ -262,6 +270,8 @@ public class PlayerCombat : MonoBehaviour
 		chargeHitBosses.Clear();
 		isCharging = true;
 		canCharge = false;
+
+		PlaySE(chargeStartSE);
 
 		TriggerChargeAnimation();
 		StartCoroutine(ChargeMoveRoutine());
@@ -405,6 +415,12 @@ public class PlayerCombat : MonoBehaviour
 		return Physics.OverlapCapsule(p1, p2, radius, mask, QueryTriggerInteraction.Collide);
 	}
 
+	void PlaySE(AudioClip clip)
+	{
+    if (clip == null || seSource == null) return;
+    seSource.PlayOneShot(clip);
+	}
+
 	bool IsSelfCollider(Collider collider)
 	{
 		if (collider == null) return true;
@@ -422,6 +438,9 @@ public class PlayerCombat : MonoBehaviour
 			? (enemy.transform.position - hitPoint).normalized
 			: transform.forward * -1f;
 		enemy.ApplyDamage(damage, hitPoint, hitNormal);
+
+		PlaySE(chargeHitSE);
+
 		Vector3 fromPlayer = enemy.transform.position - transform.position;
 		ApplyKnockback(enemy, fromPlayer, chargeKnockbackDistance);
 		return true;
@@ -438,6 +457,9 @@ public class PlayerCombat : MonoBehaviour
 			? (bossEnemy.transform.position - hitPoint).normalized
 			: transform.forward * -1f;
 		bossEnemy.ApplyDamage(damage, hitPoint, hitNormal);
+
+		PlaySE(chargeHitSE);
+
 		return true;
 	}
 
@@ -447,6 +469,9 @@ public class PlayerCombat : MonoBehaviour
 		if (boss == null || !chargeHitBosses.Add(boss)) return false;
 
 		boss.take_Damage(Mathf.RoundToInt(chargeDamage));
+
+		PlaySE(chargeHitSE);
+
 		return true;
 	}
 

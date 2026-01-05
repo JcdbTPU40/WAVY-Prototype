@@ -2,6 +2,11 @@ using UnityEngine;
 
 public class BossShot : MonoBehaviour
 {
+    [Header("SE")]
+    [SerializeField] AudioSource seSource;
+    [SerializeField] AudioClip chargeStartSE;
+    [SerializeField] AudioClip beamShotSE;
+
     [Header("弾")]
     [SerializeField] GameObject BeamPrefab;
     [SerializeField] GameObject BeamArea;
@@ -20,10 +25,11 @@ public class BossShot : MonoBehaviour
 
     Vector3 playerPosition;
     Vector3 sPawnPosition;
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
-    void Start()
+    
+    void PlaySE(AudioClip clip)
     {
-        
+    if (clip == null || seSource == null) return;
+    seSource.PlayOneShot(clip);
     }
 
     // Update is called once per frame
@@ -51,11 +57,13 @@ public class BossShot : MonoBehaviour
 
             if(!areaSpawned)
             {
-            beamArea=Instantiate(BeamArea,areaSpawnPosition,beamRotation,parent);
+                PlaySE(chargeStartSE);
 
-            Destroy(beamArea,5f);
+                beamArea=Instantiate(BeamArea,areaSpawnPosition,beamRotation,parent);
 
-            areaSpawned=true;
+                Destroy(beamArea,5f);
+
+                areaSpawned=true;
             }
         }
         if(shotTime>=beamSpan)
@@ -63,6 +71,8 @@ public class BossShot : MonoBehaviour
             if(!beamSpawned)
             {
             Instantiate(BeamPrefab,sPawnPosition,beamRotation,parent);
+
+            PlaySE(beamShotSE);
 
             beamSpawned=true;
             }
